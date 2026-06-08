@@ -23,9 +23,12 @@ func _ready() -> void:
 	skip_button.pressed.connect(_on_skip_pressed)
 	stop_button.pressed.connect(_on_stop_pressed)
 	
-	_rebuild_timeline()
-	if pomodoro.segment_count() > 0:
-		_on_segment_changed(pomodoro.index)
+	pomodoro.focus_seconds = Save.settings.focus_seconds
+	pomodoro.short_break_seconds = Save.settings.short_break_seconds
+	pomodoro.long_break_seconds = Save.settings.long_break_seconds
+	pomodoro.total_focus_count = Save.settings.total_focus_count
+	
+	pomodoro.build_plan()
 
 func _on_start_pressed() -> void:
 	if pomodoro.is_running():

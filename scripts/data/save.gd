@@ -1,0 +1,41 @@
+extends Node
+
+const SAVE_PATH := "user://save.json"
+const VERSION := 1
+
+var settings := AppSettings.new()
+
+func _ready() -> void:
+	if FileAccess.file_exists(SAVE_PATH):
+		load_game()
+	else:
+		save_game()
+		
+func save_game() -> void:
+	var data := {
+		"version": VERSION,
+		"settings": settings.to_dict()
+	}
+	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		push_warning("Fail to Save: %s" % FileAccess.get_open_error())
+		return
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+		
+func load_game() -> void:
+	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if file == null:
+		push_warning("Fail to Load: %s" % FileAccess.get_open_error())
+		return
+	var text := file.get_as_text()
+	file.close()
+	
+	var parsed = JSON.parse_string(text)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		push_warning("Fail to parse save file - Use DEfault Value")
+		return
+	# var v = parsed.get("version", 1)으로 마이그레이션 분기 가능, 1은 version 넘버
+	var s = parsed.get("settings", {})
+	if typeof(s) == TYPE_DICTIONARY:
+		settings.from_dict(s)

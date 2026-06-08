@@ -30,7 +30,6 @@ layout_mode = 2
 
 [node name="Display" parent="VBox" unique_id=1791537411 instance=ExtResource("3_idk55")]
 layout_mode = 2
-show_label = false
 show_progress = false
 
 [node name="Timeline" type="HBoxContainer" parent="VBox" unique_id=43785777]
