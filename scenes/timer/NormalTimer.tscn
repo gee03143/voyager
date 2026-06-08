@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://jfww1o0hswu7"]
+
+[ext_resource type="Script" uid="uid://c6hpbriiaaf2o" path="res://scripts/timer/normaltimer/timer_view.gd" id="1_2r6ew"]
+[ext_resource type="PackedScene" uid="uid://cq7yhqdjngbua" path="res://scenes/timer/CountdownDisplay.tscn" id="2_2r6ew"]
+
+[node name="TimerView" type="Control" unique_id=262628283]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2r6ew")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=648587023]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TimeInput" type="HBoxContainer" parent="VBox" unique_id=338233110]
+layout_mode = 2
+
+[node name="HoursSpin" type="SpinBox" parent="VBox/TimeInput" unique_id=1943164772]
+layout_mode = 2
+max_value = 23.0
+
+[node name="MinutesSpin" type="SpinBox" parent="VBox/TimeInput" unique_id=1251915730]
+layout_mode = 2
+max_value = 60.0
+value = 5.0
+
+[node name="SecondsSpin" type="SpinBox" parent="VBox/TimeInput" unique_id=630759346]
+layout_mode = 2
+max_value = 60.0
+
+[node name="Display" parent="VBox" unique_id=1791537411 instance=ExtResource("2_2r6ew")]
+layout_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="VBox" unique_id=1713200098]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="VBox/Buttons" unique_id=1535105236]
+layout_mode = 2
+text = "시작"
+
+[node name="ResetButton" type="Button" parent="VBox/Buttons" unique_id=1289900996]
+layout_mode = 2
+text = "초기화"

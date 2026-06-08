@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://cg7wgy7ywwqqo"]
+
+[ext_resource type="PackedScene" uid="uid://bt2r4k76lwg1r" path="res://scenes/timer/PromoTimer.tscn" id="1_7acyi"]
+[ext_resource type="Script" uid="uid://rqx7h6rhy827" path="res://scripts/timer/clock_tab.gd" id="1_x1od2"]
+[ext_resource type="PackedScene" uid="uid://jfww1o0hswu7" path="res://scenes/timer/NormalTimer.tscn" id="2_x1od2"]
+
+[node name="ClockTab" type="HBoxContainer" unique_id=1281600236]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_x1od2")
+
+[node name="NavBar" type="VBoxContainer" parent="." unique_id=1443296133]
+layout_mode = 2
+
+[node name="SessionButton" type="Button" parent="NavBar" unique_id=237835619]
+layout_mode = 2
+text = " 세션"
+
+[node name="TimerButton" type="Button" parent="NavBar" unique_id=748744949]
+layout_mode = 2
+text = "타이머"
+
+[node name="Pages" type="TabContainer" parent="." unique_id=2083036606]
+layout_mode = 2
+current_tab = 0
+tabs_visible = false
+
+[node name="PomodoroView" parent="Pages" unique_id=2053074751 instance=ExtResource("1_7acyi")]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="TimerView" parent="Pages" unique_id=262628283 instance=ExtResource("2_x1od2")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1

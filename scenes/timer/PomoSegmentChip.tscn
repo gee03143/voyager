@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c10ctlv76ewq0"]
 
-[ext_resource type="Script" uid="uid://b0y2far0k4tyo" path="res://scripts/timer/pomo_segment_chip.gd" id="1_h6yc8"]
+[ext_resource type="Script" uid="uid://b0y2far0k4tyo" path="res://scripts/timer/pomo/pomo_segment_chip.gd" id="1_h6yc8"]
 
 [node name="PomoSegmentChip" type="PanelContainer" unique_id=1533364469]
 script = ExtResource("1_h6yc8")
@@ -13,3 +13,4 @@ layout_mode = 2
 
 [node name="Bar" type="ProgressBar" parent="VBox" unique_id=182519463]
 layout_mode = 2
+show_percentage = false
