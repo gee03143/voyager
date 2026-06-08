@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://bt2r4k76lwg1r"]
+
+[ext_resource type="Script" uid="uid://dbmhimic6eb4" path="res://scripts/timer/pomo_timer.gd" id="1_s7lvo"]
+
+[node name="PomodoroTimer" type="Control" unique_id=2053074751]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_s7lvo")
+focus_seconds = 10.0
+
+[node name="Clock" type="Timer" parent="." unique_id=1858917175]
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=48566559]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TimeLabel" type="Label" parent="VBox" unique_id=436305482]
+layout_mode = 2
+
+[node name="Progress" type="ProgressBar" parent="VBox" unique_id=79337924]
+layout_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="VBox" unique_id=922875682]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="VBox/Buttons" unique_id=116232457]
+layout_mode = 2
+text = "시작"
+
+[node name="ResetButton" type="Button" parent="VBox/Buttons" unique_id=979814140]
+layout_mode = 2
+text = "리셋"

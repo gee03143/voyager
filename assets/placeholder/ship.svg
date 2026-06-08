@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- sail (main) -->
+  <path d="M64 18 L64 86 L106 86 Z" fill="#f2e9d8" stroke="#cbbfa6" stroke-width="2"/>
+  <!-- sail (jib) -->
+  <path d="M60 34 L60 86 L26 86 Z" fill="#e6dcc6" stroke="#cbbfa6" stroke-width="2"/>
+  <!-- mast -->
+  <rect x="62" y="14" width="4" height="74" fill="#6b4a2b"/>
+  <!-- hull -->
+  <path d="M20 88 L108 88 L96 108 L32 108 Z" fill="#6b4a2b" stroke="#4a3119" stroke-width="2"/>
+</svg>

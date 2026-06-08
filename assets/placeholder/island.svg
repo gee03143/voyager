@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- sand -->
+  <ellipse cx="64" cy="92" rx="48" ry="20" fill="#e8d4a0" stroke="#cbb27e" stroke-width="2"/>
+  <!-- hill -->
+  <path d="M40 92 q24 -44 48 0 Z" fill="#4a7c3f" stroke="#375e2f" stroke-width="2"/>
+  <!-- palm trunk -->
+  <rect x="61" y="44" width="6" height="30" rx="2" fill="#6b4a2b"/>
+  <!-- palm leaves -->
+  <path d="M64 46 q-22 -8 -30 4 q20 -2 30 2" fill="#4a7c3f"/>
+  <path d="M64 46 q22 -8 30 4 q-20 -2 -30 2" fill="#4a7c3f"/>
+</svg>
