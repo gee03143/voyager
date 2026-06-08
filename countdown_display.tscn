@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://dffryut6jgye"]
+
+[ext_resource type="Script" uid="uid://bf8fsno5h44rx" path="res://scripts/timer/countdown_display.gd" id="1_nqk8x"]
+
+[node name="CountdownDisplay" type="VBoxContainer" unique_id=1489271170]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_nqk8x")
+
+[node name="TimeLabel" type="Label" parent="." unique_id=256470286]
+layout_mode = 2
+
+[node name="Progress" type="ProgressBar" parent="." unique_id=2140242025]
+layout_mode = 2

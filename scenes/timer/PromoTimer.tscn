@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bt2r4k76lwg1r"]
+
+[ext_resource type="Script" uid="uid://dbmhimic6eb4" path="res://scripts/timer/pomodoro_view.gd" id="1_s7lvo"]
+[ext_resource type="Script" uid="uid://dnmhjxnc3yc02" path="res://scripts/timer/pomodoro.gd" id="2_idk55"]
+[ext_resource type="PackedScene" uid="uid://cq7yhqdjngbua" path="res://scenes/timer/CountdownDisplay.tscn" id="3_idk55"]
+
+[node name="PomodoroView" type="Control" unique_id=2053074751]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_s7lvo")
+
+[node name="Pomodoro" type="Node" parent="." unique_id=2076633591]
+script = ExtResource("2_idk55")
+focus_seconds = 5.0
+short_break_seconds = 1.0
+long_break_seconds = 2.0
+metadata/_custom_type_script = "uid://dnmhjxnc3yc02"
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=48566559]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PhaseLabel" type="Label" parent="VBox" unique_id=436305482]
+layout_mode = 2
+
+[node name="Display" parent="VBox" unique_id=1791537411 instance=ExtResource("3_idk55")]
+layout_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="VBox" unique_id=922875682]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="VBox/Buttons" unique_id=116232457]
+layout_mode = 2
+text = "시작"
+
+[node name="SkipButton" type="Button" parent="VBox/Buttons" unique_id=270872340]
+layout_mode = 2
+text = "건너뛰기"
+
+[node name="StopButton" type="Button" parent="VBox/Buttons" unique_id=979814140]
+layout_mode = 2
+text = "리셋"

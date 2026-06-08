@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cq7yhqdjngbua"]
+
+[ext_resource type="Script" uid="uid://bf8fsno5h44rx" path="res://scripts/timer/countdown_display.gd" id="1_o76a2"]
+
+[node name="Display" type="VBoxContainer" unique_id=1791537411]
+script = ExtResource("1_o76a2")
+metadata/_custom_type_script = "uid://bf8fsno5h44rx"
+
+[node name="TimeLabel" type="Label" parent="." unique_id=601996611]
+layout_mode = 2
+
+[node name="Progress" type="ProgressBar" parent="." unique_id=860629080]
+layout_mode = 2
