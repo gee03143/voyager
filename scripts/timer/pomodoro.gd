@@ -5,6 +5,7 @@ signal ticked(time_left: float)
 signal segment_changed(index: int)
 signal focus_finished
 signal session_completed
+signal plan_built
 
 enum SegmentType { FOCUS, SHORT_BREAK, LONG_BREAK }
 
@@ -41,6 +42,7 @@ func build_plan() -> void:
 	if segment_types.is_empty():
 		finished = true
 		return
+	plan_built.emit() 
 	_load_segment(0, false)
 	
 func start() -> void:

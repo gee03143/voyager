@@ -1,22 +1,29 @@
 extends Control
 
+const SEGMENT_CHIP := preload("res://scenes/timer/PomoSegmentChip.tscn")
+
 @onready var pomodoro: Pomodoro = $Pomodoro
 @onready var phase_label: Label = $VBox/PhaseLabel
 @onready var display: CountdownDisplay = $VBox/Display
+@onready var timeline: HBoxContainer = $VBox/Timeline
 @onready var start_button: Button = $VBox/Buttons/StartButton
 @onready var skip_button: Button = $VBox/Buttons/SkipButton
 @onready var stop_button: Button = $VBox/Buttons/StopButton
+
+var _chips: Array[PomoSegmentChip] = []
 
 func _ready() -> void:
 	pomodoro.ticked.connect(_on_ticked)
 	pomodoro.segment_changed.connect(_on_segment_changed)
 	pomodoro.focus_finished.connect(_on_focus_finished)
 	pomodoro.session_completed.connect(_on_session_completed)
+	pomodoro.plan_built.connect(_rebuild_timeline)
 
 	start_button.pressed.connect(_on_start_pressed)
 	skip_button.pressed.connect(_on_skip_pressed)
 	stop_button.pressed.connect(_on_stop_pressed)
 	
+	_rebuild_timeline()
 	if pomodoro.segment_count() > 0:
 		_on_segment_changed(pomodoro.index)
 
@@ -38,10 +45,15 @@ func _on_segment_changed(i: int) -> void:
 	var type := pomodoro.segment_type_at(i)
 	display.set_total(pomodoro.duration_of(type))
 	phase_label.text = "%s  ·  %d / %d 구간" % [_type_name(type), i + 1, pomodoro.segment_count()]
+	_update_chip_states()
 	_refresh_controls()
 
 func _on_ticked(time_left: float) -> void:
 	display.render(time_left)
+	if pomodoro.index < _chips.size():
+		var total := pomodoro.duration_of(pomodoro.segment_type_at(pomodoro.index))
+		var ratio := ((total - time_left) / total) if total > 0.0 else 0.0
+		_chips[pomodoro.index].set_progress(ratio)
 
 func _on_focus_finished() -> void:
 	print("집중 1구간 완료! (나중에 항해 진행)")
@@ -49,12 +61,35 @@ func _on_focus_finished() -> void:
 func _on_session_completed() -> void:
 	phase_label.text = "세션 완료!"
 	display.render(0.0)
+	_update_chip_states()
 	_refresh_controls()
 
 func _refresh_controls() -> void:
 	start_button.text = "일시정지" if pomodoro.is_running() else "시작"
 	start_button.disabled = pomodoro.finished
 	skip_button.disabled = pomodoro.finished or not pomodoro.started
+	
+func _rebuild_timeline() -> void:
+	for chip in _chips:
+		chip.queue_free()
+	_chips.clear()
+	for i in pomodoro.segment_count():
+		var chip := SEGMENT_CHIP.instantiate() as PomoSegmentChip
+		timeline.add_child(chip)          # 먼저 트리에 넣어야 chip 의 @onready 가 준비됨
+		chip.setup(pomodoro.segment_type_at(i))
+		_chips.append(chip)
+	_update_chip_states()
+	
+func _update_chip_states() -> void:
+	for i in _chips.size():
+		var state: int
+		if pomodoro.finished or i < pomodoro.index:
+			state = PomoSegmentChip.State.DONE
+		elif i == pomodoro.index:
+			state = PomoSegmentChip.State.ACTIVE
+		else:
+			state = PomoSegmentChip.State.PENDING
+		_chips[i].set_state(state)
 
 func _type_name(type: int) -> String:
 	match type:

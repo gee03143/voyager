@@ -31,6 +31,9 @@ layout_mode = 2
 [node name="Display" parent="VBox" unique_id=1791537411 instance=ExtResource("3_idk55")]
 layout_mode = 2
 
+[node name="Timeline" type="HBoxContainer" parent="VBox" unique_id=43785777]
+layout_mode = 2
+
 [node name="Buttons" type="HBoxContainer" parent="VBox" unique_id=922875682]
 layout_mode = 2
 
