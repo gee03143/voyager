@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Save="*uid://b46e2jhwgai18"
+Sound="*uid://b0fwg4wdcey2j"
 
 [physics]
 
