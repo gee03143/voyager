@@ -6,6 +6,7 @@ var focus_seconds: float = 25 * 60
 var short_break_seconds: float = 5 * 60
 var long_break_seconds: float = 15 * 60
 var total_focus_count: int = 4
+var timer_seconds: float = 5 * 60
 
 func to_dict() -> Dictionary:
 	return {
@@ -13,6 +14,7 @@ func to_dict() -> Dictionary:
 		"short_break_seconds": short_break_seconds,
 		"long_break_seconds": long_break_seconds,
 		"total_focus_count": total_focus_count,
+		"timer_seconds": timer_seconds,
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -21,3 +23,4 @@ func from_dict(d: Dictionary) -> void:
 	short_break_seconds = d.get("short_break_seconds", short_break_seconds)
 	long_break_seconds = d.get("long_break_seconds", long_break_seconds)
 	total_focus_count = max(1, int(d.get("total_focus_count", total_focus_count)))
+	timer_seconds = d.get("timer_seconds", timer_seconds)

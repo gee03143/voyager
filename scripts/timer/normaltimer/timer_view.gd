@@ -14,12 +14,18 @@ func _ready() -> void:
 	add_child(_timer)
 	_timer.ticked.connect(_on_ticked)
 	_timer.timer_finished.connect(_on_finished)
-
+	
+	start_button.pressed.connect(_on_start_pressed)
+	reset_button.pressed.connect(_on_reset_pressed)
+	
+	var total := int(Save.settings.timer_seconds)
+	hours_spin.value = total / 3600
+	minutes_spin.value = (total % 3600) / 60
+	seconds_spin.value = total % 60
+	
 	hours_spin.value_changed.connect(_on_time_changed)
 	minutes_spin.value_changed.connect(_on_time_changed)
 	seconds_spin.value_changed.connect(_on_time_changed)
-	start_button.pressed.connect(_on_start_pressed)
-	reset_button.pressed.connect(_on_reset_pressed)
 
 	_apply_duration()
 
@@ -40,8 +46,15 @@ func _on_start_pressed() -> void:
 	if _timer.is_running():
 		_timer.pause()
 	else:
+		var was_started := _timer.started
 		_timer.start()
+		if not was_started and _timer.started:
+			_save_settings()
 	_refresh_controls()
+
+func _save_settings() -> void:
+	Save.settings.timer_seconds = _input_seconds()
+	Save.save_game()
 
 func _on_reset_pressed() -> void:
 	_timer.reset()
@@ -56,10 +69,11 @@ func _on_finished() -> void:
 
 func _refresh_controls() -> void:
 	var running := _timer.is_running()
+	var is_standby := not _timer.started
 	start_button.text = "일시정지" if running else "시작"
 	start_button.disabled = _timer.finished
-	reset_button.disabled = not _timer.started
+	reset_button.disabled = is_standby
 
-	hours_spin.editable = not running
-	minutes_spin.editable = not running
-	seconds_spin.editable = not running
+	hours_spin.editable = is_standby
+	minutes_spin.editable = is_standby
+	seconds_spin.editable = is_standby

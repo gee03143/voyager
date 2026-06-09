@@ -9,6 +9,10 @@ const SEGMENT_CHIP := preload("res://scenes/timer/PomoSegmentChip.tscn")
 @onready var start_button: Button = $VBox/Buttons/StartButton
 @onready var skip_button: Button = $VBox/Buttons/SkipButton
 @onready var stop_button: Button = $VBox/Buttons/StopButton
+@onready var focus_spin: SpinBox = $VBox/Config/FocusSpin
+@onready var short_break_spin: SpinBox = $VBox/Config/ShortBreakSpin
+@onready var long_break_spin: SpinBox = $VBox/Config/LongBreakSpin
+@onready var count_spin: SpinBox = $VBox/Config/CountSpin
 
 var _chips: Array[PomoSegmentChip] = []
 
@@ -23,18 +27,45 @@ func _ready() -> void:
 	skip_button.pressed.connect(_on_skip_pressed)
 	stop_button.pressed.connect(_on_stop_pressed)
 	
-	pomodoro.focus_seconds = Save.settings.focus_seconds
-	pomodoro.short_break_seconds = Save.settings.short_break_seconds
-	pomodoro.long_break_seconds = Save.settings.long_break_seconds
-	pomodoro.total_focus_count = Save.settings.total_focus_count
+	focus_spin.value = Save.settings.focus_seconds / 60.0
+	short_break_spin.value = Save.settings.short_break_seconds / 60.0
+	long_break_spin.value = Save.settings.long_break_seconds / 60.0
+	count_spin.value = Save.settings.total_focus_count
+
+	focus_spin.value_changed.connect(_on_config_changed)
+	short_break_spin.value_changed.connect(_on_config_changed)
+	long_break_spin.value_changed.connect(_on_config_changed)
+	count_spin.value_changed.connect(_on_config_changed)
 	
+	_configure_pomodoro()
+	
+func _configure_pomodoro() -> void:
+	pomodoro.focus_seconds = focus_spin.value * 60.0
+	pomodoro.short_break_seconds = short_break_spin.value * 60.0
+	pomodoro.long_break_seconds = long_break_spin.value * 60.0
+	pomodoro.total_focus_count = int(count_spin.value)
 	pomodoro.build_plan()
+	
+func _on_config_changed(_v: float) -> void:
+	if pomodoro.started:
+		return
+	_configure_pomodoro()
+
+func _save_settings() -> void:
+	Save.settings.focus_seconds = focus_spin.value * 60.0
+	Save.settings.short_break_seconds = short_break_spin.value * 60.0
+	Save.settings.long_break_seconds = long_break_spin.value * 60.0
+	Save.settings.total_focus_count = int(count_spin.value)
+	Save.save_game()
 
 func _on_start_pressed() -> void:
 	if pomodoro.is_running():
 		pomodoro.pause()
 	else:
+		var fresh := not pomodoro.started
 		pomodoro.start()
+		if fresh:
+			_save_settings()
 	_refresh_controls()
 
 func _on_skip_pressed() -> void:
@@ -71,6 +102,12 @@ func _refresh_controls() -> void:
 	start_button.text = "일시정지" if pomodoro.is_running() else "시작"
 	start_button.disabled = pomodoro.finished
 	skip_button.disabled = pomodoro.finished or not pomodoro.started
+	
+	var locked := pomodoro.started
+	focus_spin.editable = not locked
+	short_break_spin.editable = not locked
+	long_break_spin.editable = not locked
+	count_spin.editable = not locked
 	
 func _rebuild_timeline() -> void:
 	for chip in _chips:

@@ -25,7 +25,6 @@ func _ready() -> void:
 	add_child(_countdown)
 	_countdown.ticked.connect(_on_countdown_ticked)
 	_countdown.finished.connect(_on_countdown_finished)
-	build_plan()
 	
 func build_plan() -> void:
 	segment_types.clear()
@@ -42,7 +41,7 @@ func build_plan() -> void:
 	if segment_types.is_empty():
 		finished = true
 		return
-	plan_built.emit() 
+	plan_built.emit()
 	_load_segment(0, false)
 	
 func start() -> void:
