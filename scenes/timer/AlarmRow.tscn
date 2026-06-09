@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://bvhnacto7xgw8"]
+
+[ext_resource type="Script" uid="uid://cs63mhncy7ykh" path="res://scripts/timer/alarm/alarm_row.gd" id="1_24chh"]
+
+[node name="AlarmRow" type="PanelContainer" unique_id=930500851]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_24chh")
+
+[node name="HBox" type="HBoxContainer" parent="." unique_id=1347215076]
+layout_mode = 2
+
+[node name="HourSpin" type="SpinBox" parent="HBox" unique_id=239337183]
+layout_mode = 2
+min_value = 1.0
+max_value = 12.0
+value = 1.0
+
+[node name="MinuteSpin" type="SpinBox" parent="HBox" unique_id=864338635]
+layout_mode = 2
+max_value = 59.0
+
+[node name="AmPmOption" type="OptionButton" parent="HBox" unique_id=1802484407]
+layout_mode = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "AM"
+popup/item_0/id = 0
+popup/item_1/text = "PM"
+popup/item_1/id = 1
+
+[node name="NameEdit" type="LineEdit" parent="HBox" unique_id=697522623]
+layout_mode = 2
+placeholder_text = "My Alarm"
+alignment = 3
+
+[node name="EnabledToggle" type="CheckButton" parent="HBox" unique_id=58698495]
+layout_mode = 2
+
+[node name="DeleteButton" type="Button" parent="HBox" unique_id=467228259]
+layout_mode = 2
+text = "X"

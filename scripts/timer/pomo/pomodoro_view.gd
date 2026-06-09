@@ -1,10 +1,9 @@
-extends Control
+extends ClockToolView
 
 const SEGMENT_CHIP := preload("res://scenes/timer/PomoSegmentChip.tscn")
 
 @onready var pomodoro: Pomodoro = $Pomodoro
 @onready var phase_label: Label = $VBox/PhaseLabel
-@onready var display: CountdownDisplay = $VBox/Display
 @onready var timeline: HBoxContainer = $VBox/Timeline
 @onready var start_button: Button = $VBox/Buttons/StartButton
 @onready var skip_button: Button = $VBox/Buttons/SkipButton
@@ -39,6 +38,8 @@ func _ready() -> void:
 	
 	_configure_pomodoro()
 	
+	_init_clock_tool()
+	
 func _configure_pomodoro() -> void:
 	pomodoro.focus_seconds = focus_spin.value * 60.0
 	pomodoro.short_break_seconds = short_break_spin.value * 60.0
@@ -66,6 +67,8 @@ func _on_start_pressed() -> void:
 		pomodoro.start()
 		if fresh:
 			_save_settings()
+			_play_alert()
+			_try_minimize()
 	_refresh_controls()
 
 func _on_skip_pressed() -> void:
@@ -97,6 +100,7 @@ func _on_session_completed() -> void:
 	display.render(0.0)
 	_update_chip_states()
 	_refresh_controls()
+	_play_alert()
 
 func _refresh_controls() -> void:
 	start_button.text = "일시정지" if pomodoro.is_running() else "시작"
@@ -140,3 +144,6 @@ func _type_name(type: int) -> String:
 		Pomodoro.SegmentType.LONG_BREAK:
 			return "긴 휴식"
 	return "집중"
+	
+func _is_active() -> bool:
+	return pomodoro.is_running()

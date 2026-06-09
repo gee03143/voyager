@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bw6mwyph0cd2q"]
+
+[ext_resource type="Script" uid="uid://cxjdgyhcfybif" path="res://scripts/timer/alarm/alarm_view.gd" id="1_o5vqa"]
+
+[node name="AlarmView" type="VBoxContainer" unique_id=1237746273]
+offset_left = 68.0
+offset_top = 41.0
+offset_right = 108.0
+offset_bottom = 81.0
+script = ExtResource("1_o5vqa")
+
+[node name="List" type="VBoxContainer" parent="." unique_id=792546251]
+layout_mode = 2
+
+[node name="AddButton" type="Button" parent="." unique_id=1768961754]
+layout_mode = 2
+text = "새 알림 추가"

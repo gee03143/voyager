@@ -3,6 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://bt2r4k76lwg1r" path="res://scenes/timer/PromoTimer.tscn" id="1_7acyi"]
 [ext_resource type="Script" uid="uid://rqx7h6rhy827" path="res://scripts/timer/clock_tab.gd" id="1_x1od2"]
 [ext_resource type="PackedScene" uid="uid://jfww1o0hswu7" path="res://scenes/timer/NormalTimer.tscn" id="2_x1od2"]
+[ext_resource type="PackedScene" uid="uid://bw6mwyph0cd2q" path="res://scenes/timer/AlarmView.tscn" id="4_1c1or"]
+[ext_resource type="PackedScene" uid="uid://bixwrmbaykoda" path="res://scenes/timer/settings_view.tscn" id="5_j8guo"]
 
 [node name="ClockTab" type="HBoxContainer" unique_id=1281600236]
 offset_right = 40.0
@@ -20,6 +22,14 @@ text = " 세션"
 layout_mode = 2
 text = "타이머"
 
+[node name="AlarmButton" type="Button" parent="NavBar" unique_id=216339813]
+layout_mode = 2
+text = "알람"
+
+[node name="SettingButton" type="Button" parent="NavBar" unique_id=1844104058]
+layout_mode = 2
+text = "설정"
+
 [node name="Pages" type="TabContainer" parent="." unique_id=2083036606]
 layout_mode = 2
 current_tab = 0
@@ -33,3 +43,13 @@ metadata/_tab_index = 0
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
+
+[node name="AlarmView" parent="Pages" unique_id=1237746273 instance=ExtResource("4_1c1or")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="SettingsView" parent="Pages" unique_id=1076172766 instance=ExtResource("5_j8guo")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3

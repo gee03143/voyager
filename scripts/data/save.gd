@@ -4,17 +4,24 @@ const SAVE_PATH := "user://save.json"
 const VERSION := 1
 
 var settings := AppSettings.new()
+var alarms: Array[Alarm] = []
 
 func _ready() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		load_game()
 	else:
 		save_game()
+	settings.changed.connect(save_game)
 		
 func save_game() -> void:
+	var alarm_dicts := []
+	for a in alarms:
+		alarm_dicts.append(a.to_dict())
+	
 	var data := {
 		"version": VERSION,
-		"settings": settings.to_dict()
+		"settings": settings.to_dict(),
+		"alarms": alarm_dicts,
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -39,3 +46,8 @@ func load_game() -> void:
 	var s = parsed.get("settings", {})
 	if typeof(s) == TYPE_DICTIONARY:
 		settings.from_dict(s)
+		
+	alarms.clear()
+	for d in parsed.get("alarms", []):
+		if typeof(d) == TYPE_DICTIONARY:
+			alarms.append(Alarm.from_dict(d))

@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://bixwrmbaykoda"]
+
+[ext_resource type="Script" uid="uid://brjnvgbkk8wqd" path="res://scripts/timer/settings_view.gd" id="1_f40fm"]
+
+[node name="SettingsView" type="VBoxContainer" unique_id=1076172766]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_f40fm")
+
+[node name="Grid" type="GridContainer" parent="." unique_id=2027710573]
+layout_mode = 2
+columns = 2
+
+[node name="SoundLabel" type="Label" parent="Grid" unique_id=184301445]
+layout_mode = 2
+text = "소리 설정"
+
+[node name="SoundRow" type="HBoxContainer" parent="Grid" unique_id=953800017]
+layout_mode = 2
+
+[node name="SoundSetOption" type="OptionButton" parent="Grid/SoundRow" unique_id=1138641599]
+layout_mode = 2
+item_count = 2
+popup/item_0/text = "Set 1"
+popup/item_0/id = 0
+popup/item_1/text = "Set 2"
+popup/item_1/id = 1
+
+[node name="PreviewButton" type="Button" parent="Grid/SoundRow" unique_id=1694856664]
+layout_mode = 2
+text = "▶"
+
+[node name="Label" type="Label" parent="Grid" unique_id=1846822024]
+layout_mode = 2
+text = "활성 시 자동 최소화"
+
+[node name="AutoMinimizeOption" type="OptionButton" parent="Grid" unique_id=2135390619]
+layout_mode = 2
+selected = 1
+item_count = 2
+popup/item_0/text = "Disabled"
+popup/item_0/id = 0
+popup/item_1/text = "Enabled"
+popup/item_1/id = 1
+
+[node name="Label2" type="Label" parent="Grid" unique_id=955685233]
+layout_mode = 2
+text = "카운트다운 숨기기"
+
+[node name="HideCountdownOption" type="OptionButton" parent="Grid" unique_id=1413186036]
+layout_mode = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "Disabled"
+popup/item_0/id = 0
+popup/item_1/text = "Enabled"
+popup/item_1/id = 1

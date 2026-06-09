@@ -1,9 +1,8 @@
-extends Control
+extends ClockToolView
 
 @onready var hours_spin: SpinBox = $VBox/TimeInput/HoursSpin
 @onready var minutes_spin: SpinBox = $VBox/TimeInput/MinutesSpin
 @onready var seconds_spin: SpinBox = $VBox/TimeInput/SecondsSpin
-@onready var display: CountdownDisplay = $VBox/Display
 @onready var start_button: Button = $VBox/Buttons/StartButton
 @onready var reset_button: Button = $VBox/Buttons/ResetButton
 
@@ -28,6 +27,8 @@ func _ready() -> void:
 	seconds_spin.value_changed.connect(_on_time_changed)
 
 	_apply_duration()
+	
+	_init_clock_tool()
 
 func _input_seconds() -> float:
 	return hours_spin.value * 3600.0 + minutes_spin.value * 60.0 + seconds_spin.value
@@ -50,6 +51,8 @@ func _on_start_pressed() -> void:
 		_timer.start()
 		if not was_started and _timer.started:
 			_save_settings()
+			_play_alert()
+			_try_minimize()
 	_refresh_controls()
 
 func _save_settings() -> void:
@@ -66,6 +69,7 @@ func _on_ticked(time_left: float) -> void:
 func _on_finished() -> void:
 	print("타이머 완료!")
 	_refresh_controls()
+	_play_alert()
 
 func _refresh_controls() -> void:
 	var running := _timer.is_running()
@@ -77,3 +81,6 @@ func _refresh_controls() -> void:
 	hours_spin.editable = is_standby
 	minutes_spin.editable = is_standby
 	seconds_spin.editable = is_standby
+
+func _is_active() -> bool:
+	return _timer.is_running()
