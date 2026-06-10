@@ -5,6 +5,7 @@ const VERSION := 1
 
 var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
+var todos: Array[Todo] = []
 
 func _ready() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
@@ -12,17 +13,26 @@ func _ready() -> void:
 	else:
 		save_game()
 	settings.changed.connect(save_game)
+	
 		
 func save_game() -> void:
+	# alarms
 	var alarm_dicts := []
 	for a in alarms:
 		alarm_dicts.append(a.to_dict())
+	
+	# todos
+	var todo_dicts := []
+	for t in todos:
+		todo_dicts.append(t.to_dict())
 	
 	var data := {
 		"version": VERSION,
 		"settings": settings.to_dict(),
 		"alarms": alarm_dicts,
+		"todos": todo_dicts,
 	}
+	
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_warning("Fail to Save: %s" % FileAccess.get_open_error())
@@ -51,3 +61,8 @@ func load_game() -> void:
 	for d in parsed.get("alarms", []):
 		if typeof(d) == TYPE_DICTIONARY:
 			alarms.append(Alarm.from_dict(d))
+			
+	todos.clear()
+	for d in parsed.get("todos", []):
+		if typeof(d) == TYPE_DICTIONARY:
+			todos.append(Todo.from_dict(d))

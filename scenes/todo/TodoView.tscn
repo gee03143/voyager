@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://buc68m4bpnu7y"]
+
+[ext_resource type="Script" uid="uid://8cdnqtuqcugh" path="res://scenes/todo/todo_view.gd" id="1_kn15c"]
+
+[node name="TodoView" type="VBoxContainer" unique_id=1298183729]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_kn15c")
+
+[node name="List" type="VBoxContainer" parent="." unique_id=101199513]
+layout_mode = 2
+
+[node name="AddButton" type="Button" parent="." unique_id=1400148124]
+layout_mode = 2
+text = "+ 새로운 과제 추가하기"
