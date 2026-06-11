@@ -7,6 +7,9 @@ var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
 var todos: Array[Todo] = []
 
+var todos_sort_key: int = 0       # 0=수동 1=마감일 2=이름 3=완료
+var todos_sort_desc: bool = false
+
 func _ready() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		load_game()
@@ -31,6 +34,8 @@ func save_game() -> void:
 		"settings": settings.to_dict(),
 		"alarms": alarm_dicts,
 		"todos": todo_dicts,
+		"todos_sort_key": todos_sort_key,
+		"todos_sort_desc": todos_sort_desc,
 	}
 	
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -66,3 +71,6 @@ func load_game() -> void:
 	for d in parsed.get("todos", []):
 		if typeof(d) == TYPE_DICTIONARY:
 			todos.append(Todo.from_dict(d))
+			
+	todos_sort_key = int(parsed.get("todos_sort_key", 0))
+	todos_sort_desc = bool(parsed.get("todos_sort_desc", false))

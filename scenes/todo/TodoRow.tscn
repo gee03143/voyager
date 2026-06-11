@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dskufppwuhs1"]
 
-[ext_resource type="Script" uid="uid://7pujsblbfa33" path="res://scenes/todo/todo_row.gd" id="1_rnimk"]
+[ext_resource type="Script" uid="uid://7pujsblbfa33" path="res://scripts/todo/todo_row.gd" id="1_rnimk"]
 
 [node name="TodoRow" type="PanelContainer" unique_id=1444403424]
 offset_right = 40.0
@@ -13,8 +13,26 @@ layout_mode = 2
 [node name="DoneCheck" type="CheckBox" parent="HBox" unique_id=484451728]
 layout_mode = 2
 
-[node name="TextEdit" type="LineEdit" parent="HBox" unique_id=1013532684]
+[node name="TextDisplay" type="RichTextLabel" parent="HBox" unique_id=495020976]
 layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "
+"
+scroll_active = false
+autowrap_mode = 0
+
+[node name="TextEdit" type="LineEdit" parent="HBox" unique_id=1013532684]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DueLabel" type="Label" parent="HBox" unique_id=1191919652]
+layout_mode = 2
+
+[node name="DueButton" type="Button" parent="HBox" unique_id=12485494]
+layout_mode = 2
+text = "📅"
 
 [node name="DeleteButton" type="Button" parent="HBox" unique_id=362496066]
 layout_mode = 2
