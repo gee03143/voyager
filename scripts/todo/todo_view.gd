@@ -1,18 +1,18 @@
 extends VBoxContainer
 
-enum SortKey { MANUAL, DUE, NAME, DONE }
-const SORT_NAMES := ["수동", "마감일", "이름", "완료상태"]
-
 const TODO_ROW := preload("res://scenes/todo/TodoRow.tscn")
 const DUE_POPUP := preload("res://scenes/todo/DuePopup.tscn")
+const GROUP_EDIT_POPUP := preload("res://scenes/todo/GroupEditPopup.tscn")
 const SAVE_DEBOUNCE := 0.5
 
 @onready var list: VBoxContainer = $List
 @onready var progress: ProgressBar = $ProgressRow/ProgressBar
 @onready var progress_label: Label = $ProgressRow/ProgressLabel
 @onready var add_button: Button = $AddButton
+@onready var group_option: OptionButton = $Header/GroupOption
 @onready var sort_key_button: MenuButton = $Header/SortKeyButton
 @onready var sort_dir_button: Button = $Header/SortDirButton
+@onready var group_edit_button: Button = $Header/GroupEditButton
 
 var _rows: Array[TodoRow] = []
 var _save_timer: Timer
@@ -20,9 +20,13 @@ var _save_timer: Timer
 var _due_popup: DuePopup
 var _editing_row: TodoRow = null
 
-var _sort_key: int = SortKey.MANUAL
+var _group_edit_popup: GroupEditPopup
+
+var _group: TodoGroup
+
+var _sort_key: int = TodoSort.Key.MANUAL
 var _sort_desc: bool = false
-var _order_idx := {}     #tiebreak
+var _sorter := TodoSort.new()             # _order_idx 대체
 
 func _ready() -> void:
 	_save_timer = Timer.new()
@@ -36,19 +40,19 @@ func _ready() -> void:
 	add_child(_due_popup)
 	_due_popup.confirmed.connect(_on_due_confirmed)
 	_due_popup.popup_hide.connect(func(): _editing_row = null)
+	
+	_group_edit_popup = GROUP_EDIT_POPUP.instantiate()
+	add_child(_group_edit_popup)
+	_group_edit_popup.groups_changed.connect(_on_groups_changed)
+	group_edit_button.pressed.connect(func(): _group_edit_popup.open())
 
 	var pm := sort_key_button.get_popup()
 	pm.id_pressed.connect(_on_sort_key_selected)
 	sort_dir_button.pressed.connect(_on_sort_dir_toggled)
-
-	_sort_key = clampi(Save.todos_sort_key, 0, SORT_NAMES.size() - 1)
-	_sort_desc = Save.todos_sort_desc
-
-	for todo in Save.todos:          # 저장된 할 일 복원
-		_add_row(todo)
-	_update_progress()
-	_update_sort_ui()
-	_apply_sort()
+	
+	group_option.item_selected.connect(_on_group_selected)
+	_refresh_group_dropdown()
+	_load_group(Save.current_group_index)
 
 func _add_row(todo: Todo) -> TodoRow:
 	var row := TODO_ROW.instantiate() as TodoRow
@@ -71,13 +75,12 @@ func _on_row_delete(row: TodoRow) -> void:
 	_on_list_changed()
 
 func _on_list_changed() -> void:
-	# 행 전체 → Save.todos 스냅샷 (메모리 즉시)
-	Save.todos.clear()
+	_group.tasks.clear()
 	for r in _rows:
-		Save.todos.append(r.get_data())
+		_group.tasks.append(r.get_data())
 	_update_progress()
 	_apply_sort()
-	_save_timer.start()              # 디스크 저장은 디바운스
+	_save_timer.start()
 	
 func _update_progress() -> void:
 	var total := _rows.size()
@@ -97,7 +100,14 @@ func _on_due_edit(row: TodoRow) -> void:
 func _on_due_confirmed(iso: String) -> void:
 	if _editing_row:
 		_editing_row.set_due(iso)             # set_due 가 changed → 저장
-		
+
+func _on_groups_changed() -> void:
+	if Save.todo_groups.find(_group) == -1:          # 활성 그룹이 삭제됨
+		_load_group(clampi(Save.current_group_index, 0, Save.todo_groups.size() - 1))
+	Save.current_group_index = Save.todo_groups.find(_group)   # 정체성으로 현재 인덱스 갱신
+	_refresh_group_dropdown()
+	_save_timer.start()
+	
 func _on_sort_key_selected(id: int) -> void:
 	_sort_key = id
 	_persist_sort()
@@ -111,44 +121,41 @@ func _on_sort_dir_toggled() -> void:
 	_apply_sort()
 
 func _update_sort_ui() -> void:
-	sort_key_button.text = "정렬: %s" % SORT_NAMES[_sort_key]
+	sort_key_button.text = "정렬: %s" % TodoSort.NAMES[_sort_key]
 	sort_dir_button.text = "🔽" if _sort_desc else "🔼"
 
 func _persist_sort() -> void:
-	Save.todos_sort_key = _sort_key
-	Save.todos_sort_desc = _sort_desc
+	_group.sort_key = _sort_key
+	_group.sort_desc = _sort_desc
 	_save_timer.start()
 
 func _apply_sort() -> void:
-	_order_idx.clear()
-	for i in _rows.size():
-		_order_idx[_rows[i]] = i           # 수동 순서 = 동순위 기준
-	var ordered := _rows.duplicate()
-	match _sort_key:
-		SortKey.DUE:  ordered.sort_custom(_cmp_due)
-		SortKey.NAME: ordered.sort_custom(_cmp_name)
-		SortKey.DONE: ordered.sort_custom(_cmp_done)
-		_:                                   # 수동: _rows 순서
-			if _sort_desc: ordered.reverse()
+	var ordered := _sorter.ordered(_rows, _sort_key, _sort_desc)
 	for i in ordered.size():
-		list.move_child(ordered[i], i)       # 화면(자식 순서)만 재배치, _rows 불변
+		list.move_child(ordered[i], i)        # 화면(자식 순서)만 재배치
+	
+func _refresh_group_dropdown() -> void:
+	group_option.clear()
+	for i in Save.todo_groups.size():
+		group_option.add_item(Save.todo_groups[i].name, i)
+	group_option.select(Save.current_group_index)
 
-func _cmp_due(a: TodoRow, b: TodoRow) -> bool:
-	var da := a.get_due()
-	var db := b.get_due()
-	if da.is_empty() or db.is_empty():
-		if da.is_empty() == db.is_empty():
-			return _order_idx[a] < _order_idx[b]   # 둘 다 없음 → 수동 순서
-		return db.is_empty()                        # 없는 건 항상 뒤
-	if da == db: return false
-	return (da < db) != _sort_desc
+func _on_group_selected(idx: int) -> void:
+	_load_group(idx)
+	Save.current_group_index = clampi(idx, 0, Save.todo_groups.size() - 1)
+	_save_timer.start()                         # 활성 그룹 저장
 
-func _cmp_name(a: TodoRow, b: TodoRow) -> bool:
-	var na := a.get_text().to_lower()
-	var nb := b.get_text().to_lower()
-	if na == nb: return false
-	return (na < nb) != _sort_desc
-
-func _cmp_done(a: TodoRow, b: TodoRow) -> bool:
-	if a.is_done() == b.is_done(): return false
-	return (not a.is_done()) != _sort_desc          # 오름차순=미완료 먼저
+func _load_group(index: int) -> void:
+	index = clampi(index, 0, Save.todo_groups.size() - 1)
+	_group = Save.todo_groups[index]
+	for r in _rows:                             # 기존 행 즉시 제거(깜빡임 방지)
+		list.remove_child(r)
+		r.queue_free()
+	_rows.clear()
+	_sort_key = clampi(_group.sort_key, 0, TodoSort.NAMES.size() - 1)
+	_sort_desc = _group.sort_desc
+	for todo in _group.tasks:                   # 새 그룹 로드
+		_add_row(todo)
+	_update_progress()
+	_update_sort_ui()
+	_apply_sort()

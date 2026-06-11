@@ -1,20 +1,20 @@
 extends Node
 
 const SAVE_PATH := "user://save.json"
-const VERSION := 1
+const VERSION := 2
 
 var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
-var todos: Array[Todo] = []
-
-var todos_sort_key: int = 0       # 0=수동 1=마감일 2=이름 3=완료
-var todos_sort_desc: bool = false
+var todo_groups: Array[TodoGroup] = []
+var current_group_index: int = 0
 
 func _ready() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		load_game()
-	else:
-		save_game()
+	if todo_groups.is_empty():
+		todo_groups.append(TodoGroup.new())          # 신규/빈 경우 기본 그룹
+	current_group_index = clampi(current_group_index, 0, todo_groups.size() - 1)
+	save_game()                                       # 마이그레이션·기본그룹 디스크 반영
 	settings.changed.connect(save_game)
 	
 		
@@ -25,17 +25,15 @@ func save_game() -> void:
 		alarm_dicts.append(a.to_dict())
 	
 	# todos
-	var todo_dicts := []
-	for t in todos:
-		todo_dicts.append(t.to_dict())
+	var todo_group_dicts := []
+	for t in todo_groups:
+		todo_group_dicts.append(t.to_dict())
 	
 	var data := {
 		"version": VERSION,
 		"settings": settings.to_dict(),
 		"alarms": alarm_dicts,
-		"todos": todo_dicts,
-		"todos_sort_key": todos_sort_key,
-		"todos_sort_desc": todos_sort_desc,
+		"todo_groups": todo_group_dicts,
 	}
 	
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -67,10 +65,17 @@ func load_game() -> void:
 		if typeof(d) == TYPE_DICTIONARY:
 			alarms.append(Alarm.from_dict(d))
 			
-	todos.clear()
-	for d in parsed.get("todos", []):
-		if typeof(d) == TYPE_DICTIONARY:
-			todos.append(Todo.from_dict(d))
-			
-	todos_sort_key = int(parsed.get("todos_sort_key", 0))
-	todos_sort_desc = bool(parsed.get("todos_sort_desc", false))
+	todo_groups.clear()
+	if parsed.has("todo_groups"):
+		for d in parsed.get("todo_groups", []):
+			if typeof(d) == TYPE_DICTIONARY:
+				todo_groups.append(TodoGroup.from_dict(d))
+	elif parsed.has("todos"):
+		var g := TodoGroup.new()
+		g.name = "기본"
+		g.sort_key = int(parsed.get("todos_sort_key", 0))
+		g.sort_desc = bool(parsed.get("todos_sort_desc", false))
+		for d in parsed.get("todos", []):
+			if typeof(d) == TYPE_DICTIONARY:
+				g.tasks.append(Todo.from_dict(d))
+		todo_groups.append(g)

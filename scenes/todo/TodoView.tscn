@@ -11,6 +11,13 @@ script = ExtResource("1_kn15c")
 [node name="Header" type="HBoxContainer" parent="." unique_id=409551666]
 layout_mode = 2
 
+[node name="GroupOption" type="OptionButton" parent="Header" unique_id=252865489]
+layout_mode = 2
+
+[node name="GroupEditButton" type="Button" parent="Header" unique_id=1798825162]
+layout_mode = 2
+text = "✏️"
+
 [node name="Spacer" type="Control" parent="Header" unique_id=1499643541]
 layout_mode = 2
 size_flags_horizontal = 3
