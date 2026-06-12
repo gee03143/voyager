@@ -17,8 +17,8 @@ func ordered(rows: Array, key: int, desc: bool) -> Array:
 		Key.DUE:  result.sort_custom(_cmp_due)
 		Key.NAME: result.sort_custom(_cmp_name)
 		Key.DONE: result.sort_custom(_cmp_done)
-		_:                                  # 수동: 원래 순서
-			if desc: result.reverse()
+		_:                                  # 수동: 항상 _rows 순서 그대로
+			pass
 	return result
 
 func _cmp_due(a: TodoRow, b: TodoRow) -> bool:

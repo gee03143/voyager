@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://buc68m4bpnu7y"]
 
 [ext_resource type="Script" uid="uid://8cdnqtuqcugh" path="res://scripts/todo/todo_view.gd" id="1_kn15c"]
+[ext_resource type="Script" uid="uid://d4nofmpdi3kkj" path="res://scripts/commonui/reorder_list.gd" id="2_3pw78"]
 
 [node name="TodoView" type="VBoxContainer" unique_id=1298183729]
 custom_minimum_size = Vector2(450, 0)
@@ -39,8 +40,10 @@ popup/item_3/id = 3
 layout_mode = 2
 text = "📶"
 
-[node name="List" type="VBoxContainer" parent="." unique_id=101199513]
+[node name="List" type="VBoxContainer" parent="." unique_id=2116464892]
 layout_mode = 2
+script = ExtResource("2_3pw78")
+metadata/_custom_type_script = "uid://d4nofmpdi3kkj"
 
 [node name="ProgressRow" type="HBoxContainer" parent="." unique_id=1516573716]
 layout_mode = 2

@@ -5,7 +5,7 @@ const DUE_POPUP := preload("res://scenes/todo/DuePopup.tscn")
 const GROUP_EDIT_POPUP := preload("res://scenes/todo/GroupEditPopup.tscn")
 const SAVE_DEBOUNCE := 0.5
 
-@onready var list: VBoxContainer = $List
+@onready var list: ReorderList  = $List
 @onready var progress: ProgressBar = $ProgressRow/ProgressBar
 @onready var progress_label: Label = $ProgressRow/ProgressLabel
 @onready var add_button: Button = $AddButton
@@ -53,10 +53,14 @@ func _ready() -> void:
 	group_option.item_selected.connect(_on_group_selected)
 	_refresh_group_dropdown()
 	_load_group(Save.current_group_index)
+	
+	list.token = &"todo"
+	list.reordered.connect(_on_reordered)
 
 func _add_row(todo: Todo) -> TodoRow:
 	var row := TODO_ROW.instantiate() as TodoRow
 	list.add_child(row)              # 트리에 먼저 → @onready 준비
+	row.set_drag_enabled(_sort_key == TodoSort.Key.MANUAL)
 	row.setup(todo)                  # changed 연결 '전'이라 setup 이 저장 안 유발
 	row.changed.connect(_on_list_changed)
 	row.delete_requested.connect(_on_row_delete)
@@ -121,8 +125,12 @@ func _on_sort_dir_toggled() -> void:
 	_apply_sort()
 
 func _update_sort_ui() -> void:
+	var manual := _sort_key == TodoSort.Key.MANUAL
 	sort_key_button.text = "정렬: %s" % TodoSort.NAMES[_sort_key]
 	sort_dir_button.text = "🔽" if _sort_desc else "🔼"
+	sort_dir_button.visible = not manual       # 수동엔 방향 없음
+	for r in _rows:
+		r.set_drag_enabled(manual)
 
 func _persist_sort() -> void:
 	_group.sort_key = _sort_key
@@ -159,3 +167,12 @@ func _load_group(index: int) -> void:
 	_update_progress()
 	_update_sort_ui()
 	_apply_sort()
+	
+func _on_reordered(from: int, to: int) -> void:
+	if _sort_key != TodoSort.Key.MANUAL:
+		return
+	var r := _rows[from]
+	_rows.remove_at(from)
+	_rows.insert(to, r)
+	_on_list_changed()                         # _rows → tasks 재구성 + 저장
+	_apply_sort()                              # 화면 자식 위치 재배치

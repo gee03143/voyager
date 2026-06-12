@@ -11,6 +11,7 @@ signal due_edit_requested(row: TodoRow)
 @onready var delete_button: Button = $HBox/DeleteButton
 @onready var due_label: Label = $HBox/DueLabel
 @onready var due_button: Button = $HBox/DueButton
+@onready var drag_handle: DragHandle = $HBox/DragHandle
 
 var _text: String = ""
 var _done: bool = false
@@ -25,6 +26,9 @@ func _ready() -> void:
 	due_button.pressed.connect(func(): due_edit_requested.emit(self))
 	_show_display()
 	_render()
+	
+	drag_handle.row = self
+	drag_handle.token = &"todo"
 
 # Data -> UI
 func setup(todo: Todo) -> void:
@@ -111,3 +115,16 @@ func _format_due(iso: String) -> String:
 	if p.size() != 3:
 		return iso
 	return "%d/%d/%d" % [int(p[0]), int(p[1]), int(p[2])]   # "2026/6/13"
+	
+func set_drag_enabled(b: bool) -> void:
+	drag_handle.enabled = b
+	
+func make_drag_preview() -> Control:
+	var ghost := duplicate() as Control
+	ghost.set_script(null)
+	ghost.get_node(get_path_to(drag_handle)).queue_free()
+	ghost.custom_minimum_size = size               # 레이아웃 밖이라 크기 보존
+	var disp := ghost.get_node(get_path_to(text_display)) as RichTextLabel
+	disp.text = text_display.text                  # 연출용 라벨 텍스트 명시 복사
+	disp.modulate = text_display.modulate          # 취소선/흐림 상태까지
+	return ghost

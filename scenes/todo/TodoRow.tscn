@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dskufppwuhs1"]
 
 [ext_resource type="Script" uid="uid://7pujsblbfa33" path="res://scripts/todo/todo_row.gd" id="1_rnimk"]
+[ext_resource type="Script" uid="uid://catr8i5oejgjw" path="res://scripts/commonui/drag_handle.gd" id="2_v4bi1"]
 
 [node name="TodoRow" type="PanelContainer" unique_id=1444403424]
 offset_right = 40.0
@@ -9,6 +10,11 @@ script = ExtResource("1_rnimk")
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=1559890846]
 layout_mode = 2
+
+[node name="DragHandle" type="Label" parent="HBox" unique_id=802487479]
+layout_mode = 2
+script = ExtResource("2_v4bi1")
+metadata/_custom_type_script = "uid://catr8i5oejgjw"
 
 [node name="DoneCheck" type="CheckBox" parent="HBox" unique_id=484451728]
 layout_mode = 2
