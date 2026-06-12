@@ -14,7 +14,7 @@ var enabled: bool = true:
 
 func _ready() -> void:
 	text = "⋮⋮"
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	mouse_default_cursor_shape = Control.CURSOR_MOVE
 	
 func _get_drag_data(_pos: Vector2) -> Variant:

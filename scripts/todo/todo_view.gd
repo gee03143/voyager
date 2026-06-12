@@ -5,7 +5,7 @@ const DUE_POPUP := preload("res://scenes/todo/DuePopup.tscn")
 const GROUP_EDIT_POPUP := preload("res://scenes/todo/GroupEditPopup.tscn")
 const SAVE_DEBOUNCE := 0.5
 
-@onready var list: ReorderList  = $List
+@onready var list: ReorderList  = $ScrollContainer/List
 @onready var progress: ProgressBar = $ProgressRow/ProgressBar
 @onready var progress_label: Label = $ProgressRow/ProgressLabel
 @onready var add_button: Button = $AddButton
@@ -175,4 +175,3 @@ func _on_reordered(from: int, to: int) -> void:
 	_rows.remove_at(from)
 	_rows.insert(to, r)
 	_on_list_changed()                         # _rows → tasks 재구성 + 저장
-	_apply_sort()                              # 화면 자식 위치 재배치

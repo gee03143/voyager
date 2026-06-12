@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://bvhnacto7xgw8"]
 
 [ext_resource type="Script" uid="uid://cs63mhncy7ykh" path="res://scripts/timer/alarm/alarm_row.gd" id="1_24chh"]
+[ext_resource type="Script" uid="uid://catr8i5oejgjw" path="res://scripts/commonui/drag_handle.gd" id="2_r0cyf"]
+[ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="3_y6yqn"]
 
 [node name="AlarmRow" type="PanelContainer" unique_id=930500851]
 offset_right = 40.0
@@ -9,6 +11,11 @@ script = ExtResource("1_24chh")
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=1347215076]
 layout_mode = 2
+
+[node name="DragHandle" type="Label" parent="HBox" unique_id=265495071]
+layout_mode = 2
+script = ExtResource("2_r0cyf")
+metadata/_custom_type_script = "uid://catr8i5oejgjw"
 
 [node name="HourSpin" type="SpinBox" parent="HBox" unique_id=239337183]
 layout_mode = 2
@@ -40,3 +47,8 @@ layout_mode = 2
 [node name="DeleteButton" type="Button" parent="HBox" unique_id=467228259]
 layout_mode = 2
 text = "X"
+
+[node name="LineEditAutoBlur" type="Node" parent="." unique_id=2052493044 node_paths=PackedStringArray("target")]
+script = ExtResource("3_y6yqn")
+target = NodePath("../HBox/NameEdit")
+metadata/_custom_type_script = "uid://ci6x0r824dwdb"

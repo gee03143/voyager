@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://7pujsblbfa33" path="res://scripts/todo/todo_row.gd" id="1_rnimk"]
 [ext_resource type="Script" uid="uid://catr8i5oejgjw" path="res://scripts/commonui/drag_handle.gd" id="2_v4bi1"]
+[ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="3_hrp0r"]
 
 [node name="TodoRow" type="PanelContainer" unique_id=1444403424]
 offset_right = 40.0
@@ -18,10 +19,12 @@ metadata/_custom_type_script = "uid://catr8i5oejgjw"
 
 [node name="DoneCheck" type="CheckBox" parent="HBox" unique_id=484451728]
 layout_mode = 2
+mouse_filter = 1
 
 [node name="TextDisplay" type="RichTextLabel" parent="HBox" unique_id=495020976]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 1
 bbcode_enabled = true
 text = "
 "
@@ -32,14 +35,26 @@ autowrap_mode = 0
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 1
 
-[node name="DueLabel" type="Label" parent="HBox" unique_id=1191919652]
+[node name="RightSlot" type="MarginContainer" parent="HBox" unique_id=147660149]
 layout_mode = 2
 
-[node name="DueButton" type="Button" parent="HBox" unique_id=12485494]
+[node name="DueLabel" type="Label" parent="HBox/RightSlot" unique_id=1191919652]
+layout_mode = 2
+
+[node name="Actions" type="HBoxContainer" parent="HBox/RightSlot" unique_id=352152012]
+layout_mode = 2
+
+[node name="DueButton" type="Button" parent="HBox/RightSlot/Actions" unique_id=12485494]
 layout_mode = 2
 text = "📅"
 
-[node name="DeleteButton" type="Button" parent="HBox" unique_id=362496066]
+[node name="DeleteButton" type="Button" parent="HBox/RightSlot/Actions" unique_id=362496066]
 layout_mode = 2
 text = "X"
+
+[node name="LineEditAutoBlur" type="Node" parent="." unique_id=1771905794 node_paths=PackedStringArray("target")]
+script = ExtResource("3_hrp0r")
+target = NodePath("../HBox/TextEdit")
+metadata/_custom_type_script = "uid://ci6x0r824dwdb"

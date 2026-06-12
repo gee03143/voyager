@@ -4,6 +4,7 @@ extends PanelContainer
 signal changed
 signal delete_requested(row: AlarmRow)
 
+@onready var drag_handle: DragHandle = $HBox/DragHandle
 @onready var hour_spin: SpinBox = $HBox/HourSpin
 @onready var minute_spin: SpinBox = $HBox/MinuteSpin
 @onready var ampm_option: OptionButton = $HBox/AmPmOption
@@ -18,6 +19,13 @@ func _ready() -> void:
 	name_edit.text_changed.connect(func(_t): changed.emit())
 	enabled_toggle.toggled.connect(func(_p): changed.emit())
 	delete_button.pressed.connect(func(): delete_requested.emit(self))
+	
+	drag_handle.row = self
+	drag_handle.token = &"alarm"
+	
+	name_edit.focus_entered.connect(func(): set_process_input(true))
+	name_edit.focus_exited.connect(func(): set_process_input(false))
+	set_process_input(false)                  # 평소엔 _input 처리 안 함
 
 # Data -> UI
 func setup(alarm: Alarm) -> void:

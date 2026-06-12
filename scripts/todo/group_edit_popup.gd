@@ -3,27 +3,34 @@ extends PopupPanel
 
 signal groups_changed                       # 추가/이름변경/삭제 → 뷰가 동기화·저장
 
-@onready var group_list: VBoxContainer = $VBox/GroupList
 @onready var add_group_button: Button = $VBox/AddGroupButton
 @onready var close_button: Button = $VBox/CloseButton
+@onready var group_list: ReorderList = $VBox/GroupList
 
 func _ready() -> void:
 	add_group_button.pressed.connect(_on_add_group)
 	close_button.pressed.connect(hide)
+	
+	group_list.token = &"group"
+	group_list.reordered.connect(_on_reordered)
 
 func open() -> void:
 	_rebuild()
 	popup_centered()
 
 func _rebuild() -> void:
-	for c in group_list.get_children():
-		c.queue_free()
+	group_list.clear_items()
 	for i in Save.todo_groups.size():
 		_add_group_row(i)
 
 func _add_group_row(index: int) -> void:
 	var g := Save.todo_groups[index]
 	var row := HBoxContainer.new()
+
+	var handle := DragHandle.new()
+	handle.token = &"group"
+	handle.row = row
+	row.add_child(handle)
 
 	var name_edit := LineEdit.new()
 	name_edit.text = g.name
@@ -57,3 +64,10 @@ func _on_delete(index: int) -> void:
 	Save.todo_groups.remove_at(index)
 	_rebuild()
 	groups_changed.emit()
+
+func _on_reordered(from: int, to: int) -> void:
+	var g: TodoGroup = Save.todo_groups[from]
+	Save.todo_groups.remove_at(from)
+	Save.todo_groups.insert(to, g)
+	_rebuild()
+	groups_changed.emit()            # TodoView가 활성 인덱스 재계산 + 드롭다운 갱신 + 저장

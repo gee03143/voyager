@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bw6mwyph0cd2q"]
 
 [ext_resource type="Script" uid="uid://cxjdgyhcfybif" path="res://scripts/timer/alarm/alarm_view.gd" id="1_o5vqa"]
+[ext_resource type="Script" uid="uid://d4nofmpdi3kkj" path="res://scripts/commonui/reorder_list.gd" id="2_3xbml"]
 
 [node name="AlarmView" type="VBoxContainer" unique_id=1237746273]
 offset_left = 68.0
@@ -9,8 +10,18 @@ offset_right = 108.0
 offset_bottom = 81.0
 script = ExtResource("1_o5vqa")
 
-[node name="List" type="VBoxContainer" parent="." unique_id=792546251]
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1994544663]
+custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="List" type="VBoxContainer" parent="ScrollContainer" unique_id=1936353735]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2_3xbml")
+metadata/_custom_type_script = "uid://d4nofmpdi3kkj"
 
 [node name="AddButton" type="Button" parent="." unique_id=1768961754]
 layout_mode = 2

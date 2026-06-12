@@ -85,3 +85,8 @@ func _show_indicator(index: int) -> void:
 	_indicator.global_position = global_position + Vector2(0, y)
 	_indicator.size.x = size.x
 	_indicator.visible = true
+
+func clear_items() -> void:
+	for c in _rows():
+		remove_child(c)
+		c.queue_free()

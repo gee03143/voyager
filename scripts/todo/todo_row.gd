@@ -5,13 +5,15 @@ signal changed
 signal delete_requested(row: TodoRow)
 signal due_edit_requested(row: TodoRow)
 
+@onready var drag_handle: DragHandle = $HBox/DragHandle
 @onready var done_check: CheckBox = $HBox/DoneCheck
 @onready var text_display: RichTextLabel = $HBox/TextDisplay
 @onready var text_edit: LineEdit = $HBox/TextEdit
-@onready var delete_button: Button = $HBox/DeleteButton
-@onready var due_label: Label = $HBox/DueLabel
-@onready var due_button: Button = $HBox/DueButton
-@onready var drag_handle: DragHandle = $HBox/DragHandle
+
+#RightSlot
+@onready var due_label: Label = $HBox/RightSlot/DueLabel
+@onready var due_button: Button = $HBox/RightSlot/Actions/DueButton
+@onready var delete_button: Button = $HBox/RightSlot/Actions/DeleteButton
 
 var _text: String = ""
 var _done: bool = false
@@ -29,6 +31,10 @@ func _ready() -> void:
 	
 	drag_handle.row = self
 	drag_handle.token = &"todo"
+	
+	mouse_entered.connect(func(): _set_actions_shown(true))
+	mouse_exited.connect(func(): _set_actions_shown(false))
+	_set_actions_shown(false)
 
 # Data -> UI
 func setup(todo: Todo) -> void:
@@ -106,15 +112,7 @@ func _render() -> void:
 		text_display.modulate.a = 1.0
 		
 func _render_due() -> void:
-	due_label.text = _format_due(_due)
-	
-func _format_due(iso: String) -> String:
-	if iso.is_empty():
-		return ""
-	var p := iso.split("-")
-	if p.size() != 3:
-		return iso
-	return "%d/%d/%d" % [int(p[0]), int(p[1]), int(p[2])]   # "2026/6/13"
+	due_label.text = DateUtil.format_due(_due)
 	
 func set_drag_enabled(b: bool) -> void:
 	drag_handle.enabled = b
@@ -128,3 +126,9 @@ func make_drag_preview() -> Control:
 	disp.text = text_display.text                  # 연출용 라벨 텍스트 명시 복사
 	disp.modulate = text_display.modulate          # 취소선/흐림 상태까지
 	return ghost
+	
+func _set_actions_shown(on: bool) -> void:
+	due_label.modulate.a = 0.0 if on else 1.0
+	for b in [due_button, delete_button]:
+		b.modulate.a = 1.0 if on else 0.0
+		b.mouse_filter = Control.MOUSE_FILTER_PASS if on else Control.MOUSE_FILTER_IGNORE

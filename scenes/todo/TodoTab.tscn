@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://buc68m4bpnu7y"]
 
-[ext_resource type="Script" uid="uid://8cdnqtuqcugh" path="res://scripts/todo/todo_view.gd" id="1_kn15c"]
-[ext_resource type="Script" uid="uid://d4nofmpdi3kkj" path="res://scripts/commonui/reorder_list.gd" id="2_3pw78"]
+[ext_resource type="Script" uid="uid://8cdnqtuqcugh" path="res://scripts/todo/todo_view.gd" id="1_0uakj"]
+[ext_resource type="Script" uid="uid://d4nofmpdi3kkj" path="res://scripts/commonui/reorder_list.gd" id="2_5hbox"]
 
 [node name="TodoView" type="VBoxContainer" unique_id=1298183729]
 custom_minimum_size = Vector2(450, 0)
 offset_right = 174.0
 offset_bottom = 97.0
-script = ExtResource("1_kn15c")
+script = ExtResource("1_0uakj")
 
 [node name="Header" type="HBoxContainer" parent="." unique_id=409551666]
 layout_mode = 2
@@ -40,9 +40,18 @@ popup/item_3/id = 3
 layout_mode = 2
 text = "📶"
 
-[node name="List" type="VBoxContainer" parent="." unique_id=2116464892]
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=516792947]
+custom_minimum_size = Vector2(0, 250)
 layout_mode = 2
-script = ExtResource("2_3pw78")
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="List" type="VBoxContainer" parent="ScrollContainer" unique_id=2116464892]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2_5hbox")
 metadata/_custom_type_script = "uid://d4nofmpdi3kkj"
 
 [node name="ProgressRow" type="HBoxContainer" parent="." unique_id=1516573716]

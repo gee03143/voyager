@@ -3,7 +3,7 @@ extends VBoxContainer
 const ALARM_ROW := preload("res://scenes/timer/AlarmRow.tscn")
 const SAVE_DEBOUNCE := 0.5
 
-@onready var list: VBoxContainer = $List
+@onready var list: ReorderList = $ScrollContainer/List
 @onready var add_button: Button = $AddButton
 
 var _rows: Array[AlarmRow] = []
@@ -26,6 +26,9 @@ func _ready() -> void:
 	add_child(_alarm_clock)
 	_alarm_clock.alarms = Save.alarms
 	_alarm_clock.alarm_triggered.connect(_on_alarm_triggered)
+	
+	list.token = &"alarm"
+	list.reordered.connect(_on_reordered)
 
 func _add_row(alarm: Alarm) -> void:
 	var row := ALARM_ROW.instantiate() as AlarmRow
@@ -61,3 +64,11 @@ func _on_list_changed() -> void:
 func _on_alarm_triggered(alarm: Alarm) -> void:
 	Sound.play_set(Save.settings.sound_set)
 	print("[알람] %02d:%02d  %s" % [alarm.hour, alarm.minute, alarm.label])
+	
+func _on_reordered(from: int, to: int) -> void:
+	var r := _rows[from]
+	_rows.remove_at(from)
+	_rows.insert(to, r)
+	for i in _rows.size():
+		list.move_child(_rows[i], i)   # 화면 순서도 _rows에 맞춤
+	_on_list_changed()                 # _rows → Save.alarms 스냅샷 + 저장

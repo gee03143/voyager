@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://b1bidw6byjnkm"]
 
 [ext_resource type="Script" uid="uid://nr1goeq6klwp" path="res://scripts/todo/group_edit_popup.gd" id="1_k8t3c"]
+[ext_resource type="Script" uid="uid://d4nofmpdi3kkj" path="res://scripts/commonui/reorder_list.gd" id="2_r0sx7"]
 
 [node name="GroupEditPopup" type="PopupPanel" unique_id=35086652]
 oversampling_override = 1.0
-size = Vector2i(300, 105)
+size = Vector2i(300, 109)
 visible = true
 script = ExtResource("1_k8t3c")
 
@@ -12,14 +13,16 @@ script = ExtResource("1_k8t3c")
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 296.0
-offset_bottom = 101.0
+offset_bottom = 105.0
 
 [node name="TitleLabel" type="Label" parent="VBox" unique_id=1794689476]
 layout_mode = 2
 text = "목록 편집"
 
-[node name="GroupList" type="VBoxContainer" parent="VBox" unique_id=807116272]
+[node name="GroupList" type="VBoxContainer" parent="VBox" unique_id=102821393]
 layout_mode = 2
+script = ExtResource("2_r0sx7")
+metadata/_custom_type_script = "uid://d4nofmpdi3kkj"
 
 [node name="AddGroupButton" type="Button" parent="VBox" unique_id=1614778401]
 layout_mode = 2
