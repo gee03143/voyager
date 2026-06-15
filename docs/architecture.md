@@ -47,10 +47,13 @@
 - 포모: `scripts/timer/pomo/{pomodoro.gd, pomodoro_view.gd, pomo_segment_chip.gd}`
 - 타이머: `scripts/timer/normaltimer/{simple_timer.gd, timer_view.gd}`
 - 알람: `scripts/timer/alarm/{alarm.gd, alarm_clock.gd, alarm_row.gd, alarm_view.gd}`
-- 씬: `scenes/timer/*.tscn`
+- Todo: `scripts/todo/{todo.gd, todo_group.gd, todo_view.gd, todo_row.gd, todo_sort.gd, due_popup.gd, group_edit_popup.gd}`
+- 공통UI: `scripts/commonui/{drag_handle.gd, reorder_list.gd, line_edit_auto_blur.gd}` · 유틸: `scripts/util/due_date_util.gd`(`DateUtil`)
+- 씬: `scenes/timer/*.tscn`, `scenes/todo/*.tscn`
 - 에셋: `assets/sounds/Piano_Ui_Set{1,2}.wav`, `assets/placeholder/*.svg`
 
-## 다음 작업 (Week 2 · Todo — 레퍼런스 프론트 전체)
+## Todo (Week 2 — ✅ 완료) — 레퍼런스 프론트 전체
+> 상태: ①~⑧ 전 슬라이스 F6 동작. 드래그는 재사용 `DragHandle`/`ReorderList`(`scripts/commonui`)로 추출해 태스크·그룹·알람 3사례 적용. 마감일 표기=`DateUtil`(`scripts/util`), 편집칸 바깥클릭 포커스해제=`LineEditAutoBlur`(`commonui`).
 범위 = 레퍼런스 이미지의 **거의 모든 기능이 프론트엔드에서 실제 동작**(백엔드/sync 제외). 한 주 분량.
 - **데이터(그룹 기반)**: `Save.todo_groups: Array[TodoGroup]` + `current_group_index`.
   `TodoGroup {name, tasks: Array[Todo], sort_key, sort_desc}` · `Todo {text, done, due_date}`.
@@ -65,10 +68,15 @@
 - **패널은 자기 크기를 정의**(`custom_minimum_size`), 앱 창(Window Viewport)과 무관. TodoView는 인게임의 여러 팝업 중 하나 — 전역 창 크기를 바꾸지 말 것. 컴포넌트 조립은 Week 4 앱 셸에서.
 - ID/타임스탬프: 여전히 미도입. "추가순 정렬"이 필요해지면 그때 created 도입 검토.
 - **데일리 체크리스트(요일 활성화·자정 리셋)는 Week 3 유지** — Todo와 별개 기능.
-- **공통 리스트 베이스 추출**: Todo 완성 후 알람과 두 사례 보고 추출("두 번째 사례에서 추출").
+- **공통 리스트 베이스 추출**: 드래그/재정렬·포커스해제는 `commonui`로 추출 완료(3사례). 추가/삭제·진행도 등 **CRUD 리스트 베이스**는 아직 미추출(TodoView/AlarmView 각자 보유) — 추후 필요 시.
 
 > 교훈(Week 2 중반): 범위를 "최소/권장"으로 자꾸 깎아 목업+추후로 미룬 뒤 완료 판정 → 잘못.
 > Week N = 그 주에 **착수**하고 분량도 그만큼 걸린다는 의미. 레퍼런스가 곧 산출물 정의다.
+
+## 다음 작업 (Week 3 · 데일리 체크리스트) ⚠️ 위험 주
+- 요일별 활성화 + 자정 리셋. 알람의 요일/반복 로직 재사용 검토.
+- **안정 ID 결정 시점**: 데일리의 "반복 정체성"이 ID 도입 트리거(위 "안정 ID/타임스탬프 보류" 항목). Todo+데일리 **두 사례**를 보고 ID 컨벤션 확정 — 빌드 전 결정 필요.
+- 드래그/스크롤 재사용 부품(`commonui`)·`DateUtil` 그대로 활용 가능.
 
 ## 미룬 항목 (roadmap.md "미룬 항목" 섹션)
 - 타이머 스타일 Circle / 자동 최소화 실제 효과(Week 7) / 총 집중시간 추적(Week 4, `focus_finished` 연결) / 알람 전역화(autoload) / 리스트 패턴 추출

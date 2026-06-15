@@ -39,7 +39,8 @@
 
 ## 현재 진행
 - Week 1 완료 (시계 탭: 포모/타이머/알람/설정 + `ClockToolView` 공통 베이스)
-- **Week 2 진행 중**: Todo — **레퍼런스 프론트 전체**가 산출물(추가/체크/취소선/삭제·마감일·정렬·다중그룹·드래그/호버/진행도).
-  가장 작은 슬라이스부터 빌드: ①평평 데이터→②TodoRow(취소선)→③단일리스트→④마감일→⑤정렬→⑥다중그룹(데이터 리팩토링)→⑦드래그→⑧폴리시.
-  현재 ①완료(`Todo{text,done}`+`Save.todos`), **②착수 예정**. 데일리 체크리스트는 Week 3.
-- 단계별 상세·다음 작업·빌드 순서는 `docs/architecture.md`, `docs/roadmap.md` 참고
+- **Week 2 완료**: Todo 레퍼런스 프론트 전체 — 추가/체크/취소선/삭제·마감일(상대표기 오늘/내일/날짜)·정렬·다중그룹 CRUD·진행도·드래그·호버·스크롤. 전부 F6 동작.
+- **Week 3 진행 중**:
+  - ✅ 드래그 정렬·재사용화 — `DragHandle`/`ReorderList`(`scripts/commonui`)를 **태스크·그룹·알람 3사례**에 적용. 호버 버튼 노출, 스크롤, `DateUtil`(`scripts/util`), `LineEditAutoBlur`(`scripts/commonui`) 추출.
+  - ⏳ **데일리 체크리스트(요일 활성화·자정 리셋)** 착수 예정 — 안정 ID 도입 결정이 여기서 필요(Todo+데일리 두 사례).
+- 단계별 상세·다음 작업은 `docs/architecture.md`, `docs/roadmap.md` 참고
