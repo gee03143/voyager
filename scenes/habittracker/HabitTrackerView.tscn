@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://de6n57hebkgrg"]
+
+[ext_resource type="Script" uid="uid://dx82cfbhmnioh" path="res://scripts/habittracker/habit_tracker_view.gd" id="1_wv8ks"]
+[ext_resource type="Script" uid="uid://d4nofmpdi3kkj" path="res://scripts/commonui/reorder_list.gd" id="2_ih7ui"]
+
+[node name="HabitTrackerView" type="VBoxContainer" unique_id=1593460480]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_wv8ks")
+
+[node name="Header" type="HBoxContainer" parent="." unique_id=113572953]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=2065621685]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="List" type="VBoxContainer" parent="ScrollContainer" unique_id=1486016374]
+layout_mode = 2
+script = ExtResource("2_ih7ui")
+metadata/_custom_type_script = "uid://d4nofmpdi3kkj"
+
+[node name="AddButton" type="Button" parent="." unique_id=451622607]
+layout_mode = 2
+text = "+ 습관 추가"

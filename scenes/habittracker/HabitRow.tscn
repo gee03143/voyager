@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://d2gfd2t5r5gqb"]
+
+[ext_resource type="Script" uid="uid://c72xmfldtfv41" path="res://scripts/habittracker/habit_row.gd" id="1_tgr6m"]
+[ext_resource type="Script" uid="uid://catr8i5oejgjw" path="res://scripts/commonui/drag_handle.gd" id="2_ggo1q"]
+[ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="3_kg58k"]
+
+[node name="HabitRow" type="HBoxContainer" unique_id=88465366]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_tgr6m")
+
+[node name="DragHandle" type="Label" parent="." unique_id=31641502]
+layout_mode = 2
+script = ExtResource("2_ggo1q")
+metadata/_custom_type_script = "uid://catr8i5oejgjw"
+
+[node name="NameEdit" type="LineEdit" parent="." unique_id=1094526632]
+layout_mode = 2
+
+[node name="CellsBox" type="HBoxContainer" parent="." unique_id=1335540578]
+layout_mode = 2
+
+[node name="DeleteButton" type="Button" parent="." unique_id=1415224762]
+layout_mode = 2
+text = "X"
+
+[node name="LineEditAutoBlur" type="Node" parent="." unique_id=646873660 node_paths=PackedStringArray("target")]
+script = ExtResource("3_kg58k")
+target = NodePath("../NameEdit")
+metadata/_custom_type_script = "uid://ci6x0r824dwdb"

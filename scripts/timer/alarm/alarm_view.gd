@@ -3,6 +3,7 @@ extends VBoxContainer
 const ALARM_ROW := preload("res://scenes/timer/AlarmRow.tscn")
 const SAVE_DEBOUNCE := 0.5
 
+@onready var scroll: ScrollContainer = $ScrollContainer
 @onready var list: ReorderList = $ScrollContainer/List
 @onready var add_button: Button = $AddButton
 
@@ -30,17 +31,20 @@ func _ready() -> void:
 	list.token = &"alarm"
 	list.reordered.connect(_on_reordered)
 
-func _add_row(alarm: Alarm) -> void:
+func _add_row(alarm: Alarm) -> AlarmRow:
 	var row := ALARM_ROW.instantiate() as AlarmRow
 	list.add_child(row)              # 트리에 먼저 → @onready 준비
 	row.setup(alarm)                 # (changed 연결 '전'이라 setup 이 저장 안 유발)
 	row.changed.connect(_on_list_changed)
 	row.delete_requested.connect(_on_row_delete)
 	_rows.append(row)
+	return row
 
 func _on_add_pressed() -> void:
-	_add_row(_new_alarm_now())            # 현재 시각으로 새 알
+	var row := _add_row(_new_alarm_now())            # 현재 시각으로 새 알
 	_on_list_changed()                    # 새 알람 저장
+	await get_tree().process_frame
+	scroll.ensure_control_visible(row)
 	
 func _new_alarm_now() -> Alarm:
 	var now := Time.get_time_dict_from_system()   # {hour, minute, second} (24시간)

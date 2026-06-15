@@ -5,6 +5,7 @@ const DUE_POPUP := preload("res://scenes/todo/DuePopup.tscn")
 const GROUP_EDIT_POPUP := preload("res://scenes/todo/GroupEditPopup.tscn")
 const SAVE_DEBOUNCE := 0.5
 
+@onready var scroll: ScrollContainer  = $ScrollContainer
 @onready var list: ReorderList  = $ScrollContainer/List
 @onready var progress: ProgressBar = $ProgressRow/ProgressBar
 @onready var progress_label: Label = $ProgressRow/ProgressLabel
@@ -72,6 +73,8 @@ func _on_add_pressed() -> void:
 	var row := _add_row(Todo.new())  # 빈 할 일 추가
 	_on_list_changed()               # 새 항목 저장
 	row.start_edit()
+	await get_tree().process_frame
+	scroll.ensure_control_visible(row)
 
 func _on_row_delete(row: TodoRow) -> void:
 	_rows.erase(row)

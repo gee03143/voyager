@@ -1,12 +1,15 @@
 extends Node
 
 const SAVE_PATH := "user://save.json"
-const VERSION := 2
+const VERSION := 3
 
 var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
 var todo_groups: Array[TodoGroup] = []
 var current_group_index: int = 0
+var habits: Array[Habit] = []
+var habit_week_start: String = ""  # 이번 주 월요일 "YYYY-MM-DD" 
+var habit_history: Array = []       # 얼린 과거 주 [{week_start, items:[habit dict]}]
 
 func _ready() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
@@ -29,11 +32,19 @@ func save_game() -> void:
 	for t in todo_groups:
 		todo_group_dicts.append(t.to_dict())
 	
+	# habits
+	var habit_dicts := []
+	for h in habits:
+		habit_dicts.append(h.to_dict())
+	
 	var data := {
 		"version": VERSION,
 		"settings": settings.to_dict(),
 		"alarms": alarm_dicts,
 		"todo_groups": todo_group_dicts,
+		"habits": habit_dicts,
+		"habit_week_start": habit_week_start,
+		"habit_history": habit_history,
 	}
 	
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -79,3 +90,10 @@ func load_game() -> void:
 			if typeof(d) == TYPE_DICTIONARY:
 				g.tasks.append(Todo.from_dict(d))
 		todo_groups.append(g)
+		
+	habits.clear()
+	for d in parsed.get("habits", []):
+		if typeof(d) == TYPE_DICTIONARY:
+			habits.append(Habit.from_dict(d))
+	habit_week_start = str(parsed.get("habit_week_start", ""))
+	habit_history = parsed.get("habit_history", [])
