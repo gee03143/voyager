@@ -29,8 +29,7 @@
 - 결합도: 알림은 **signal**, 단일 진실은 **`Save`**(autoload)
 - 다국어: 원본 문자열=키, 문장 통째로 포맷(조각 연결 금지)
 - 미래 서버/sync 대비: 단일 진실(`Save`)·JSON·`version` 필드.
-  **안정 ID/타임스탬프는 도입 보류** (Week 2 결정 — 목적이 가설이라 판단). 알람처럼 스냅샷 방식.
-  도입 트리거 = 항목을 정체성으로 다뤄야 할 때(데일리 반복·참조·sync). 상세·근거는 `docs/architecture.md`.
+  **안정 ID**: Todo·알람은 스냅샷(ID 없음) 유지. **습관(Week 3)에서 ID 도입**(randi 정수, `habit_defs` 키) — "주를 가로지르는 반복 정체성"이 트리거. 도입 기준 = 항목을 정체성으로 다뤄야 할 때(반복·참조·sync). 상세 `docs/architecture.md`.
 
 ## 데이터 / 오토로드
 - `Save` (autoload, `user://save.json`, `version`) — 단일 진실
@@ -40,7 +39,8 @@
 ## 현재 진행
 - Week 1 완료 (시계 탭: 포모/타이머/알람/설정 + `ClockToolView` 공통 베이스)
 - **Week 2 완료**: Todo 레퍼런스 프론트 전체 — 추가/체크/취소선/삭제·마감일(상대표기 오늘/내일/날짜)·정렬·다중그룹 CRUD·진행도·드래그·호버·스크롤. 전부 F6 동작.
-- **Week 3 진행 중**:
-  - ✅ 드래그 정렬·재사용화 — `DragHandle`/`ReorderList`(`scripts/commonui`)를 **태스크·그룹·알람 3사례**에 적용. 호버 버튼 노출, 스크롤, `DateUtil`(`scripts/util`), `LineEditAutoBlur`(`scripts/commonui`) 추출.
-  - ⏳ **데일리 체크리스트(요일 활성화·자정 리셋)** 착수 예정 — 안정 ID 도입 결정이 여기서 필요(Todo+데일리 두 사례).
-- 단계별 상세·다음 작업은 `docs/architecture.md`, `docs/roadmap.md` 참고
+- **Week 3 완료**:
+  - ✅ 드래그 정렬·재사용화 — `DragHandle`/`ReorderList`(`scripts/commonui`)를 **태스크·그룹·알람 3사례**에 적용. 호버·스크롤·`DateUtil`(`scripts/util`)·`LineEditAutoBlur`(`commonui`) 추출.
+  - ✅ **습관 트래커(데일리)** — 주간 그리드·요일 활성화(우클릭)·달성도 원형·주간 페이지네이션·백필. 모델: `Save.habit_defs`(단일출처 `{id,title,active_days}`) + `habit_weeks`(주별 희소 체크). **안정 ID 도입**(randi). 상세 `docs/architecture.md`.
+- **Week 4 착수 예정**: 항해 진행 + 발견 + 앱 셸.
+- 단계별 상세는 `docs/architecture.md`, `docs/roadmap.md` 참고
