@@ -24,10 +24,6 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "▶"
 
-[node name="TodayButton" type="Button" parent="WeekNav" unique_id=1579506445]
-layout_mode = 2
-text = "오늘"
-
 [node name="Header" type="HBoxContainer" parent="." unique_id=113572953]
 layout_mode = 2
 

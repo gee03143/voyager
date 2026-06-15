@@ -16,6 +16,7 @@ metadata/_custom_type_script = "uid://catr8i5oejgjw"
 
 [node name="NameEdit" type="LineEdit" parent="." unique_id=1094526632]
 layout_mode = 2
+select_all_on_focus = true
 
 [node name="CellsBox" type="HBoxContainer" parent="." unique_id=1335540578]
 layout_mode = 2

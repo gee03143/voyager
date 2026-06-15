@@ -40,6 +40,7 @@ popup/item_1/id = 1
 layout_mode = 2
 placeholder_text = "My Alarm"
 alignment = 3
+select_all_on_focus = true
 
 [node name="EnabledToggle" type="CheckButton" parent="HBox" unique_id=58698495]
 layout_mode = 2

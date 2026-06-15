@@ -7,9 +7,9 @@ var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
 var todo_groups: Array[TodoGroup] = []
 var current_group_index: int = 0
-var habits: Array[Habit] = []
-var habit_week_start: String = ""  # 이번 주 월요일 "YYYY-MM-DD" 
-var habit_history: Array = []       # 얼린 과거 주 [{week_start, items:[habit dict]}]
+
+var habit_defs: Array = []      # [{id, title, active_days}]  공유 정의(단일 출처, 순서=표시순서)
+var habit_weeks: Array = []     # [{week_start, checks: {id:[7]}}]  주별 체크(희소)
 
 func _ready() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
@@ -32,19 +32,13 @@ func save_game() -> void:
 	for t in todo_groups:
 		todo_group_dicts.append(t.to_dict())
 	
-	# habits
-	var habit_dicts := []
-	for h in habits:
-		habit_dicts.append(h.to_dict())
-	
 	var data := {
 		"version": VERSION,
 		"settings": settings.to_dict(),
 		"alarms": alarm_dicts,
 		"todo_groups": todo_group_dicts,
-		"habits": habit_dicts,
-		"habit_week_start": habit_week_start,
-		"habit_history": habit_history,
+		"habit_defs": habit_defs,
+		"habit_weeks": habit_weeks,
 	}
 	
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -91,9 +85,7 @@ func load_game() -> void:
 				g.tasks.append(Todo.from_dict(d))
 		todo_groups.append(g)
 		
-	habits.clear()
-	for d in parsed.get("habits", []):
-		if typeof(d) == TYPE_DICTIONARY:
-			habits.append(Habit.from_dict(d))
-	habit_week_start = str(parsed.get("habit_week_start", ""))
-	habit_history = parsed.get("habit_history", [])
+	var raw_defs = parsed.get("habit_defs", [])
+	habit_defs = raw_defs if typeof(raw_defs) == TYPE_ARRAY else []
+	var raw_weeks = parsed.get("habit_weeks", [])
+	habit_weeks = raw_weeks if typeof(raw_weeks) == TYPE_ARRAY else []
