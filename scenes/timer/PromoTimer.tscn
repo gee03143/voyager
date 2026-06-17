@@ -6,19 +6,13 @@
 [ext_resource type="Texture2D" uid="uid://cjlrqdvs1r2tg" path="res://assets/placeholder/skip.svg" id="4_lsfon"]
 [ext_resource type="Texture2D" uid="uid://c7awmbv8t1nd1" path="res://assets/placeholder/reset.svg" id="5_p3mas"]
 
-[node name="PomodoroView" type="Control" unique_id=2053074751]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="PomodoroView" type="MarginContainer" unique_id=283874525]
+offset_right = 356.0
+offset_bottom = 183.0
 script = ExtResource("1_s7lvo")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=48566559]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 2
 
 [node name="Config" type="GridContainer" parent="VBox" unique_id=210816297]
 layout_mode = 2

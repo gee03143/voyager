@@ -5,19 +5,13 @@
 [ext_resource type="Texture2D" uid="uid://42ognb8rq1fq" path="res://assets/placeholder/play.svg" id="3_wli07"]
 [ext_resource type="Texture2D" uid="uid://c7awmbv8t1nd1" path="res://assets/placeholder/reset.svg" id="4_cvy7g"]
 
-[node name="TimerView" type="Control" unique_id=262628283]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="TimerView" type="MarginContainer" unique_id=949782713]
+offset_right = 266.0
+offset_bottom = 125.0
 script = ExtResource("1_2r6ew")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=648587023]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 2
 
 [node name="TimeInput" type="HBoxContainer" parent="VBox" unique_id=338233110]
 layout_mode = 2
