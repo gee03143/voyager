@@ -1,8 +1,9 @@
 extends Node
 
 const SAVE_PATH := "user://save.json"
-const VERSION := 3
+const VERSION := 4
 
+var voyage := Voyage.new()
 var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
 var todo_groups: Array[TodoGroup] = []
@@ -11,17 +12,24 @@ var current_group_index: int = 0
 var habit_defs: Array = []      # [{id, title, active_days}]  공유 정의(단일 출처, 순서=표시순서)
 var habit_weeks: Array = []     # [{week_start, checks: {id:[7]}}]  주별 체크(희소)
 
+var _play_base_seconds: float = 0.0     # 세션 시작 시점의 누적 플레이
+var _session_start_ms: int = 0
+
 func _ready() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		load_game()
 	if todo_groups.is_empty():
-		todo_groups.append(TodoGroup.new())          # 신규/빈 경우 기본 그룹
+		todo_groups.append(TodoGroup.new())
 	current_group_index = clampi(current_group_index, 0, todo_groups.size() - 1)
-	save_game()                                       # 마이그레이션·기본그룹 디스크 반영
+	_play_base_seconds = voyage.total_play_seconds
+	_session_start_ms = Time.get_ticks_msec()
+	get_tree().auto_accept_quit = false
+	save_game()
 	settings.changed.connect(save_game)
-	
+	voyage.changed.connect(save_game)
 		
 func save_game() -> void:
+	voyage.total_play_seconds = _play_base_seconds + (Time.get_ticks_msec() - _session_start_ms) / 1000.0
 	# alarms
 	var alarm_dicts := []
 	for a in alarms:
@@ -39,6 +47,7 @@ func save_game() -> void:
 		"todo_groups": todo_group_dicts,
 		"habit_defs": habit_defs,
 		"habit_weeks": habit_weeks,
+		"voyage": voyage.to_dict(),
 	}
 	
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -89,3 +98,12 @@ func load_game() -> void:
 	habit_defs = raw_defs if typeof(raw_defs) == TYPE_ARRAY else []
 	var raw_weeks = parsed.get("habit_weeks", [])
 	habit_weeks = raw_weeks if typeof(raw_weeks) == TYPE_ARRAY else []
+	
+	var rv = parsed.get("voyage", {})
+	if typeof(rv) == TYPE_DICTIONARY:
+		voyage.from_dict(rv)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		save_game()
+		get_tree().quit()
