@@ -1,5 +1,8 @@
 extends ClockToolView
 
+const ICON_PAUSE := preload("res://assets/placeholder/pause.svg")
+const ICON_PLAY := preload("res://assets/placeholder/play.svg")
+
 @onready var hours_spin: SpinBox = $VBox/TimeInput/HoursSpin
 @onready var minutes_spin: SpinBox = $VBox/TimeInput/MinutesSpin
 @onready var seconds_spin: SpinBox = $VBox/TimeInput/SecondsSpin
@@ -11,6 +14,7 @@ var _timer: SimpleTimer
 func _ready() -> void:
 	_timer = Clock.timer
 	_timer.timer_finished.connect(_on_finished)
+	_timer.running_changed.connect(_refresh_controls)
 	
 	start_button.pressed.connect(_on_start_pressed)
 	reset_button.pressed.connect(_on_reset_pressed)
@@ -75,7 +79,7 @@ func _on_finished() -> void:
 func _refresh_controls() -> void:
 	var running := _timer.is_running()
 	var is_standby := not _timer.started
-	start_button.text = "일시정지" if running else "시작"
+	start_button.icon = ICON_PAUSE if running else ICON_PLAY
 	start_button.disabled = _timer.finished
 	reset_button.disabled = is_standby
 

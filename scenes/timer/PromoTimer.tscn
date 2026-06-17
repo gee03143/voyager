@@ -1,7 +1,10 @@
 [gd_scene format=3 uid="uid://bt2r4k76lwg1r"]
 
 [ext_resource type="Script" uid="uid://dbmhimic6eb4" path="res://scripts/timer/pomo/pomodoro_view.gd" id="1_s7lvo"]
+[ext_resource type="Texture2D" uid="uid://42ognb8rq1fq" path="res://assets/placeholder/play.svg" id="3_hdkv5"]
 [ext_resource type="PackedScene" uid="uid://cq7yhqdjngbua" path="res://scenes/timer/CountdownDisplay.tscn" id="3_idk55"]
+[ext_resource type="Texture2D" uid="uid://cjlrqdvs1r2tg" path="res://assets/placeholder/skip.svg" id="4_lsfon"]
+[ext_resource type="Texture2D" uid="uid://c7awmbv8t1nd1" path="res://assets/placeholder/reset.svg" id="5_p3mas"]
 
 [node name="PomodoroView" type="Control" unique_id=2053074751]
 layout_mode = 3
@@ -74,12 +77,15 @@ layout_mode = 2
 
 [node name="StartButton" type="Button" parent="VBox/Buttons" unique_id=116232457]
 layout_mode = 2
-text = "시작"
+icon = ExtResource("3_hdkv5")
+icon_alignment = 1
 
 [node name="SkipButton" type="Button" parent="VBox/Buttons" unique_id=270872340]
 layout_mode = 2
-text = "건너뛰기"
+icon = ExtResource("4_lsfon")
+icon_alignment = 1
 
 [node name="StopButton" type="Button" parent="VBox/Buttons" unique_id=979814140]
 layout_mode = 2
-text = "리셋"
+icon = ExtResource("5_p3mas")
+icon_alignment = 1

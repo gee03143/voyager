@@ -1,6 +1,8 @@
 extends ClockToolView
 
 const SEGMENT_CHIP := preload("res://scenes/timer/PomoSegmentChip.tscn")
+const ICON_PAUSE := preload("res://assets/placeholder/pause.svg")
+const ICON_PLAY := preload("res://assets/placeholder/play.svg")
 
 @onready var phase_label: Label = $VBox/PhaseLabel
 @onready var timeline: HBoxContainer = $VBox/Timeline
@@ -18,6 +20,7 @@ var _chips: Array[PomoSegmentChip] = []
 func _ready() -> void:
 	pomodoro = Clock.pomodoro
 	pomodoro.segment_changed.connect(_on_segment_changed)
+	pomodoro.running_changed.connect(_refresh_controls)
 	pomodoro.focus_finished.connect(_on_focus_finished)
 	pomodoro.session_completed.connect(_on_session_completed)
 	pomodoro.plan_built.connect(_rebuild_timeline)
@@ -89,7 +92,7 @@ func _on_stop_pressed() -> void:
 func _on_segment_changed(i: int) -> void:
 	var type := pomodoro.segment_type_at(i)
 	display.set_total(pomodoro.duration_of(type))
-	phase_label.text = "%s  ·  %d / %d 구간" % [_type_name(type), i + 1, pomodoro.segment_count()]
+	phase_label.text = "%s  ·  %d / %d 구간" % [Pomodoro.type_name(type), i + 1, pomodoro.segment_count()]
 	_update_chip_states()
 	_refresh_controls()
 
@@ -97,14 +100,10 @@ func _on_focus_finished() -> void:
 	print("집중 1구간 완료! (나중에 항해 진행)")
 
 func _on_session_completed() -> void:
-	phase_label.text = "세션 완료!"
-	display.render(0.0)
-	_update_chip_states()
-	_refresh_controls()
 	_play_alert()
 
 func _refresh_controls() -> void:
-	start_button.text = "일시정지" if pomodoro.is_running() else "시작"
+	start_button.icon = ICON_PAUSE if pomodoro.is_running() else ICON_PLAY
 	start_button.disabled = pomodoro.finished
 	skip_button.disabled = pomodoro.finished or not pomodoro.started
 	
@@ -135,16 +134,6 @@ func _update_chip_states() -> void:
 		else:
 			state = PomoSegmentChip.State.PENDING
 		_chips[i].set_state(state)
-
-func _type_name(type: int) -> String:
-	match type:
-		Pomodoro.SegmentType.FOCUS:
-			return "집중"
-		Pomodoro.SegmentType.SHORT_BREAK:
-			return "짧은 휴식"
-		Pomodoro.SegmentType.LONG_BREAK:
-			return "긴 휴식"
-	return "집중"
 	
 func _is_active() -> bool:
 	return pomodoro.is_running()

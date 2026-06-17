@@ -2,6 +2,7 @@ class_name Pomodoro
 extends Node
 
 signal segment_changed(index: int)
+signal running_changed
 signal focus_finished
 signal session_completed
 signal plan_built
@@ -46,10 +47,12 @@ func start() -> void:
 		_start_segment_timer()      # 첫 시작(standby)
 	elif _handle.is_paused():
 		_handle.resume()            # 일시정지 → 재개
+	running_changed.emit()
 
 func pause() -> void:
 	if _handle != null and _handle.is_valid() and not _handle.is_paused():
 		_handle.pause()
+		running_changed.emit()
 
 func is_running() -> bool:
 	return _handle != null and _handle.is_valid() and not _handle.is_paused()
@@ -116,3 +119,18 @@ func _advance() -> void:
 		session_completed.emit()
 	else:
 		_load_segment(next, true)   # 항상 재생
+		
+static func type_name(type: int) -> String:
+	match type:
+		SegmentType.FOCUS:
+			return "집중"
+		SegmentType.SHORT_BREAK:
+			return "짧은 휴식"
+		SegmentType.LONG_BREAK:
+			return "긴 휴식"
+	return ""
+
+func current_total() -> float:
+	if segment_types.is_empty():
+		return 0.0
+	return duration_of(segment_types[index])

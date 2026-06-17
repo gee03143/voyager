@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://dbitpeq18sx2o"]
+
+[ext_resource type="Script" uid="uid://t7ufxkhp6sb1" path="res://scripts/hud.gd" id="1_f1f40"]
+[ext_resource type="Script" uid="uid://blpy0nnod56at" path="res://scripts/habittracker/radial_progress.gd" id="2_rwkyw"]
+[ext_resource type="Script" uid="uid://oi88pryw8ohh" path="res://scripts/commonui/segment_timeline.gd" id="3_rwkyw"]
+[ext_resource type="Texture2D" uid="uid://yos04ttvb1pn" path="res://assets/placeholder/helm.svg" id="3_yc8k2"]
+[ext_resource type="Texture2D" uid="uid://dxbybywbi8h1y" path="res://assets/placeholder/pause.svg" id="5_gfly3"]
+[ext_resource type="Texture2D" uid="uid://cjlrqdvs1r2tg" path="res://assets/placeholder/skip.svg" id="6_igu3p"]
+[ext_resource type="Texture2D" uid="uid://c7awmbv8t1nd1" path="res://assets/placeholder/reset.svg" id="7_fiauw"]
+
+[node name="Hud" type="PanelContainer" unique_id=1516792778]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_f1f40")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=205934661]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=885989183]
+layout_mode = 2
+
+[node name="RingBox" type="Control" parent="Margin/VBox" unique_id=1873468242]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+
+[node name="Ring" type="Control" parent="Margin/VBox/RingBox" unique_id=796163632]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_rwkyw")
+arc_color = Color(0.8039216, 0.6392157, 0.32156864, 1)
+arc_width = 6.0
+track_ticks = 48
+metadata/_custom_type_script = "uid://blpy0nnod56at"
+
+[node name="TimeLabel" type="Label" parent="Margin/VBox/RingBox" unique_id=221472982]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CaptionRow" type="HBoxContainer" parent="Margin/VBox" unique_id=1151062274]
+layout_mode = 2
+
+[node name="Helm" type="TextureRect" parent="Margin/VBox/CaptionRow" unique_id=931637049]
+layout_mode = 2
+texture = ExtResource("3_yc8k2")
+stretch_mode = 4
+
+[node name="Caption" type="Label" parent="Margin/VBox/CaptionRow" unique_id=1304298404]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Timeline" type="Control" parent="Margin/VBox" unique_id=1598141985]
+custom_minimum_size = Vector2(1, 18)
+layout_mode = 2
+script = ExtResource("3_rwkyw")
+metadata/_custom_type_script = "uid://oi88pryw8ohh"
+
+[node name="Buttons" type="HBoxContainer" parent="Margin/VBox" unique_id=629068378]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="PauseButton" type="Button" parent="Margin/VBox/Buttons" unique_id=2047438355]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "
+
+"
+icon = ExtResource("5_gfly3")
+icon_alignment = 1
+
+[node name="SkipButton" type="Button" parent="Margin/VBox/Buttons" unique_id=106076523]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "
+
+
+"
+icon = ExtResource("6_igu3p")
+icon_alignment = 1
+
+[node name="ResetButton" type="Button" parent="Margin/VBox/Buttons" unique_id=180077478]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "
+
+"
+icon = ExtResource("7_fiauw")
+icon_alignment = 1

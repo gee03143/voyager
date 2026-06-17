@@ -3,19 +3,13 @@ extends HBoxContainer
 @onready var nav: VBoxContainer = $NavBar
 @onready var pages: TabContainer = $Pages
 
-func _ready() -> void:
-	var group := ButtonGroup.new()
-	var idx := 0
-	for child in nav.get_children():
-		if child is Button:
-			child.toggle_mode = true
-			child.button_group = group
-			child.pressed.connect(_on_nav_pressed.bind(idx))
-			if idx == 0:
-				child.button_pressed = true
-			idx += 1
-	pages.current_tab = 0
+var _nav := ButtonGroupNav.new()
 
-func _on_nav_pressed(index: int) -> void:
-	if index < pages.get_tab_count():
+func _ready() -> void:
+	_nav.setup_from(nav)
+	_nav.selected.connect(_on_nav_selected)
+	_nav.select(0)
+
+func _on_nav_selected(index: int) -> void:
+	if index >= 0 and index < pages.get_tab_count():
 		pages.current_tab = index

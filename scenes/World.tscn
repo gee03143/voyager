@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://cnnerwoxqu3m8"]
+
+[ext_resource type="Texture2D" uid="uid://bvuuoah6i7535" path="res://assets/placeholder/island.svg" id="1_32lhk"]
+[ext_resource type="Script" uid="uid://bx3savggf0mb5" path="res://scripts/world.gd" id="1_d1c63"]
+[ext_resource type="Texture2D" uid="uid://dwcwcp4pm2rlk" path="res://assets/placeholder/ship.svg" id="2_7g83o"]
+[ext_resource type="PackedScene" uid="uid://cg7wgy7ywwqqo" path="res://scenes/timer/ClockTab.tscn" id="4_1lgw5"]
+[ext_resource type="PackedScene" uid="uid://buc68m4bpnu7y" path="res://scenes/todo/TodoTab.tscn" id="5_hlk0d"]
+[ext_resource type="PackedScene" uid="uid://de6n57hebkgrg" path="res://scenes/habittracker/HabitTrackerView.tscn" id="6_0uv0p"]
+[ext_resource type="PackedScene" uid="uid://dbitpeq18sx2o" path="res://scenes/Hud.tscn" id="7_0uv0p"]
+
+[node name="World" type="Node2D" unique_id=1409265880 node_paths=PackedStringArray("dock", "panels")]
+script = ExtResource("1_d1c63")
+dock = NodePath("UI/Dock")
+panels = [NodePath("UI/PanelHost/ClockTab"), NodePath("UI/PanelHost/TodoView"), NodePath("UI/PanelHost/HabitTrackerView")]
+
+[node name="Background" type="CanvasLayer" parent="." unique_id=988105801]
+layer = -10
+
+[node name="Sky" type="ColorRect" parent="Background" unique_id=638304801]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.7490196, 0.9019608, 0.9607843, 1)
+
+[node name="Sea" type="ColorRect" parent="Background" unique_id=137498959]
+anchors_preset = -1
+anchor_top = 0.6
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 0.19998169
+offset_bottom = 0.19995117
+color = Color(0.24313726, 0.47058824, 0.65882355, 1)
+
+[node name="Port" type="Sprite2D" parent="." unique_id=9895481]
+position = Vector2(180, 410)
+scale = Vector2(3.5, 3.5)
+texture = ExtResource("1_32lhk")
+
+[node name="Ship" type="Sprite2D" parent="." unique_id=1585407981]
+position = Vector2(660, 430)
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("2_7g83o")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=379188479]
+
+[node name="Dock" type="VBoxContainer" parent="UI" unique_id=1197393021]
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -20.0
+offset_right = 40.0
+offset_bottom = 20.0
+grow_vertical = 2
+
+[node name="ClockButton" type="Button" parent="UI/Dock" unique_id=839608971]
+layout_mode = 2
+text = "시계"
+
+[node name="TodoButton" type="Button" parent="UI/Dock" unique_id=1402855475]
+layout_mode = 2
+text = "할일"
+
+[node name="HabitButton" type="Button" parent="UI/Dock" unique_id=801797632]
+layout_mode = 2
+text = "습관"
+
+[node name="VoyageButton" type="Button" parent="UI/Dock" unique_id=1590726701]
+layout_mode = 2
+text = "항해"
+
+[node name="PanelHost" type="CenterContainer" parent="UI" unique_id=61537474]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ClockTab" parent="UI/PanelHost" unique_id=1281600236 instance=ExtResource("4_1lgw5")]
+visible = false
+layout_mode = 2
+
+[node name="TodoView" parent="UI/PanelHost" unique_id=1298183729 instance=ExtResource("5_hlk0d")]
+layout_mode = 2
+
+[node name="HabitTrackerView" parent="UI/PanelHost" unique_id=1593460480 instance=ExtResource("6_0uv0p")]
+layout_mode = 2
+
+[node name="Hud" parent="UI" unique_id=1516792778 instance=ExtResource("7_0uv0p")]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_right = 0.0
+offset_bottom = 51.0
+grow_horizontal = 0
+pivot_offset = Vector2(-16, 16)
+pivot_offset_ratio = Vector2(1, 0)
