@@ -2,7 +2,6 @@ extends ClockToolView
 
 const SEGMENT_CHIP := preload("res://scenes/timer/PomoSegmentChip.tscn")
 
-@onready var pomodoro: Pomodoro = $Pomodoro
 @onready var phase_label: Label = $VBox/PhaseLabel
 @onready var timeline: HBoxContainer = $VBox/Timeline
 @onready var start_button: Button = $VBox/Buttons/StartButton
@@ -13,10 +12,11 @@ const SEGMENT_CHIP := preload("res://scenes/timer/PomoSegmentChip.tscn")
 @onready var long_break_spin: SpinBox = $VBox/Config/LongBreakSpin
 @onready var count_spin: SpinBox = $VBox/Config/CountSpin
 
+var pomodoro: Pomodoro
 var _chips: Array[PomoSegmentChip] = []
 
 func _ready() -> void:
-	pomodoro.ticked.connect(_on_ticked)
+	pomodoro = Clock.pomodoro
 	pomodoro.segment_changed.connect(_on_segment_changed)
 	pomodoro.focus_finished.connect(_on_focus_finished)
 	pomodoro.session_completed.connect(_on_session_completed)
@@ -36,21 +36,29 @@ func _ready() -> void:
 	long_break_spin.value_changed.connect(_on_config_changed)
 	count_spin.value_changed.connect(_on_config_changed)
 	
-	_configure_pomodoro()
+	_rebuild_timeline()
+	_on_segment_changed(pomodoro.index)
 	
 	_init_clock_tool()
 	
-func _configure_pomodoro() -> void:
+func _process(_delta: float) -> void:
+	if not is_visible_in_tree():
+		return
+	var t := pomodoro.time_left()
+	display.render(t)
+	if pomodoro.index < _chips.size():
+		var total := pomodoro.duration_of(pomodoro.segment_type_at(pomodoro.index))
+		if total > 0.0:
+			_chips[pomodoro.index].set_progress((total - t) / total)
+	
+func _on_config_changed(_v: float) -> void:
+	if pomodoro.started:
+		return
 	pomodoro.focus_seconds = focus_spin.value * 60.0
 	pomodoro.short_break_seconds = short_break_spin.value * 60.0
 	pomodoro.long_break_seconds = long_break_spin.value * 60.0
 	pomodoro.total_focus_count = int(count_spin.value)
 	pomodoro.build_plan()
-	
-func _on_config_changed(_v: float) -> void:
-	if pomodoro.started:
-		return
-	_configure_pomodoro()
 
 func _save_settings() -> void:
 	Save.settings.focus_seconds = focus_spin.value * 60.0
@@ -84,13 +92,6 @@ func _on_segment_changed(i: int) -> void:
 	phase_label.text = "%s  ·  %d / %d 구간" % [_type_name(type), i + 1, pomodoro.segment_count()]
 	_update_chip_states()
 	_refresh_controls()
-
-func _on_ticked(time_left: float) -> void:
-	display.render(time_left)
-	if pomodoro.index < _chips.size():
-		var total := pomodoro.duration_of(pomodoro.segment_type_at(pomodoro.index))
-		var ratio := ((total - time_left) / total) if total > 0.0 else 0.0
-		_chips[pomodoro.index].set_progress(ratio)
 
 func _on_focus_finished() -> void:
 	print("집중 1구간 완료! (나중에 항해 진행)")

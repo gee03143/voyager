@@ -19,6 +19,8 @@ config/icon="res://icon.svg"
 
 Save="*uid://b46e2jhwgai18"
 Sound="*uid://b0fwg4wdcey2j"
+Timers="*uid://d2x0ciuouyfpp"
+Clock="*uid://8s7pcds8ormb"
 
 [physics]
 

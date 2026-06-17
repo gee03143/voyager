@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://bt2r4k76lwg1r"]
 
 [ext_resource type="Script" uid="uid://dbmhimic6eb4" path="res://scripts/timer/pomo/pomodoro_view.gd" id="1_s7lvo"]
-[ext_resource type="Script" uid="uid://dnmhjxnc3yc02" path="res://scripts/timer/pomo/pomodoro.gd" id="2_idk55"]
 [ext_resource type="PackedScene" uid="uid://cq7yhqdjngbua" path="res://scenes/timer/CountdownDisplay.tscn" id="3_idk55"]
 
 [node name="PomodoroView" type="Control" unique_id=2053074751]
@@ -12,13 +11,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_s7lvo")
-
-[node name="Pomodoro" type="Node" parent="." unique_id=2076633591]
-script = ExtResource("2_idk55")
-focus_seconds = 5.0
-short_break_seconds = 1.0
-long_break_seconds = 2.0
-metadata/_custom_type_script = "uid://dnmhjxnc3yc02"
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=48566559]
 layout_mode = 0
@@ -62,7 +54,9 @@ suffix = "분"
 
 [node name="CountSpin" type="SpinBox" parent="VBox/Config" unique_id=478338213]
 layout_mode = 2
+min_value = 1.0
 max_value = 12.0
+value = 1.0
 suffix = "회"
 
 [node name="PhaseLabel" type="Label" parent="VBox" unique_id=436305482]

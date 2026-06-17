@@ -49,7 +49,12 @@
 ### Week 4 · 항해 진행 + 발견 + 앱 셸 — **상주 월드 셸 확정**
 > 앱 셸 = **상주 월드 셸**(월드가 바탕, 도구는 그 위 팝업). 상세·결정 근거는 architecture.md "앱 셸 — 상주 월드 셸".
 > 좌측 세로 도크 / 패널 한 번에 하나(hide 토글, 타이머 보존) / 돌아가는 타이머는 월드에 상시 HUD.
-- [ ] **F 틱-안전 기반**: `CountDown` 클럭 기반(`_end_ms`) 교체. 외부 시그니처 동일, 한 파일. (백그라운드/최소화에서 정확 — architecture "틱엔 연출만" 원칙)
+- [x] **T1 타이밍 프리미티브** (완료): `Timers`(autoload `TimerManager`) + `TimerHandle`. 클럭 기반 핸들(`set_timer`→`remaining/pause/resume/cancel`). autoload 등록 완료, 정적 검증 통과.
+- [x] **T2 세션 소유자** (완료): T2a(타이밍 재배선)/T2b(소유 이전)로 분할 진행.
+  - T2a: `pomodoro.gd` 핸들 기반 재작성 ✅, `TimerManager.is_paused`+`TimerHandle.is_paused` 추가 ✅, `pomodoro_view.gd` 폴링 `_process` 추가 ✅. **남은 것 = `pomodoro_view.gd`에서 ① 19행 `pomodoro.ticked.connect(_on_ticked)` 삭제, ② `_on_ticked` 함수 삭제** (ticked 시그널 제거됨 → 안 지우면 실행 에러) → 이후 F6(시작/일시정지/스킵/세그먼트전환/세션완료 + 최소화 정확) 검증.
+  - T2b: `Clock`(autoload) 도입해 `Pomodoro` 소유, `PomodoroView`를 `$Pomodoro`→`Clock.pomodoro` 바인딩(뷰는 reset 아닌 **sync**), `PomodoroView.tscn`의 `$Pomodoro` 노드 제거.
+- [x] **T3 타이머 뷰** (완료): `SimpleTimer`→`Timers` 재배선, TimerView 바인딩, `countdown.gd` 삭제 완료. (알람은 휘발성 아님 → TimerManager 비귀속, "알람 전역화"로 별도) ※ 점검에서 `simple_timer.start()` 가드 `and`→`or` 버그 1건 발견·수정.
+- [ ] ⭐ **다음 착수 = ⓪ 데이터** (Voyage)
 - [ ] ⓪ 데이터: `Voyage{total_play_seconds, total_focus_seconds}` + version 4. 플레이시간 = `Save`가 클럭 기반 갱신 + 종료 저장. (거리·섬은 ⑤/⑥에서)
 - [ ] ① 월드 루트(`GameTitle` 교체): 항구·바다·배 플레이스홀더, 메인 씬
 - [ ] ② 도크 + 패널 호스트: 기존 뷰를 팝업으로 open/close(1개 한정, hide 토글), 도크 매핑 commonui 추출

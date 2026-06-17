@@ -9,9 +9,7 @@ extends ClockToolView
 var _timer: SimpleTimer
 
 func _ready() -> void:
-	_timer = SimpleTimer.new()
-	add_child(_timer)
-	_timer.ticked.connect(_on_ticked)
+	_timer = Clock.timer
 	_timer.timer_finished.connect(_on_finished)
 	
 	start_button.pressed.connect(_on_start_pressed)
@@ -26,9 +24,15 @@ func _ready() -> void:
 	minutes_spin.value_changed.connect(_on_time_changed)
 	seconds_spin.value_changed.connect(_on_time_changed)
 
-	_apply_duration()
-	
+	display.set_total(_timer.duration)
+	_refresh_controls()
+
 	_init_clock_tool()
+	
+func _process(_delta: float) -> void:
+	if not is_visible_in_tree():
+		return
+	display.render(_timer.time_left())
 
 func _input_seconds() -> float:
 	return hours_spin.value * 3600.0 + minutes_spin.value * 60.0 + seconds_spin.value
@@ -62,9 +66,6 @@ func _save_settings() -> void:
 func _on_reset_pressed() -> void:
 	_timer.reset()
 	_refresh_controls()
-
-func _on_ticked(time_left: float) -> void:
-	display.render(time_left)
 
 func _on_finished() -> void:
 	print("타이머 완료!")

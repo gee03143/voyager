@@ -1,7 +1,6 @@
 class_name Pomodoro
 extends Node
 
-signal ticked(time_left: float)
 signal segment_changed(index: int)
 signal focus_finished
 signal session_completed
@@ -18,15 +17,10 @@ var segment_types: Array[int] = []
 var index: int = 0
 var started: bool = false
 var finished: bool = false
-var _countdown: CountDown
+var _handle: TimerHandle = null
 
-func _ready() -> void:
-	_countdown = CountDown.new()
-	add_child(_countdown)
-	_countdown.ticked.connect(_on_countdown_ticked)
-	_countdown.finished.connect(_on_countdown_finished)
-	
 func build_plan() -> void:
+	_clear_handle()
 	segment_types.clear()
 	for i in total_focus_count:
 		segment_types.append(SegmentType.FOCUS)
@@ -43,27 +37,38 @@ func build_plan() -> void:
 		return
 	plan_built.emit()
 	_load_segment(0, false)
-	
+
 func start() -> void:
-	if not finished:
-		started = true
-		_countdown.start()
-	
+	if finished:
+		return
+	started = true
+	if _handle == null or not _handle.is_valid():
+		_start_segment_timer()      # 첫 시작(standby)
+	elif _handle.is_paused():
+		_handle.resume()            # 일시정지 → 재개
+
 func pause() -> void:
-	_countdown.pause()
-	
+	if _handle != null and _handle.is_valid() and not _handle.is_paused():
+		_handle.pause()
+
 func is_running() -> bool:
-	return _countdown.is_running()
-	
+	return _handle != null and _handle.is_valid() and not _handle.is_paused()
+
 func reset() -> void:
-	_countdown.pause()
-	build_plan()
+	build_plan()                    # build_plan 이 핸들도 정리
 
 func skip() -> void:
 	if not finished:
 		_advance()
-		
+
 # --- UI 조회용 ---
+func time_left() -> float:
+	if _handle != null and _handle.is_valid():
+		return _handle.remaining()
+	if finished or segment_types.is_empty():
+		return 0.0
+	return duration_of(segment_types[index])      # standby = 해당 구간 전체 길이
+
 func segment_count() -> int:
 	return segment_types.size()
 
@@ -79,30 +84,35 @@ func duration_of(type: int) -> float:
 		SegmentType.LONG_BREAK:
 			return long_break_seconds
 	return focus_seconds
-	
+
 # --- 내부 ---
 func _load_segment(i: int, resume: bool) -> void:
 	index = i
-	_countdown.configure(duration_of(segment_types[i]))
+	_clear_handle()
 	if resume:
-		_countdown.start()
-	else:
-		_countdown.pause()
+		_start_segment_timer()
 	segment_changed.emit(i)
 
-func _on_countdown_ticked(time_left: float) -> void:
-	ticked.emit(time_left)
+func _start_segment_timer() -> void:
+	_handle = Timers.set_timer(duration_of(segment_types[index]), _on_segment_finished)
 
-func _on_countdown_finished() -> void:
+func _clear_handle() -> void:
+	if _handle != null:
+		if _handle.is_valid():
+			_handle.cancel()
+		_handle = null
+
+func _on_segment_finished() -> void:
+	_handle = null                  # 만료 핸들은 매니저가 이미 제거
 	_advance()
 
 func _advance() -> void:
 	if segment_types[index] == SegmentType.FOCUS:
-		focus_finished.emit()         # 끝났든 건너뛰었든 채운 것으로 취급
+		focus_finished.emit()       # 끝났든 건너뛰었든 채운 것으로 취급
 	var next := index + 1
 	if next >= segment_types.size():
 		finished = true
-		_countdown.pause()
+		_clear_handle()
 		session_completed.emit()
 	else:
-		_load_segment(next, true)     # 항상 재생
+		_load_segment(next, true)   # 항상 재생

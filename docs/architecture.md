@@ -16,7 +16,7 @@
 
 ## 아키텍처 원칙 (확립됨)
 - **메커니즘 vs 뷰/컨트롤러 분리**
-  - 메커니즘(`CountDown`, `Pomodoro`, `SimpleTimer`, `AlarmClock`)은 `Save`/전역을 **모름** — 재사용·테스트 가능
+  - 메커니즘(`Pomodoro`, `SimpleTimer`, `AlarmClock`; 지속시간 타이밍은 `TimerManager`)은 `Save`/전역을 **모름** — 재사용·테스트 가능. (`CountDown`은 `TimerManager`로 대체·삭제됨, Week 4)
   - 뷰/컨트롤러가 `Save` 를 알고 배선
 - **공통 뷰 동작은 `ClockToolView`** (베이스, `extends Control`): `_apply_settings`(카운트다운 표시), `_try_minimize`, `_play_alert`, `_is_active`(virtual override)
 - **저장 정책**
@@ -26,7 +26,7 @@
 - **"하나만 보고 일반화 안 함"** → 두 번째 사례에서 베이스 추출
 - **틱(`_process`)엔 연출만**: 데스크톱 컴패니언이라 백그라운드/최소화에서 `_process`가 throttle/pause될 수 있다. **시간·카운트 등 측정/누적 로직을 틱에서 하지 말 것**(delta 합산 X) → 모노토닉 클럭(`Time.get_ticks_msec()`) 차이로 계산. `ticked` 같은 표시 갱신만 틱 허용. 콜백 발화 자체는 루프 재개 시점에 일어남(지연은 불가피하나 측정값은 클럭이라 정확).
   - **클럭 선택**: 지속시간(duration) 타이머 = **모노토닉**(`Time.get_ticks_msec`, OS 수면 중 멈춤=집중 아님이라 맞음). 벽시계 시각 도달(알람) = **시스템 시각**(`Time.get_time_dict_from_system`).
-  - **틱-안전 감사(Week 4 착수 시)**: ① `CountDown`(countdown.gd) = delta 누적형 → **클럭 기반(`_end_ms`) 교체**(기반 부품 수정, 외부 시그니처 동일). ② `AlarmClock` = 클럭 읽기라 드리프트 없으나 1초 폴링이 "매 분 최소 1회 실행" 가정 → 서스펜드로 분 건너뛰면 그 분 알람 유실. **갭 catch-up은 "알람 전역화"에 fire-late 정책과 함께** 보강(지금 아님).
+  - **틱-안전 감사(Week 4 착수 시)**: ① `CountDown`(countdown.gd) = delta 누적형 → **전역 `TimerManager`로 대체**(노드 폐기, 클럭 타이밍은 매니저 코어로 흡수 — 아래 "타이밍 인프라"). ② `AlarmClock` = 클럭 읽기라 드리프트 없으나 1초 폴링이 "매 분 최소 1회 실행" 가정 → 서스펜드로 분 건너뛰면 그 분 알람 유실. **갭 catch-up은 "알람 전역화"에 fire-late 정책과 함께** 보강(지금 아님).
 - 알람: UI **12시간+오전/오후**, 내부 **24시간**
 - 다국어: 원본문자열=키, 나중에 일괄 `tr()`; 지금은 문장 통째 포맷 유지(조각 연결 금지)
 - 미래 서버/sync 대비: 단일 진실(`Save`)·JSON·`version` 필드.
@@ -104,10 +104,22 @@
   - `total_focus_seconds` 누적 = **포모 `focus_finished`(집중 단계) + 일반 타이머 완료** 시 (사용자 결정). 메커니즘은 `Save` 모름 유지 → `Save` 아는 뷰/컨트롤러가 배선. 드문 사건 → **즉시 저장**(`changed`→save, save-on-start와 같은 결). 이게 Week 1 미뤄둔 "총 집중시간 persist"의 실체.
   - `total_play_seconds` 누적 = **클럭 기반, `Save`(autoload)가 소유**. 세션 시작 시 `_play_base_seconds=total_play_seconds`·`_session_start_ms=Time.get_ticks_msec()` 기록 → `save_game()` 직전 `total_play_seconds = base + (now-start)/1000` 갱신. 매 프레임 `delta` 누적(X) → 백그라운드/최소화에서 `_process` throttle 돼도 클럭 차이로 정확. 종료 시 `NOTIFICATION_WM_CLOSE_REQUEST`로 마지막 저장.
   - **거리(파생)·발견 섬**: 슬라이스 ⑤/⑥에서 도입. distance = `total_focus_seconds × 환산율`(파생, 단일 진실), 섬 = 지도·도감이 참조 → 안정 ID(`randi` 패턴).
-- **빌드 순서(각 단계 F6 검증, 범위 축소 아님)**: **F**(`CountDown` 클럭 기반 교체 — 틱-안전 baseline) → ⓪데이터 → ①월드 루트 → ②도크+패널 호스트 → ③집중 누적(`focus_finished`+타이머 완료→`total_focus_seconds`) → ④상시 타이머 HUD → ⑤배 반응 + 거리(`distance()` 파생) 도입·해리 배지 → ⑥발견.
+- **빌드 순서(각 단계 F6 검증, 범위 축소 아님)**: **T1**(`Timers`=`TimerManager`+`TimerHandle` autoload) → **T2**(`Clock` autoload + `Pomodoro`→`Timers`·PomodoroView 바인딩·`CountDown` 제거) → **T3**(`SimpleTimer`→`Timers`·TimerView 바인딩) → ⓪데이터 → ①월드 루트 → ②도크+패널 호스트 → ③집중 누적(`focus_finished`+타이머 완료→`total_focus_seconds`) → ④상시 타이머 HUD → ⑤배 반응 + 거리(`distance()` 파생) 도입·해리 배지 → ⑥발견.
   - 배의 "항해 중 라이브 연출"은 폴리시 — Week 4 산출물은 **완료 시 누적**까지. 라이브 애니는 나중.
 - **발견 테마 보류(사용자 명시)**: 섬 발견 **트리거·카탈로그·연출**은 게임 테마 논의가 필요 → **슬라이스 ⓪~⑤(월드·도크·항해 누적) 끝낸 뒤 재논의**. Week 4 내 진행 예정이나 지금 착수 작업과는 무관.
 - **부수 정리 기회**: 월드가 상주하므로 미뤄둔 **알람 전역화**(autoload 발화)·**데일리 라이브 롤오버**(주 경계 즉시 갱신)의 자리가 생김 — Week 4에 꼭 다 할 필욘 없으나 훅 위치 확보.
+
+## 타이밍 인프라 (TimerManager / Clock — Week 4 foundation)
+> 셸의 전제: 진행 중인 타이머가 뷰(패널)와 무관하게 살아있어야 한다. 기존엔 메커니즘이 뷰 자식(`PomodoroView.$Pomodoro`, `TimerView`가 `SimpleTimer` 생성, `AlarmView`가 `AlarmClock` 생성)이라 부적합 → 전역으로 올린다. (사용자=Unreal `FTimerManager` 착안 제안)
+
+- **`Timers` (autoload, `TimerManager extends Node`)** — 범용 클럭 기반 지속시간 타이머 프리미티브.
+  - API: `set_timer(duration, on_finished: Callable) -> TimerHandle` / `get_remaining(id)` / `pause·resume·clear(id)` / `is_active(id)`. `TimerHandle`(RefCounted)이 `.remaining()/.pause()/.resume()/.cancel()/.is_valid()`를 매니저에 위임(단일 진실=매니저, 핸들=얇은 키+편의).
+  - 타이밍 = 모노토닉(`Time.get_ticks_msec`), **delta 누적 X**. `_process`는 "`now>=end_ms`면 콜백 발화 후 제거"만(클럭 비교; 콜백 발화엔 루프 필요 = 복귀 시 발화하나 측정은 정확). → `CountDown` 노드 폐기, 그 역할이 매니저 코어로.
+  - 표시 갱신 = **뷰가 `handle.remaining()` 폴링**(연출=틱 허용). 매니저는 완료 콜백만 — "틱엔 연출만" 유지.
+  - **메커니즘 계층**: `Save`/도메인 모름(재사용·테스트 가능). 내장 `Timer`/`SceneTreeTimer`는 클럭-안전 조회·핸들 일시정지/취소가 없어 부적합 → 커스텀 정당.
+- **`Clock` (autoload, 세션 컨트롤러)** — `Pomodoro`/`SimpleTimer` 인스턴스 **소유**(뷰에서 분리). `Timers`로 타이밍, active 세션 추적, `focus_finished`/타이머완료 → `Save.voyage.add_focus`(슬라이스 ③). 뷰는 `Clock.pomodoro` 등에 **바인딩**(생성·소유 X), 표시는 폴링. **컨트롤러 계층**: `Save` 앎.
+- **영속성 경계(사용자 결정)**: 진행 중 포모/타이머 세션 = **휘발성**(프로세스 종료 시 소멸, Save 직렬화 X). 알람 = **영속**(`Save.alarms`) → 성격이 달라 **`TimerManager`에 귀속 안 함**. `AlarmClock`(벽시계 폴링)은 별도로 두고 "알람 전역화"로 autoload화 + 갭 catch-up.
+- **autoload 등록 순서**: `Save`, `Sound`, **`Timers`**, **`Clock`**(Clock이 Timers·Save 참조하므로 뒤).
 
 ## 미룬 항목 (roadmap.md "미룬 항목" 섹션)
 - 타이머 스타일 Circle / 자동 최소화 실제 효과(Week 7) / 총 집중시간 추적(Week 4, `focus_finished` 연결) / 알람 전역화(autoload) / CRUD 리스트 베이스 추출 / **데일리 라이브 롤오버**(앱 켜둔 채 주 경계 — Week 4 앱 셸 열림 훅).

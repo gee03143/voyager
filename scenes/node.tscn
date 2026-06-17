@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cy5ax66eln3u7"]
+
+[sub_resource type="GDScript" id="GDScript_ru4op"]
+script/source = "extends Node
+
+var h: TimerHandle
+
+func _ready() -> void:
+	h = Timers.set_timer(3.0, func(): print(\">>> finished\"))
+
+func _process(_d: float) -> void:
+	if h.is_valid():
+		print(\"remaining: %.2f\" % h.remaining())
+"
+
+[node name="Node" type="Node" unique_id=880691971]
+script = SubResource("GDScript_ru4op")
