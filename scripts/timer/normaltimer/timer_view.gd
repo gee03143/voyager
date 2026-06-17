@@ -13,7 +13,6 @@ var _timer: SimpleTimer
 
 func _ready() -> void:
 	_timer = Clock.timer
-	_timer.timer_finished.connect(_on_finished)
 	_timer.running_changed.connect(_refresh_controls)
 	
 	start_button.pressed.connect(_on_start_pressed)
@@ -70,11 +69,6 @@ func _save_settings() -> void:
 func _on_reset_pressed() -> void:
 	_timer.reset()
 	_refresh_controls()
-
-func _on_finished() -> void:
-	print("타이머 완료!")
-	_refresh_controls()
-	_play_alert()
 
 func _refresh_controls() -> void:
 	var running := _timer.is_running()

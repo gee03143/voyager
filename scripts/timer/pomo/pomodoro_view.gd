@@ -22,7 +22,6 @@ func _ready() -> void:
 	pomodoro.segment_changed.connect(_on_segment_changed)
 	pomodoro.running_changed.connect(_refresh_controls)
 	pomodoro.focus_finished.connect(_on_focus_finished)
-	pomodoro.session_completed.connect(_on_session_completed)
 	pomodoro.plan_built.connect(_rebuild_timeline)
 
 	start_button.pressed.connect(_on_start_pressed)
@@ -98,9 +97,6 @@ func _on_segment_changed(i: int) -> void:
 
 func _on_focus_finished() -> void:
 	print("집중 1구간 완료! (나중에 항해 진행)")
-
-func _on_session_completed() -> void:
-	_play_alert()
 
 func _refresh_controls() -> void:
 	start_button.icon = ICON_PAUSE if pomodoro.is_running() else ICON_PLAY

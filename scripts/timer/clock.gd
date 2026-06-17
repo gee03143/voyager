@@ -29,7 +29,14 @@ func _on_focus_finished() -> void:
 	Save.voyage.add_focus(pomodoro.focus_seconds)   # 집중 1구간 = 계획된 집중 길이 적립
 
 func _on_timer_finished() -> void:
-	Save.voyage.add_focus(timer.duration)           # 일반 타이머 완주 = 그 길이 적립
+	print("타이머 완료!")
+	Save.voyage.add_focus(timer.duration)
+	Sound.play_set(Save.settings.sound_set)   # 완료음(컨트롤러가 완료를 앎)
+	timer.reset()                             # 완주 → 자동 대기 복귀 (포모와 일관)
+
+func _on_session_completed() -> void:
+	Sound.play_set(Save.settings.sound_set)   # 완료음
+	pomodoro.build_plan()                     # 완료 → 자동 대기 복귀
 	
 # --- active 세션 선택 (진행 중 = started & !finished, 포모 우선 → 타이머) ---
 func active_kind() -> int:
@@ -79,6 +86,3 @@ func active_reset() -> void:
 	match active_kind():
 		Kind.POMODORO: pomodoro.reset()
 		Kind.TIMER: timer.reset()
-		
-func _on_session_completed() -> void:
-	pomodoro.build_plan()      # 완료 → 자동으로 초기 대기 상태(리셋 불필요)
