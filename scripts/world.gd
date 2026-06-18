@@ -6,6 +6,7 @@ extends Node2D
 @onready var haeri_label: Label = $UI/HaeriBadge
 @onready var parallax: ParallaxBackground = $Parallax
 @onready var ship: Sprite2D = $Ship
+@onready var _parallax_layers: Array = $Parallax.get_children()
 
 const PX_PER_NMI := 60.0	 # 스크롤 환산(픽셀/해리)
 
@@ -23,7 +24,7 @@ var _nav := ButtonGroupNav.new()
 var _ship_speed := 0.0
 
 func _ready() -> void:
-	_nav.setup_from(dock)
+	_nav.setup_from(dock, true)
 	_nav.selected.connect(_on_nav_selected)
 	_nav.select(dock.get_child_count() - 1)   # 시작 = 마지막 버튼(항해) = 월드만
 	
@@ -36,7 +37,10 @@ func _process(delta: float) -> void:
 		Save.voyage.voyage_distance += _ship_speed * delta          # 속도 적분 = 거리
 	haeri_label.text = "%.1f leagues" % Save.voyage.voyage_distance
 	
-	parallax.scroll_offset.x = Save.voyage.voyage_distance * PX_PER_NMI
+	var d := Save.voyage.voyage_distance * PX_PER_NMI
+	for layer in _parallax_layers:
+		if layer is ParallaxLayer and layer.motion_mirroring.x > 0.0:
+			layer.motion_offset.x = -fmod(d * layer.motion_scale.x, layer.motion_mirroring.x)
 	
 	_bob_t += delta
 	var rough := 1.0 + _ship_speed * 0.6     # 항해 중 더 큰 흔들림
