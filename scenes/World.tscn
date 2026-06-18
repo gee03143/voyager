@@ -1,12 +1,16 @@
 [gd_scene format=3 uid="uid://cnnerwoxqu3m8"]
 
-[ext_resource type="Texture2D" uid="uid://bvuuoah6i7535" path="res://assets/placeholder/island.svg" id="1_32lhk"]
 [ext_resource type="Script" uid="uid://bx3savggf0mb5" path="res://scripts/world.gd" id="1_d1c63"]
 [ext_resource type="Texture2D" uid="uid://dwcwcp4pm2rlk" path="res://assets/placeholder/ship.svg" id="2_7g83o"]
+[ext_resource type="Texture2D" uid="uid://6c58asirvn2v" path="res://assets/ocean_background/Ocean_8/1.png" id="2_ygioq"]
+[ext_resource type="Texture2D" uid="uid://ycmaxcbln441" path="res://assets/ocean_background/Ocean_8/2.png" id="3_pdh0q"]
 [ext_resource type="PackedScene" uid="uid://cg7wgy7ywwqqo" path="res://scenes/timer/ClockTab.tscn" id="4_1lgw5"]
 [ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="4_b3faq"]
+[ext_resource type="Texture2D" uid="uid://bvhgi6w1eykdy" path="res://assets/ocean_background/Ocean_8/3.png" id="4_nrtoj"]
 [ext_resource type="PackedScene" uid="uid://buc68m4bpnu7y" path="res://scenes/todo/TodoTab.tscn" id="5_hlk0d"]
+[ext_resource type="Texture2D" uid="uid://bkv87vslddwwo" path="res://assets/ocean_background/Ocean_8/4.png" id="5_i4b1j"]
 [ext_resource type="PackedScene" uid="uid://de6n57hebkgrg" path="res://scenes/habittracker/HabitTrackerView.tscn" id="6_0uv0p"]
+[ext_resource type="Texture2D" uid="uid://cy7uhj8lp6ars" path="res://assets/ocean_background/Ocean_8/5.png" id="6_c0d7e"]
 [ext_resource type="PackedScene" uid="uid://dbitpeq18sx2o" path="res://scenes/Hud.tscn" id="7_0uv0p"]
 
 [node name="World" type="Node2D" unique_id=1409265880 node_paths=PackedStringArray("dock", "panels")]
@@ -16,8 +20,10 @@ panels = [NodePath("UI/PanelHost/ClockTab"), NodePath("UI/PanelHost/TodoFrame"),
 
 [node name="Background" type="CanvasLayer" parent="." unique_id=988105801]
 layer = -10
+visible = false
 
 [node name="Sky" type="ColorRect" parent="Background" unique_id=638304801]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -26,6 +32,7 @@ grow_vertical = 2
 color = Color(0.7490196, 0.9019608, 0.9607843, 1)
 
 [node name="Sea" type="ColorRect" parent="Background" unique_id=137498959]
+visible = false
 anchors_preset = -1
 anchor_top = 0.6
 anchor_right = 1.0
@@ -34,13 +41,56 @@ offset_top = 0.19998169
 offset_bottom = 0.19995117
 color = Color(0.24313726, 0.47058824, 0.65882355, 1)
 
-[node name="Port" type="Sprite2D" parent="." unique_id=9895481]
-position = Vector2(180, 410)
-scale = Vector2(3.5, 3.5)
-texture = ExtResource("1_32lhk")
+[node name="Parallax" type="ParallaxBackground" parent="." unique_id=642249087]
+layer = -5
+
+[node name="Layer1" type="ParallaxLayer" parent="Parallax" unique_id=498662050]
+motion_scale = Vector2(0.1, 0.1)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer1" unique_id=104696729]
+scale = Vector2(2, 2)
+texture = ExtResource("2_ygioq")
+centered = false
+
+[node name="Layer2" type="ParallaxLayer" parent="Parallax" unique_id=275411105]
+motion_scale = Vector2(0.25, 0.25)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer2" unique_id=697181496]
+scale = Vector2(2, 2)
+texture = ExtResource("3_pdh0q")
+centered = false
+
+[node name="Layer3" type="ParallaxLayer" parent="Parallax" unique_id=618649013]
+motion_scale = Vector2(0.45, 0.45)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer3" unique_id=517675219]
+scale = Vector2(2, 2)
+texture = ExtResource("4_nrtoj")
+centered = false
+
+[node name="Layer4" type="ParallaxLayer" parent="Parallax" unique_id=1603528694]
+motion_scale = Vector2(0.7, 0.7)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer4" unique_id=1270662822]
+scale = Vector2(2, 2)
+texture = ExtResource("5_i4b1j")
+centered = false
+
+[node name="Layer5" type="ParallaxLayer" parent="Parallax" unique_id=1481206207]
+motion_scale = Vector2(0, 0)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer5" unique_id=33373405]
+scale = Vector2(2, 2)
+texture = ExtResource("6_c0d7e")
+centered = false
 
 [node name="Ship" type="Sprite2D" parent="." unique_id=1585407981]
-position = Vector2(660, 430)
+position = Vector2(660, 500)
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("2_7g83o")
 
@@ -136,3 +186,17 @@ offset_bottom = 51.0
 grow_horizontal = 0
 pivot_offset = Vector2(-16, 16)
 pivot_offset_ratio = Vector2(1, 0)
+
+[node name="HaeriBadge" type="Label" parent="UI" unique_id=1857369763]
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -0.5
+offset_top = 16.0
+offset_right = 99.5
+offset_bottom = 39.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+horizontal_alignment = 1
+vertical_alignment = 1

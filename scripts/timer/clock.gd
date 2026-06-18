@@ -48,6 +48,11 @@ func active_kind() -> int:
 
 func is_active() -> bool:
 	return active_kind() != Kind.NONE
+	
+func is_focusing() -> bool:
+	if timer.is_running():
+		return true
+	return pomodoro.is_running() and pomodoro.segment_type_at(pomodoro.index) == Pomodoro.SegmentType.FOCUS
 
 # --- 읽기 (HUD 폴링용) ---
 func active_time_left() -> float:
