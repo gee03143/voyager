@@ -42,5 +42,5 @@
 - **Week 3 완료**:
   - ✅ 드래그 정렬·재사용화 — `DragHandle`/`ReorderList`(`scripts/commonui`)를 **태스크·그룹·알람 3사례**에 적용. 호버·스크롤·`DateUtil`(`scripts/util`)·`LineEditAutoBlur`(`commonui`) 추출.
   - ✅ **습관 트래커(데일리)** — 주간 그리드·요일 활성화(우클릭)·달성도 원형·주간 페이지네이션·백필. 모델: `Save.habit_defs`(단일출처 `{id,title,active_days}`) + `habit_weeks`(주별 희소 체크). **안정 ID 도입**(randi). 상세 `docs/architecture.md`.
-- **Week 4 진행 중**: 상주 월드 셸(월드 바탕 + 도구 팝업) + 항해 진행. 타이밍 인프라 **T1~T3 완료** — autoload `Timers`(TimerManager, 클럭 기반)·`Clock`(포모/타이머 소유), `CountDown` 삭제, 뷰는 폴링. **⭐ 다음 착수 = 슬라이스 ⓪(Voyage 데이터)**. 전체 빌드순서(⓪~⑥)·결정 근거는 roadmap/architecture 참고.
+- **Week 4 진행 중 — T1~⑤ 완료**: 상주 월드 셸(월드 바탕 + 도구 팝업) + 항해. autoload `Timers`/`Clock`, 도크+패널(`ButtonGroupNav`), 상시 타이머 HUD, 셸 폴리시까지 됨. **항해 = 집중 중에만 실시간 전진**(`Clock.is_focusing`), `voyage_distance`(감성 거리, `total_focus_seconds` 통계와 분리), Ocean_8 패럴랙스(레이어별 `motion_offset` fmod 구동). **⭐ 다음 착수 = ⑥ 발견(게임 테마 논의부터)** + 병행 알람 전역화. 결정 근거·구현 결과는 architecture "Week 4 구현 결과"/roadmap 참고.
 - 단계별 상세는 `docs/architecture.md`, `docs/roadmap.md` 참고

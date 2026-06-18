@@ -54,27 +54,33 @@
   - T2a: `pomodoro.gd` 핸들 기반 재작성 ✅, `TimerManager.is_paused`+`TimerHandle.is_paused` 추가 ✅, `pomodoro_view.gd` 폴링 `_process` 추가 ✅. **남은 것 = `pomodoro_view.gd`에서 ① 19행 `pomodoro.ticked.connect(_on_ticked)` 삭제, ② `_on_ticked` 함수 삭제** (ticked 시그널 제거됨 → 안 지우면 실행 에러) → 이후 F6(시작/일시정지/스킵/세그먼트전환/세션완료 + 최소화 정확) 검증.
   - T2b: `Clock`(autoload) 도입해 `Pomodoro` 소유, `PomodoroView`를 `$Pomodoro`→`Clock.pomodoro` 바인딩(뷰는 reset 아닌 **sync**), `PomodoroView.tscn`의 `$Pomodoro` 노드 제거.
 - [x] **T3 타이머 뷰** (완료): `SimpleTimer`→`Timers` 재배선, TimerView 바인딩, `countdown.gd` 삭제 완료. (알람은 휘발성 아님 → TimerManager 비귀속, "알람 전역화"로 별도) ※ 점검에서 `simple_timer.start()` 가드 `and`→`or` 버그 1건 발견·수정.
-- [ ] ⭐ **다음 착수 = ⓪ 데이터** (Voyage)
-- [ ] ⓪ 데이터: `Voyage{total_play_seconds, total_focus_seconds}` + version 4. 플레이시간 = `Save`가 클럭 기반 갱신 + 종료 저장. (거리·섬은 ⑤/⑥에서)
-- [ ] ① 월드 루트(`GameTitle` 교체): 항구·바다·배 플레이스홀더, 메인 씬
-- [ ] ② 도크 + 패널 호스트: 기존 뷰를 팝업으로 open/close(1개 한정, hide 토글), 도크 매핑 commonui 추출
-- [ ] ③ 집중 누적: 포모 `focus_finished` + 일반 타이머 완료 → `total_focus_seconds` 누적·즉시 저장
-- [ ] ④ 상시 타이머 HUD: 패널 닫아도 돌아가는 카운트다운 표시
-- [ ] ⑤ 배 반응 + 거리 도입: `distance()`=`total_focus_seconds×환산율`(파생) → 배 위치 반영, 해리 배지 (라이브 항해 애니는 폴리시, 나중)
-- [ ] ⑥ 발견: **테마 논의 후 착수**(F~⑤ 끝낸 뒤 재논의 — 사용자 명시). 세션 완료 시 섬 발견, `discovered_islands`+섬=안정 ID
-- [ ] (병행) 알람 전역화: `AlarmClock` autoload화 + 갭 catch-up(fire-late 정책). ①~⑤와 별개로 Week 4 내
-- [ ] (셸 폴리시 — 빌드 슬라이스 후, 사용자 요청): ① **패널 배경** 추가(월드 위 가독성 — 패널에 PanelContainer/StyleBox). ② **시계 서브탭 위치 흔들림** 수정(탭별 페이지 폭 차이로 `CenterContainer`가 재중심 → nav 버튼 이동. 패널 고정폭/앵커로 해결).
-- ✅ 목표: 집중 끝내면 항해가 나아가고 뭔가 발견됨 + 도구를 월드 위에서 열고닫음
+- [x] ⓪ 데이터: `Voyage{total_play_seconds, total_focus_seconds, voyage_distance}` + version 4. (플레이=Save 클럭 기반, 종료 저장)
+- [x] ① 월드 루트(`World.tscn`, `GameTitle` 교체) → 이후 Ocean_8 픽셀아트 패럴랙스로 발전.
+- [x] ② 도크 + 패널 호스트: `ButtonGroupNav`(commonui, 도크·시계서브탭 공용)로 좌측 도크가 뷰를 팝업 open/close(1개 한정, 활성 버튼 재클릭=닫기 `allow_close`).
+- [x] ③ 집중 누적: `Clock`이 `focus_finished`/타이머완료 → `Save.voyage.add_focus`(=`total_focus_seconds` 집중 통계). ※ 항해 진행은 ⑤에서 별도 `voyage_distance`로 분리.
+- [x] ④ 상시 타이머 HUD: 월드 우상단 카드, active 세션(포모 우선→타이머) 폴링 + 단계 타임라인 + 아이콘 제어(정지/스킵/리셋). 패널↔HUD 동기화 = `running_changed` 이벤트.
+- [x] ⑤ 배 반응 + 항해 거리 — **모델 재설계**(상세 architecture "Week 4 구현 결과"):
+  - 항해 = **집중 중에만 실시간** 전진(`Clock.is_focusing`), 정박 시 정지. (사용시간 기준 폐기 — 내러티브 + 집중 유도)
+  - `voyage_distance`(영속·별도) = 배 속도 적분(감성용, 부정확 OK), `total_focus_seconds`(통계)와 분리. 배지 "leagues".
+  - 배 고정 + 사인 bob/rock. 패럴랙스 = Ocean_8 5레이어, 레이어별 `motion_offset=-fmod(거리×scale, mirror)`(루프+float32 정밀).
+- [x] (셸 폴리시): 패널 배경 = `TabContainer.panel` 스타일(시계)/`PanelContainer`(todo·habit). 서브탭 흔들림 = `PanelHost`→`Control` + 패널 좌상단 앵커+grow End.
+- [x] (고려 처리): 타이머도 완주 시 자동 대기(포모와 일관) / 완료음 `Clock`으로 이동(뷰 의존 제거).
+- [ ] ⭐ **다음 착수 = ⑥ 발견 = 병 속 편지 받기 루프** (테마 확정 2026-06-18): 집중 항해 중 병 앰비언트 발견(비방해 토스트) → 양피지 열람(토큰 템플릿+슬롯, 읽는 이 언어로 렌더) → 선반 수집(`collected_letters`, 안정 ID). 시드 편지 풀(큐레이션)만 돌아 악용 구조적 불가 = MVP-safe. 컴포저·어휘해금은 W5/W6, 진짜 교환은 Phase 3. 상세 = architecture "발견 콘텐츠 — 병 속 편지".
+- [ ] (병행) 알람 전역화: `AlarmClock` autoload화 + 갭 catch-up(fire-late). Week 4 내, ①~⑤와 별개.
+- ✅ 목표: 집중하면 항해가 (실시간) 나아가고, 도구를 월드 위에서 열고닫음. (발견은 ⑥)
 
-### Week 5 · 지도 + 섬 도감
+### Week 5 · 지도 + 섬 도감 + 어휘 해금(자체 발견)
+- [ ] 섬 원경 스크롤 등장 → 발견 → `discovered_islands`(안정 ID)
 - [ ] 격자 지도 개방 (항해 거리/발견 연동)
-- [ ] 섬 도감 (발견한 섬 표시)
-- ✅ 목표: 발견이 지도와 도감에 반영됨
+- [ ] 섬 도감 (발견 섬 표시) — 병 선반도 같은 도감 패턴으로 합류
+- [ ] 섬 발견 = 테마 어휘 해금 → `lexicon` 도입 (편지 컴포저 재료)
+- ✅ 목표: 발견이 지도·도감에 반영, 편지 어휘가 풀리기 시작
 
-### Week 6 · 항해 일지 + 통합/세이브 안정성
-- [ ] 세션 종료 메모 작성 + 기록 목록
+### Week 6 · 항해 일지(= 편지 작성) + 통합/세이브 안정성
+- [ ] 세션 종료 회고 = 템플릿+슬롯 컴포저로 "나도 띄우기"(`sent_letters` 로컬) + 기록 목록
+- [ ] 어휘 해금 나머지 소스: 집중 마일스톤 + 받은 편지에서 확률적 구절 보관
 - [ ] 전체 흐름 통합, 저장/불러오기 견고화, 엣지 케이스
-- ✅ 목표: 하루치 루프가 기록·복원됨
+- ✅ 목표: 하루치 루프가 기록·복원되고, 회고가 편지로 바다에 나감
 
 ### Week 7 · 데스크톱 컴패니언 + 마감 버퍼  ⚠️ 위험 주
 - [ ] 미니/풀 모드 전환, 투명, always-on-top, 드래그
@@ -102,7 +108,7 @@
 서버·동시성은 사실상 **백엔드 프로젝트**다. Godot 작업이 거의 아님.
 
 - 서버 / DB / API
-- 익명 처리, 병 속 편지 모더레이션
+- 익명 처리, 병 속 편지 **진짜 교환**(실송수신 · 좋아요=비동기 상호성 · 신고/차단 · 모더레이션 파이프라인 · 크로스랭귀지 라이브)
 - 다른 항해자 흔적, 간접 동접, 항로 흔적
 - 호스팅 + **상시 운영 비용**
 
