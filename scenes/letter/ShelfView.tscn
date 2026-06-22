@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://dvj2jiisr43e5"]
+
+[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="1_b42nj"]
+[ext_resource type="Script" uid="uid://da7pru0r5ls3v" path="res://scripts/letter/shelf_view.gd" id="2_6uo50"]
+
+[node name="ShelfView" type="PanelContainer" unique_id=1866375658]
+custom_minimum_size = Vector2(360, 420)
+theme_override_styles/panel = ExtResource("1_b42nj")
+script = ExtResource("2_6uo50")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1400756263]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 6
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1729174567]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="Margin/VBox" unique_id=1373990186]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/VBox/Header" unique_id=721025825]
+layout_mode = 2
+text = "받은 편지"
+
+[node name="Spacer" type="Control" parent="Margin/VBox/Header" unique_id=1825137636]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Close" type="Button" parent="Margin/VBox/Header" unique_id=2138484466]
+layout_mode = 2
+text = "닫기"
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/VBox" unique_id=516316561]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Margin/VBox/Scroll" unique_id=1047172670]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

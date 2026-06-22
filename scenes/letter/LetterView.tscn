@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://ccedlq84ygyas"]
+
+[ext_resource type="Script" uid="uid://dhrpudtcvbpc0" path="res://scripts/letter/letter_view.gd" id="1_cgrmy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y268x"]
+bg_color = Color(0.9607843, 0.91764706, 0.8235294, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.84705883, 0.75686276, 0.6039216, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="LetterView" type="PanelContainer" unique_id=1631220425]
+theme_override_styles/panel = SubResource("StyleBoxFlat_y268x")
+script = ExtResource("1_cgrmy")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=597880861]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1127546478]
+custom_minimum_size = Vector2(360, 100)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Message" type="Label" parent="Margin/VBox" unique_id=1013290836]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3529412, 0.26666668, 0.15294118, 1)
+theme_override_font_sizes/font_size = 18
+text = "오늘은 천천히, 그러나 멈추지 않고 노를 저었어요. 당신의 항해도 무사하길.
+"
+autowrap_mode = 2
+
+[node name="Sep" type="HSeparator" parent="Margin/VBox" unique_id=831708249]
+layout_mode = 2
+
+[node name="Foot" type="HBoxContainer" parent="Margin/VBox" unique_id=305337138]
+layout_mode = 2
+
+[node name="FootText" type="VBoxContainer" parent="Margin/VBox/Foot" unique_id=1054755839]
+layout_mode = 2
+
+[node name="Author" type="Label" parent="Margin/VBox/Foot/FootText" unique_id=1427297623]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5411765, 0.45882353, 0.31764707, 1)
+theme_override_font_sizes/font_size = 13
+text = "— 이름 모를 항해자"
+
+[node name="Meta" type="Label" parent="Margin/VBox/Foot/FootText" unique_id=1361285913]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5411765, 0.45882353, 0.31764707, 1)
+theme_override_font_sizes/font_size = 13
+text = "어딘가의 바다에서 · 3일 전"
+
+[node name="Spacer" type="Control" parent="Margin/VBox/Foot" unique_id=1200460981]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Margin/VBox" unique_id=2049454675]
+layout_mode = 2
+
+[node name="Keep" type="Button" parent="Margin/VBox/Buttons" unique_id=485325529]
+layout_mode = 2
+text = "선반에 보관"
+
+[node name="Close" type="Button" parent="Margin/VBox/Buttons" unique_id=422918000]
+layout_mode = 2
+text = "닫기"

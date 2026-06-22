@@ -1,9 +1,10 @@
 extends Node
 
 const SAVE_PATH := "user://save.json"
-const VERSION := 4
+const VERSION := 5
 
 var voyage := Voyage.new()
+var letters := LetterArchive.new()
 var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
 var todo_groups: Array[TodoGroup] = []
@@ -48,6 +49,7 @@ func save_game() -> void:
 		"habit_defs": habit_defs,
 		"habit_weeks": habit_weeks,
 		"voyage": voyage.to_dict(),
+		"letters": letters.to_dict(),
 	}
 	
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -102,6 +104,10 @@ func load_game() -> void:
 	var rv = parsed.get("voyage", {})
 	if typeof(rv) == TYPE_DICTIONARY:
 		voyage.from_dict(rv)
+		
+	var rl = parsed.get("letters", {})
+	if typeof(rl) == TYPE_DICTIONARY:
+		letters.from_dict(rl)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:

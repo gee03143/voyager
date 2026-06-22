@@ -12,6 +12,22 @@
 [ext_resource type="PackedScene" uid="uid://de6n57hebkgrg" path="res://scenes/habittracker/HabitTrackerView.tscn" id="6_0uv0p"]
 [ext_resource type="Texture2D" uid="uid://cy7uhj8lp6ars" path="res://assets/ocean_background/Ocean_8/5.png" id="6_c0d7e"]
 [ext_resource type="PackedScene" uid="uid://dbitpeq18sx2o" path="res://scenes/Hud.tscn" id="7_0uv0p"]
+[ext_resource type="Script" uid="uid://ljhbwe5jg3ae" path="res://scripts/letter/shelf.gd" id="8_rpuxp"]
+[ext_resource type="Texture2D" uid="uid://bvuuoah6i7535" path="res://assets/placeholder/island.svg" id="9_nthub"]
+[ext_resource type="PackedScene" uid="uid://ccedlq84ygyas" path="res://scenes/letter/LetterView.tscn" id="13_nrtoj"]
+[ext_resource type="Script" uid="uid://g177ddhfcxdg" path="res://scripts/discovery/discovery.gd" id="14_i4b1j"]
+[ext_resource type="Script" uid="uid://ddvjm3imkk4xn" path="res://scripts/letter/mailbox.gd" id="15_c0d7e"]
+[ext_resource type="PackedScene" uid="uid://dvj2jiisr43e5" path="res://scenes/letter/ShelfView.tscn" id="17_nthub"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_44lqw"]
+size = Vector2(107, 79)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i4b1j"]
+bg_color = Color(0.6, 0.6, 0.6, 0.9019608)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="World" type="Node2D" unique_id=1409265880 node_paths=PackedStringArray("dock", "panels")]
 script = ExtResource("1_d1c63")
@@ -93,6 +109,23 @@ centered = false
 position = Vector2(660, 500)
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("2_7g83o")
+
+[node name="Shelf" type="Node2D" parent="." unique_id=1986878626]
+position = Vector2(1000, 500)
+script = ExtResource("8_rpuxp")
+
+[node name="Body" type="Sprite2D" parent="Shelf" unique_id=1596453282]
+texture = ExtResource("9_nthub")
+
+[node name="Area2D" type="Area2D" parent="Shelf" unique_id=1524809486]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Shelf/Area2D" unique_id=378559884]
+position = Vector2(-1.5, 14.5)
+shape = SubResource("RectangleShape2D_44lqw")
+
+[node name="Badge" type="Label" parent="Shelf" unique_id=549552772]
+offset_right = 40.0
+offset_bottom = 23.0
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=379188479]
 
@@ -200,3 +233,44 @@ size_flags_horizontal = 3
 size_flags_vertical = 6
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Mailbox" type="Node" parent="UI" unique_id=309487392 node_paths=PackedStringArray("discovery", "shelf")]
+script = ExtResource("15_c0d7e")
+discovery = NodePath("../../Discovery")
+shelf = NodePath("../../Shelf")
+
+[node name="Toast" type="PanelContainer" parent="UI/Mailbox" unique_id=1834752939]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -0.5
+offset_top = -23.0
+offset_right = 0.5
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_i4b1j")
+
+[node name="ToastText" type="Label" parent="UI/Mailbox/Toast" unique_id=1380354725]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15294118, 0.34901962, 0.49803922, 1)
+
+[node name="LetterView" parent="UI/Mailbox" unique_id=1631220425 instance=ExtResource("13_nrtoj")]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -201.0
+offset_top = -119.5
+offset_right = 201.0
+offset_bottom = 119.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ShelfView" parent="UI/Mailbox" unique_id=1866375658 instance=ExtResource("17_nthub")]
+visible = false
+
+[node name="Discovery" type="Node" parent="." unique_id=1871224704]
+script = ExtResource("14_i4b1j")

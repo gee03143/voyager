@@ -27,8 +27,8 @@ func _ready() -> void:
 	_nav.setup_from(dock, true)
 	_nav.selected.connect(_on_nav_selected)
 	_nav.select(dock.get_child_count() - 1)   # 시작 = 마지막 버튼(항해) = 월드만
-	
 	_ship_base_y = ship.position.y
+
 
 func _process(delta: float) -> void:
 	var target := CRUISE_SPEED if Clock.is_focusing() else 0.0
