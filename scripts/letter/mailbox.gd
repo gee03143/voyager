@@ -1,7 +1,7 @@
 extends Node
 
-# 받은 편지함: Discovery(범용 발견)를 구독해 편지를 트레이에 쌓고, 토스트·인디케이터·열람을 구동.
-# Discovery=발견 시점만 / Mailbox=편지 도메인(트레이)+UI / LetterView=펼쳐 읽기.
+# 받은 편지함: Discovery(범용 발견)를 구독해 편지를 트레이에 쌓고, 배너(Notice)·선반 배지·열람을 구동.
+# Discovery=발견 시점 / Mailbox=편지 도메인(트레이)+UI / Shelf=항구 진입+배지 / LetterView=열람 / ShelfView=보관 목록.
 
 @export var discovery: Discovery
 @export var notice: Notice

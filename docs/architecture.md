@@ -118,7 +118,8 @@
 - **`ButtonGroupNav`**(commonui): 도크·시계서브탭 공용. `allow_close`(도크=true→활성 재클릭 시 닫기/월드, 서브탭=false→항상 하나 열림).
 - **패럴랙스**(Ocean_8 픽셀아트 5레이어, 576×324 ×2배, Texture Filter Nearest): 레이어별 `motion_offset = -fmod(voyage_distance×PX×motion_scale, motion_mirroring)`로 구동. **ParallaxLayer 규칙**: `2×motion_mirroring ≥ 뷰포트`(아니면 2장만 그려 화면 못 채움), `mirroring = 텍스처폭×scale`. fmod-wrap으로 float32 정밀도 회피(`scroll_offset`에 대입 시 ~140k leagues=누적집중 ~39h부터 떨림). 배는 고정 + 사인 bob/rock.
 - **셸 폴리시**: 패널 배경 = `TabContainer`의 `panel` 스타일(시계)/`PanelContainer`(todo·habit). 서브탭 위치 흔들림 = `PanelHost`를 `Control`로 + 패널 좌상단 앵커+grow End(콘텐츠 자동 크기, nav 고정).
-- **미진행**: ⑥ 발견(테마 확정 2026-06-18 — 아래 "발견 콘텐츠 — 병 속 편지" 참조), (병행) 알람 전역화.
+- **Week 4 완료(2026-06-19)**: ⑥ 발견(병 속 편지 받기 루프 — 아래 "발견 콘텐츠 — 병 속 편지" 참조) ✅ · 알람 전역화(autoload `Alarms`: 패널 닫아도 발화 + 월드 배너 공용 `Notice` + 갭 catch-up/fire-late·묵은 알람 무시) ✅.
+- **남은 보류(블로커 아님)**: 위젯 열린 채 집중 자동시작 처리(재논의 예정), `Discovery.interval` 테스트값→실제 빈도 튜닝, 자잘 정리(`alarm_view._on_alarm_triggered` 죽은 코드 삭제·`mailbox._process` 미사용 인자 `_delta`).
 
 ## 발견 콘텐츠 — 병 속 편지 (연결성 기둥, Week 4 ⑥ ~ Phase 3)
 > Week 4 발견 테마 논의 결론(2026-06-18). 프로젝트 정체성: **생산성 도구가 코어 루프**, 연결성은 마켓에 보이는 **수집 + 간접 연결** 후크. "연결성은 추상적이라 안 팔린다"는 우려는 **Kind Words가 반증**(바로 그 연결성으로 주목·판매). 레퍼런스 = Kind Words(익명·비동기·지지 편지)의 **정서** + 다크소울/엘든링 메시지 시스템(고정 어휘·템플릿·비동기·평가)의 **메커니즘**.

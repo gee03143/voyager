@@ -66,7 +66,7 @@
 - [x] (셸 폴리시): 패널 배경 = `TabContainer.panel` 스타일(시계)/`PanelContainer`(todo·habit). 서브탭 흔들림 = `PanelHost`→`Control` + 패널 좌상단 앵커+grow End.
 - [x] (고려 처리): 타이머도 완주 시 자동 대기(포모와 일관) / 완료음 `Clock`으로 이동(뷰 의존 제거).
 - [x] **⑥ 발견 = 병 속 편지 받기 루프** (완료, F6 2026-06-19): 집중 항해 중 병 앰비언트 발견(비방해 토스트) → 항구 선반 오브젝트(슬라이드-인 + "받은 편지 N" 배지) 클릭 → 양피지 열람(토큰 템플릿+슬롯, 읽는 이 언어로 렌더) → 보관(`Save.letters`=`LetterArchive`, 안정 id) → 선반에서 다시 보기(영속). 시드 풀(큐레이션)만 = MVP-safe. 구현: 범용 `Discovery` + `Mailbox` + `Shelf`(다이제틱) + `LetterView` + `ShelfView` + `LetterContent`. 컴포저·어휘해금=W5/W6, 진짜 교환=Phase 3. 상세 = architecture "발견 콘텐츠 — 병 속 편지".
-- [ ] ⭐ **다음 착수 = (병행) 알람 전역화**: `AlarmClock` autoload화 + 갭 catch-up(fire-late). Week 4 내, ⑥과 별개.
+- [x] (병행) 알람 전역화 (완료, 2026-06-19): 슬라이스 1(autoload `Alarms` 이전 + 뷰 CRUD화 → 패널 닫아도 발화) / 2(월드 배너 공용 `Notice`, 알람=상단·편지=하단 각자 인스턴스) / 3(갭 catch-up·fire-late: "마지막 확인~지금" 벽시계 차이로 놓친 분 발화, `MAX_CATCHUP_MINUTES` 초과 갭=묵은 알람으로 무시). `AlarmClock`=감지·발화 / 뷰=CRUD만.
 - ✅ 목표: 집중하면 항해가 (실시간) 나아가고, 도구를 월드 위에서 열고닫음. (발견은 ⑥)
 
 ### Week 5 · 지도 + 섬 도감 + 어휘 해금(자체 발견)
