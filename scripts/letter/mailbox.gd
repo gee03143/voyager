@@ -4,40 +4,30 @@ extends Node
 # Discovery=발견 시점만 / Mailbox=편지 도메인(트레이)+UI / LetterView=펼쳐 읽기.
 
 @export var discovery: Discovery
+@export var notice: Notice
 @export var shelf: Shelf
 
-@onready var _toast: Control = $Toast
-@onready var _toast_text: Label = $Toast/ToastText
 @onready var _letter_view = $LetterView
 @onready var _shelf_view = $ShelfView
 
-const TOAST_TIME := 3.5
 
 var _pending: Array = []        # 안 읽은 편지 [{template, slots}, ...]
-var _toast_left := 0.0
 var _current: Dictionary = {}   # 지금 열려 있는 편지
 
 func _ready() -> void:
 	discovery.discovered.connect(_on_discovered)
 	shelf.pressed.connect(_on_shelf_pressed)
 	_letter_view.kept.connect(_on_kept)
-	_toast.visible = false
 	_shelf_view.visible = false
 	_letter_view.visible = false
 
-func _process(delta: float) -> void:
-	if _toast_left > 0.0:                      # 토스트 자동 숨김
-		_toast_left -= delta
-		if _toast_left <= 0.0:
-			_toast.visible = false
+func _process(_delta: float) -> void:
 	shelf.set_badge(_pending.size())
 
 func _on_discovered() -> void:
 	var pool := LetterContent.SEED_LETTERS
 	_pending.append(pool[randi() % pool.size()])
-	_toast_text.text = "편지를 하나 주웠어요 · 집중이 끝나면 열어보세요"
-	_toast.visible = true
-	_toast_left = TOAST_TIME
+	notice.show_notice("편지를 하나 주웠어요 · 집중이 끝나면 열어보세요")
 
 func _on_shelf_pressed() -> void:
 	if not _pending.is_empty():               # 안 읽은 게 있으면 읽기

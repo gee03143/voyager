@@ -1,9 +1,10 @@
-class_name AlarmClock
 extends Node
+
+# 전역 알람 시계(autoload `Alarms`): 벽시계 시각을 폴링해 Save.alarms를 발화.
+# 뷰와 무관하게 상주 → 알람 패널을 닫아도 울림. 단일 진실 = Save.alarms.
 
 signal alarm_triggered(alarm: Alarm)
 
-var alarms: Array[Alarm] = []
 var _last_minute: int = -1
 
 func _ready() -> void:
@@ -22,8 +23,12 @@ func _current_minute() -> int:
 func _check() -> void:
 	var m := _current_minute()
 	if m == _last_minute:
-		return                          # 같은 분 → 아무것도 안 함
-	_last_minute = m                    # 새 분 진입
-	for a in alarms:
+		return
+	_last_minute = m
+	for a in Save.alarms:                # 주입 대신 Save를 직접(편집 즉시 반영)
 		if a.enabled and a.hour * 60 + a.minute == m:
-			alarm_triggered.emit(a)
+			_fire(a)
+
+func _fire(a: Alarm) -> void:
+	Sound.play_set(Save.settings.sound_set)
+	alarm_triggered.emit(a)

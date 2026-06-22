@@ -9,7 +9,6 @@ const SAVE_DEBOUNCE := 0.5
 
 var _rows: Array[AlarmRow] = []
 var _save_timer: Timer
-var _alarm_clock: AlarmClock # 추후 알람 탭이 아닌 Autoload로 올려 앱 전역에서 알람 트리거 고려
 
 func _ready() -> void:
 	_save_timer = Timer.new()
@@ -22,11 +21,6 @@ func _ready() -> void:
 
 	for alarm in Save.alarms:        # 저장된 알람 복원
 		_add_row(alarm)
-		
-	_alarm_clock = AlarmClock.new()
-	add_child(_alarm_clock)
-	_alarm_clock.alarms = Save.alarms
-	_alarm_clock.alarm_triggered.connect(_on_alarm_triggered)
 	
 	list.token = &"alarm"
 	list.reordered.connect(_on_reordered)
@@ -64,10 +58,6 @@ func _on_list_changed() -> void:
 	for r in _rows:
 		Save.alarms.append(r.get_data())
 	_save_timer.start()              # 디스크 저장은 디바운스
-	
-func _on_alarm_triggered(alarm: Alarm) -> void:
-	Sound.play_set(Save.settings.sound_set)
-	print("[알람] %02d:%02d  %s" % [alarm.hour, alarm.minute, alarm.label])
 	
 func _on_reordered(from: int, to: int) -> void:
 	var r := _rows[from]

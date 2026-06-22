@@ -65,8 +65,8 @@
   - 배 고정 + 사인 bob/rock. 패럴랙스 = Ocean_8 5레이어, 레이어별 `motion_offset=-fmod(거리×scale, mirror)`(루프+float32 정밀).
 - [x] (셸 폴리시): 패널 배경 = `TabContainer.panel` 스타일(시계)/`PanelContainer`(todo·habit). 서브탭 흔들림 = `PanelHost`→`Control` + 패널 좌상단 앵커+grow End.
 - [x] (고려 처리): 타이머도 완주 시 자동 대기(포모와 일관) / 완료음 `Clock`으로 이동(뷰 의존 제거).
-- [ ] ⭐ **다음 착수 = ⑥ 발견 = 병 속 편지 받기 루프** (테마 확정 2026-06-18): 집중 항해 중 병 앰비언트 발견(비방해 토스트) → 양피지 열람(토큰 템플릿+슬롯, 읽는 이 언어로 렌더) → 선반 수집(`collected_letters`, 안정 ID). 시드 편지 풀(큐레이션)만 돌아 악용 구조적 불가 = MVP-safe. 컴포저·어휘해금은 W5/W6, 진짜 교환은 Phase 3. 상세 = architecture "발견 콘텐츠 — 병 속 편지".
-- [ ] (병행) 알람 전역화: `AlarmClock` autoload화 + 갭 catch-up(fire-late). Week 4 내, ①~⑤와 별개.
+- [x] **⑥ 발견 = 병 속 편지 받기 루프** (완료, F6 2026-06-19): 집중 항해 중 병 앰비언트 발견(비방해 토스트) → 항구 선반 오브젝트(슬라이드-인 + "받은 편지 N" 배지) 클릭 → 양피지 열람(토큰 템플릿+슬롯, 읽는 이 언어로 렌더) → 보관(`Save.letters`=`LetterArchive`, 안정 id) → 선반에서 다시 보기(영속). 시드 풀(큐레이션)만 = MVP-safe. 구현: 범용 `Discovery` + `Mailbox` + `Shelf`(다이제틱) + `LetterView` + `ShelfView` + `LetterContent`. 컴포저·어휘해금=W5/W6, 진짜 교환=Phase 3. 상세 = architecture "발견 콘텐츠 — 병 속 편지".
+- [ ] ⭐ **다음 착수 = (병행) 알람 전역화**: `AlarmClock` autoload화 + 갭 catch-up(fire-late). Week 4 내, ⑥과 별개.
 - ✅ 목표: 집중하면 항해가 (실시간) 나아가고, 도구를 월드 위에서 열고닫음. (발견은 ⑥)
 
 ### Week 5 · 지도 + 섬 도감 + 어휘 해금(자체 발견)
