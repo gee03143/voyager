@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://baouvnhwlly04"]
+
+[ext_resource type="Script" uid="uid://3icm6u2xjxc1" path="res://scripts/record/record_calendar.gd" id="1_y1myj"]
+
+[node name="RecordCalendar" type="VBoxContainer" unique_id=2011657158]
+script = ExtResource("1_y1myj")

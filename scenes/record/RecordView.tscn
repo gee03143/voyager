@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bmq06t54wyo34"]
+
+[ext_resource type="Script" uid="uid://cql1iiduio5hy" path="res://scripts/record/record_view.gd" id="1_asogf"]
+
+[node name="RecordView" type="VBoxContainer" unique_id=1026010099]
+script = ExtResource("1_asogf")
+
+[node name="Header" type="HBoxContainer" parent="." unique_id=1289184358]
+layout_mode = 2
+
+[node name="DayLabel" type="Label" parent="Header" unique_id=1355603793]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PlayLabel" type="Label" parent="Header" unique_id=845869727]
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=159226304]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="ScrollContainer" unique_id=1873409622]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

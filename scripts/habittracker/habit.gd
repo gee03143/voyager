@@ -43,7 +43,4 @@ static func _generate_new_id() -> int:
 	for wk in Save.habit_weeks:
 		for k in wk.get("checks", {}):
 			used[int(k)] = true          # 과거 체크 키까지 포함해 절대 재사용 안 함
-	var id := randi()
-	while id == 0 or used.has(id):
-		id = randi()
-	return id
+	return IdGen.fresh(used)

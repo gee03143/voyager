@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://tmafopdrdnt5"]
+
+[ext_resource type="Script" uid="uid://dft0g0f5aiip3" path="res://scripts/record/record_panel.gd" id="1_45m0g"]
+[ext_resource type="PackedScene" uid="uid://baouvnhwlly04" path="res://scenes/record/RecordCalendar.tscn" id="2_5xh2a"]
+[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="2_e7b51"]
+[ext_resource type="PackedScene" uid="uid://bmq06t54wyo34" path="res://scenes/record/RecordView.tscn" id="3_e7b51"]
+
+[node name="RecordPanel" type="VBoxContainer" unique_id=1649160020]
+custom_minimum_size = Vector2(640, 360)
+offset_right = 18.0
+offset_bottom = 39.0
+script = ExtResource("1_45m0g")
+
+[node name="TabNav" type="HBoxContainer" parent="." unique_id=95565593]
+layout_mode = 2
+
+[node name="ActivityButton" type="Button" parent="TabNav" unique_id=622876105]
+layout_mode = 2
+text = "활동"
+
+[node name="StatsButton" type="Button" parent="TabNav" unique_id=552069832]
+layout_mode = 2
+text = "통계"
+
+[node name="JournalButton" type="Button" parent="TabNav" unique_id=154052968]
+layout_mode = 2
+text = "일지"
+
+[node name="Content" type="PanelContainer" parent="." unique_id=455626373]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_e7b51")
+
+[node name="Host" type="VBoxContainer" parent="Content" unique_id=725952999]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActivityTab" type="HBoxContainer" parent="Content/Host" unique_id=2114065173]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="Calendar" parent="Content/Host/ActivityTab" unique_id=2011657158 instance=ExtResource("2_5xh2a")]
+layout_mode = 2
+
+[node name="RecordView" parent="Content/Host/ActivityTab" unique_id=1026010099 instance=ExtResource("3_e7b51")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatsTab" type="VBoxContainer" parent="Content/Host" unique_id=1177846438]
+visible = false
+layout_mode = 2
+
+[node name="JournalTab" type="Control" parent="Content/Host" unique_id=437576587]
+visible = false
+layout_mode = 2

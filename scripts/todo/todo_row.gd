@@ -2,6 +2,7 @@ class_name TodoRow
 extends PanelContainer
 
 signal changed
+signal completed(title: String)
 signal delete_requested(row: TodoRow)
 signal due_edit_requested(row: TodoRow)
 
@@ -71,6 +72,8 @@ func is_done() -> bool:
 func _on_done_toggled(pressed: bool) -> void:
 	_done = pressed
 	_render()
+	if _done and not _text.strip_edges().is_empty():
+		completed.emit(_text)
 	changed.emit()
 
 func get_text() -> String:

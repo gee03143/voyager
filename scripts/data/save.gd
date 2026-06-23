@@ -2,9 +2,13 @@ extends Node
 
 const SAVE_PATH := "user://save.json"
 const VERSION := 5
+const RECORDS_PATH := "user://records.json"
+const RECORDS_VERSION := 1
 
 var voyage := Voyage.new()
 var letters := LetterArchive.new()
+var activity_log := ActivityLog.new()
+var journal := Journal.new()
 var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
 var todo_groups: Array[TodoGroup] = []
@@ -16,19 +20,43 @@ var habit_weeks: Array = []     # [{week_start, checks: {id:[7]}}]  주별 체�
 var _play_base_seconds: float = 0.0     # 세션 시작 시점의 누적 플레이
 var _session_start_ms: int = 0
 
+var _play_ckpt_ms: int = 0         # 적립 체크포인트(모노토닉)
+
 func _ready() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		load_game()
+	if FileAccess.file_exists(RECORDS_PATH):
+		load_records()
 	if todo_groups.is_empty():
 		todo_groups.append(TodoGroup.new())
 	current_group_index = clampi(current_group_index, 0, todo_groups.size() - 1)
 	_play_base_seconds = voyage.total_play_seconds
 	_session_start_ms = Time.get_ticks_msec()
+	_play_ckpt_ms = _session_start_ms
+	var play_timer := Timer.new()
+	play_timer.wait_time = 60.0
+	play_timer.one_shot = false
+	add_child(play_timer)
+	play_timer.timeout.connect(_accumulate_play_day)   # 메모리 누적만(자정 근사)
+	play_timer.start()
 	get_tree().auto_accept_quit = false
 	save_game()
+	save_records()
 	settings.changed.connect(save_game)
 	voyage.changed.connect(save_game)
+	activity_log.changed.connect(save_records)
+	journal.changed.connect(save_records)
 		
+func _accumulate_play_day() -> void:
+	var now_ms := Time.get_ticks_msec()
+	var elapsed := (now_ms - _play_ckpt_ms) / 1000.0
+	_play_ckpt_ms = now_ms
+	activity_log.add_play(_local_day_iso(), elapsed)
+
+func _local_day_iso() -> String:
+	var t := Time.get_date_dict_from_system()     # 로컬 날짜(habit과 동일 기준)
+	return "%04d-%02d-%02d" % [t.year, t.month, t.day]
+
 func save_game() -> void:
 	voyage.total_play_seconds = _play_base_seconds + (Time.get_ticks_msec() - _session_start_ms) / 1000.0
 	# alarms
@@ -112,4 +140,35 @@ func load_game() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		save_game()
+		save_records()
 		get_tree().quit()
+		
+func save_records() -> void:
+	_accumulate_play_day()
+	var data := {
+		"version": RECORDS_VERSION,
+		"activity_log": activity_log.to_dict(),
+		"journal": journal.to_dict(),
+	}
+	var file := FileAccess.open(RECORDS_PATH, FileAccess.WRITE)
+	if file == null:
+		push_warning("Fail to Save records: %s" % FileAccess.get_open_error())
+		return
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+
+func load_records() -> void:
+	var file := FileAccess.open(RECORDS_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var text := file.get_as_text()
+	file.close()
+	var parsed = JSON.parse_string(text)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	var ra = parsed.get("activity_log", {})
+	if typeof(ra) == TYPE_DICTIONARY:
+		activity_log.from_dict(ra)
+	var rj = parsed.get("journal", {})
+	if typeof(rj) == TYPE_DICTIONARY:
+		journal.from_dict(rj)

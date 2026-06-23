@@ -66,6 +66,7 @@ func _add_row(todo: Todo) -> TodoRow:
 	row.changed.connect(_on_list_changed)
 	row.delete_requested.connect(_on_row_delete)
 	row.due_edit_requested.connect(_on_due_edit)
+	row.completed.connect(_on_task_completed)
 	_rows.append(row)
 	return row
 
@@ -103,6 +104,9 @@ func _on_due_edit(row: TodoRow) -> void:
 	_editing_row = row
 	var d := row.get_data()
 	_due_popup.open_for(d.due_date, d.text)   # 현재 마감일·할 일 이름 전달
+
+func _on_task_completed(title: String) -> void:
+	Save.activity_log.add("todo", {"title": title})
 
 func _on_due_confirmed(iso: String) -> void:
 	if _editing_row:

@@ -29,12 +29,14 @@ func _on_focus_finished() -> void:
 	Save.voyage.add_focus(pomodoro.focus_seconds)   # 집중 1구간 = 계획된 집중 길이 적립
 
 func _on_timer_finished() -> void:
-	print("타이머 완료!")
 	Save.voyage.add_focus(timer.duration)
+	Save.activity_log.add("timer", {"seconds": int(timer.duration)})
 	Sound.play_set(Save.settings.sound_set)   # 완료음(컨트롤러가 완료를 앎)
 	timer.reset()                             # 완주 → 자동 대기 복귀 (포모와 일관)
 
 func _on_session_completed() -> void:
+	var secs := int(pomodoro.focus_seconds * pomodoro.total_focus_count)
+	Save.activity_log.add("pomodoro_session", {"focus_count": pomodoro.total_focus_count, "seconds": secs})
 	Sound.play_set(Save.settings.sound_set)   # 완료음
 	pomodoro.build_plan()                     # 완료 → 자동 대기 복귀
 	
