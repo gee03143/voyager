@@ -4,6 +4,8 @@ const SAVE_PATH := "user://save.json"
 const VERSION := 5
 const RECORDS_PATH := "user://records.json"
 const RECORDS_VERSION := 1
+const JOURNAL_PATH := "user://journal.json"
+const JOURNAL_VERSION := 1
 
 var voyage := Voyage.new()
 var letters := LetterArchive.new()
@@ -27,6 +29,8 @@ func _ready() -> void:
 		load_game()
 	if FileAccess.file_exists(RECORDS_PATH):
 		load_records()
+	if FileAccess.file_exists(JOURNAL_PATH):
+		load_journal()
 	if todo_groups.is_empty():
 		todo_groups.append(TodoGroup.new())
 	current_group_index = clampi(current_group_index, 0, todo_groups.size() - 1)
@@ -42,10 +46,11 @@ func _ready() -> void:
 	get_tree().auto_accept_quit = false
 	save_game()
 	save_records()
+	save_journal()
 	settings.changed.connect(save_game)
 	voyage.changed.connect(save_game)
 	activity_log.changed.connect(save_records)
-	journal.changed.connect(save_records)
+	journal.changed.connect(save_journal)
 		
 func _accumulate_play_day() -> void:
 	var now_ms := Time.get_ticks_msec()
@@ -141,6 +146,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		save_game()
 		save_records()
+		save_journal()
 		get_tree().quit()
 		
 func save_records() -> void:
@@ -148,7 +154,6 @@ func save_records() -> void:
 	var data := {
 		"version": RECORDS_VERSION,
 		"activity_log": activity_log.to_dict(),
-		"journal": journal.to_dict(),
 	}
 	var file := FileAccess.open(RECORDS_PATH, FileAccess.WRITE)
 	if file == null:
@@ -172,3 +177,23 @@ func load_records() -> void:
 	var rj = parsed.get("journal", {})
 	if typeof(rj) == TYPE_DICTIONARY:
 		journal.from_dict(rj)
+
+func save_journal() -> void:
+	var data := journal.to_dict()        # {groups, docs}
+	data["version"] = JOURNAL_VERSION
+	var file := FileAccess.open(JOURNAL_PATH, FileAccess.WRITE)
+	if file == null:
+		push_warning("Fail to Save journal: %s" % FileAccess.get_open_error())
+		return
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+
+func load_journal() -> void:
+	var file := FileAccess.open(JOURNAL_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var text := file.get_as_text()
+	file.close()
+	var parsed = JSON.parse_string(text)
+	if typeof(parsed) == TYPE_DICTIONARY:
+		journal.from_dict(parsed)
