@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dg5x6yha4wta5"]
+
+[ext_resource type="Script" uid="uid://dxgvudpqifcqf" path="res://scripts/commonui/hold_button.gd" id="1_fra1b"]
+
+[node name="HoldButton" type="Button" unique_id=16528522]
+script = ExtResource("1_fra1b")
+
+[node name="Gauge" type="ProgressBar" parent="." unique_id=367297050]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -4.0
+mouse_filter = 2
+show_percentage = false

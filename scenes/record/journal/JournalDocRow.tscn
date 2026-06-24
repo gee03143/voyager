@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bqst40l6uaweh"]
+
+[ext_resource type="Script" uid="uid://c1sbcifiqo0kh" path="res://scripts/record/journal/journal_doc_row.gd" id="1_w2hi8"]
+[ext_resource type="PackedScene" uid="uid://dg5x6yha4wta5" path="res://scenes/commonui/HoldButton.tscn" id="2_88dv2"]
+
+[node name="JournalDocRow" type="PanelContainer" unique_id=1236425911]
+script = ExtResource("1_w2hi8")
+
+[node name="HBox" type="HBoxContainer" parent="." unique_id=1149091678]
+layout_mode = 2
+
+[node name="Body" type="VBoxContainer" parent="HBox" unique_id=1378581423]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 0
+
+[node name="TitleLabel" type="Label" parent="HBox/Body" unique_id=1567459731]
+layout_mode = 2
+
+[node name="DateLabel" type="Label" parent="HBox/Body" unique_id=1181326123]
+layout_mode = 2
+
+[node name="DeleteButton" parent="HBox" unique_id=16528522 instance=ExtResource("2_88dv2")]
+layout_mode = 2
+text = "X"

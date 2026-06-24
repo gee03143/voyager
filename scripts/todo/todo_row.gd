@@ -14,7 +14,7 @@ signal due_edit_requested(row: TodoRow)
 #RightSlot
 @onready var due_label: Label = $HBox/RightSlot/DueLabel
 @onready var due_button: Button = $HBox/RightSlot/Actions/DueButton
-@onready var delete_button: Button = $HBox/RightSlot/Actions/DeleteButton
+@onready var delete_button: HoldButton = $HBox/RightSlot/Actions/DeleteButton
 
 var _text: String = ""
 var _done: bool = false
@@ -25,7 +25,7 @@ func _ready() -> void:
 	text_display.gui_input.connect(_on_display_input)
 	text_edit.text_submitted.connect(_on_edit_submitted)
 	text_edit.focus_exited.connect(_commit_edit)
-	delete_button.pressed.connect(func(): delete_requested.emit(self))
+	delete_button.held.connect(func(): delete_requested.emit(self))
 	due_button.pressed.connect(func(): due_edit_requested.emit(self))
 	_show_display()
 	_render()
@@ -33,8 +33,9 @@ func _ready() -> void:
 	drag_handle.row = self
 	drag_handle.token = &"todo"
 	
-	mouse_entered.connect(func(): _set_actions_shown(true))
-	mouse_exited.connect(func(): _set_actions_shown(false))
+	HoverReveal.setup(self, [due_button, delete_button])
+	mouse_entered.connect(func(): due_label.modulate.a = 0.0)
+	mouse_exited.connect(func(): due_label.modulate.a = 1.0)
 	_set_actions_shown(false)
 
 # Data -> UI

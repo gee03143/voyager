@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cx2sgkc61kpy8"]
+
+[ext_resource type="Script" uid="uid://b4ia2keyllxms" path="res://scripts/record/journal/journal_group_header.gd" id="1_rsax0"]
+[ext_resource type="PackedScene" uid="uid://dg5x6yha4wta5" path="res://scenes/commonui/HoldButton.tscn" id="2_xd4dg"]
+
+[node name="JournalGroupHeader" type="HBoxContainer" unique_id=1217250401]
+script = ExtResource("1_rsax0")
+
+[node name="ToggleButton" type="Button" parent="." unique_id=2108784251]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="." unique_id=1260884807]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RenameButton" type="Button" parent="." unique_id=681917752]
+layout_mode = 2
+text = "✎"
+
+[node name="DeleteButton" parent="." unique_id=16528522 instance=ExtResource("2_xd4dg")]
+layout_mode = 2
+text = "X"

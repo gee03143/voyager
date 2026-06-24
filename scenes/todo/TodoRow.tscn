@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://7pujsblbfa33" path="res://scripts/todo/todo_row.gd" id="1_rnimk"]
 [ext_resource type="Script" uid="uid://catr8i5oejgjw" path="res://scripts/commonui/drag_handle.gd" id="2_v4bi1"]
+[ext_resource type="PackedScene" uid="uid://dg5x6yha4wta5" path="res://scenes/commonui/HoldButton.tscn" id="3_7cel4"]
 [ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="3_hrp0r"]
 
 [node name="TodoRow" type="PanelContainer" unique_id=1444403424]
@@ -51,7 +52,7 @@ layout_mode = 2
 layout_mode = 2
 text = "📅"
 
-[node name="DeleteButton" type="Button" parent="HBox/RightSlot/Actions" unique_id=362496066]
+[node name="DeleteButton" parent="HBox/RightSlot/Actions" unique_id=16528522 instance=ExtResource("3_7cel4")]
 layout_mode = 2
 text = "X"
 

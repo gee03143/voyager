@@ -42,6 +42,10 @@ static func format_day(iso: String) -> String:
 		return "%d/%d" % [int(p[1]), int(p[2])]
 	return "%d/%d/%d" % [int(p[0]), int(p[1]), int(p[2])]
 
+static func format_created(ts: int) -> String:        # ts → "D/M/YYYY"
+	var p := local_day_iso(ts).split("-")
+	return "%d/%d/%d" % [int(p[2]), int(p[1]), int(p[0])]
+
 static func monday_iso() -> String:
 	var t := Time.get_date_dict_from_system()
 	var days_back := (int(t.weekday) + 6) % 7          # weekday: 일0..토6 → 월요일까지 거슬러

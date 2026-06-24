@@ -9,9 +9,10 @@ const ACCENT := {
 	"timer": Color("2e86de"),              # 파랑
 	"todo": Color("d9b38c"),               # 베이지
 	"habit": Color("27ae60"),              # 초록
+	"journal": Color("9575cd"),            # 보라
 }
 const ICON := {
-	"pomodoro_session": "🍅", "timer": "⏲", "todo": "☑", "habit": "✅",
+	"pomodoro_session": "🍅", "timer": "⏲", "todo": "☑", "habit": "✅", "journal": "📓"
 }
 
 var _day: String = ""   # 현재 표시 중인 날짜 iso
@@ -64,6 +65,9 @@ func _format_event(e: Dictionary) -> String:
 			var cnt := int(e.get("focus_count", 0))
 			var each := (int(e.get("seconds", 0)) / cnt) if cnt > 0 else 0
 			return "%d x %s 세션." % [cnt, _fmt_ms(each)]
+		"journal":
+			var t := Save.journal.doc_title(int(e.get("doc_id", 0)))
+			return "일지 작성: %s" % (t if t != "" else "(삭제된 일지)")
 	return ""
 
 func _make_row(e: Dictionary) -> Control:

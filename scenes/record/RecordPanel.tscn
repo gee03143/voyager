@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://baouvnhwlly04" path="res://scenes/record/RecordCalendar.tscn" id="2_5xh2a"]
 [ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="2_e7b51"]
 [ext_resource type="PackedScene" uid="uid://bmq06t54wyo34" path="res://scenes/record/RecordView.tscn" id="3_e7b51"]
-[ext_resource type="PackedScene" uid="uid://425i7ha8epq5" path="res://scenes/record/JournalView.tscn" id="5_e7b51"]
+[ext_resource type="PackedScene" uid="uid://425i7ha8epq5" path="res://scenes/record/journal/JournalView.tscn" id="5_e7b51"]
 
 [node name="RecordPanel" type="VBoxContainer" unique_id=1649160020]
 custom_minimum_size = Vector2(640, 360)

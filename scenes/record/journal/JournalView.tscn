@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://425i7ha8epq5"]
 
-[ext_resource type="Script" uid="uid://puhmyprsgfvh" path="res://scripts/record/journal_view.gd" id="1_2p8i4"]
+[ext_resource type="Script" uid="uid://puhmyprsgfvh" path="res://scripts/record/journal/journal_view.gd" id="1_wwchr"]
 
 [node name="JournalView" type="HBoxContainer" unique_id=730269896]
 custom_minimum_size = Vector2(560, 340)
 theme_override_constants/separation = 12
-script = ExtResource("1_2p8i4")
+script = ExtResource("1_wwchr")
 
 [node name="Left" type="VBoxContainer" parent="." unique_id=207772038]
 layout_mode = 2
@@ -13,6 +13,9 @@ layout_mode = 2
 [node name="AddButton" type="Button" parent="Left" unique_id=922164103]
 layout_mode = 2
 text = "+ 새로운 일지 항목 추가하기"
+
+[node name="FilterOption" type="OptionButton" parent="Left" unique_id=1501032029]
+layout_mode = 2
 
 [node name="Scroll" type="ScrollContainer" parent="Left" unique_id=462667817]
 layout_mode = 2
@@ -26,6 +29,17 @@ size_flags_vertical = 3
 [node name="Editor" type="VBoxContainer" parent="." unique_id=1891206367]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="GroupRow" type="HBoxContainer" parent="Editor" unique_id=119359538]
+layout_mode = 2
+
+[node name="GroupOption" type="OptionButton" parent="Editor/GroupRow" unique_id=141862279]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddGroupButton" type="Button" parent="Editor/GroupRow" unique_id=1026928756]
+layout_mode = 2
+text = "+ 그룹"
 
 [node name="TitleEdit" type="LineEdit" parent="Editor" unique_id=1407170803]
 layout_mode = 2

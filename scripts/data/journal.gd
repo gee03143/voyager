@@ -35,6 +35,13 @@ func remove_doc(id: int) -> void:
 			changed.emit()
 			return
 
+func doc_title(id: int) -> String:
+	for d in docs:
+		if int(d.get("id", 0)) == id:
+			var t := str(d.get("title", "")).strip_edges()
+			return t if t != "" else "(제목 없음)"
+	return ""        # 없음 = 삭제됨
+
 # --- 그룹 CRUD ---
 func add_group(name: String) -> int:
 	var used := {}
