@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://cad8niq4h6ncf"]
+
+[ext_resource type="Script" uid="uid://c8lairpnw8r6k" path="res://scripts/letter/composer_view.gd" id="1_fsrj7"]
+
+[node name="ComposerView" type="VBoxContainer" unique_id=1576559014]
+script = ExtResource("1_fsrj7")
+
+[node name="SubjectRow" type="HBoxContainer" parent="." unique_id=548046836]
+layout_mode = 2
+
+[node name="SubjectLabel" type="Label" parent="SubjectRow" unique_id=76553943]
+layout_mode = 2
+text = "활동"
+
+[node name="SubjectOption" type="OptionButton" parent="SubjectRow" unique_id=509545370]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StateRow" type="HBoxContainer" parent="." unique_id=1157684466]
+layout_mode = 2
+
+[node name="StateLabel" type="Label" parent="StateRow" unique_id=1354305427]
+layout_mode = 2
+text = "상태"
+
+[node name="StateOption" type="OptionButton" parent="StateRow" unique_id=631335484]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TemplateRow" type="HBoxContainer" parent="." unique_id=1714972567]
+layout_mode = 2
+
+[node name="TemplateLabel" type="Label" parent="TemplateRow" unique_id=979568730]
+layout_mode = 2
+text = "형식"
+
+[node name="TemplateOption" type="OptionButton" parent="TemplateRow" unique_id=2091007576]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Preview" type="Label" parent="." unique_id=1696852454]
+layout_mode = 2
+
+[node name="SendButton" type="Button" parent="." unique_id=817710746]
+layout_mode = 2
+text = "병에 담아 띄우기"

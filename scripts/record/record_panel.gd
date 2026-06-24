@@ -4,7 +4,7 @@ extends VBoxContainer
 @onready var calendar = $Content/Host/ActivityTab/Calendar
 @onready var view = $Content/Host/ActivityTab/RecordView
 @onready var stats_tab: VBoxContainer = $Content/Host/StatsTab
-@onready var _pages: Array = [$Content/Host/ActivityTab, $Content/Host/StatsTab, $Content/Host/JournalTab]
+@onready var _pages: Array = [$Content/Host/ActivityTab, $Content/Host/StatsTab, $Content/Host/JournalTab, $Content/Host/ComposerTab]
 
 var _nav := ButtonGroupNav.new()
 var _day: String = ""

@@ -7,7 +7,7 @@ extends Node
 
 signal discovered
 
-@export var interval: float = 2.0   # 발견 간격(leagues). 인스턴스별 설정(테스트=2.0).
+@export var interval: float = 300.0   # 발견 간격(leagues). 인스턴스별 설정(테스트=2.0).
 
 var _next_at := 0.0
 

@@ -6,6 +6,7 @@ enum Kind { NONE, POMODORO, TIMER }
 # 휘발성(종료 시 소멸, Save 직렬화 X). Save는 앎(컨트롤러 계층).
 var pomodoro: Pomodoro
 var timer: SimpleTimer
+var current_activity: String = ""   # 현재 집중 대상(Subject key, 휘발성)
 
 func _ready() -> void:
 	pomodoro = Pomodoro.new()
@@ -27,16 +28,17 @@ func _ready() -> void:
 
 func _on_focus_finished() -> void:
 	Save.voyage.add_focus(pomodoro.focus_seconds)   # 집중 1구간 = 계획된 집중 길이 적립
+	Save.lexicon.unlock_subject(current_activity)	# 집중 1구간 = 그 활동 했음 → 해금
 
 func _on_timer_finished() -> void:
 	Save.voyage.add_focus(timer.duration)
-	Save.activity_log.add("timer", {"seconds": int(timer.duration)})
+	Save.activity_log.add("timer", {"seconds": int(timer.duration), "subject": current_activity})
 	Sound.play_set(Save.settings.sound_set)   # 완료음(컨트롤러가 완료를 앎)
 	timer.reset()                             # 완주 → 자동 대기 복귀 (포모와 일관)
 
 func _on_session_completed() -> void:
 	var secs := int(pomodoro.focus_seconds * pomodoro.total_focus_count)
-	Save.activity_log.add("pomodoro_session", {"focus_count": pomodoro.total_focus_count, "seconds": secs})
+	Save.activity_log.add("pomodoro_session", {"focus_count": pomodoro.total_focus_count, "seconds": secs, "subject": current_activity})
 	Sound.play_set(Save.settings.sound_set)   # 완료음
 	pomodoro.build_plan()                     # 완료 → 자동 대기 복귀
 	

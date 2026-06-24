@@ -13,16 +13,17 @@ func _on_visibility_changed() -> void:
 
 func _rebuild() -> void:
 	for c in _list.get_children():
-		_list.remove_child(c)         # 즉시 분리(중복 방지) 후 해제
+		_list.remove_child(c)
 		c.queue_free()
-	if Save.letters.collected.is_empty():
+	var recv := Save.letters.received()
+	if recv.is_empty():
 		var empty := Label.new()
 		empty.text = "아직 보관한 편지가 없어요"
 		_list.add_child(empty)
 		return
-	for L in Save.letters.collected:
+	for L in recv:
 		var lbl := Label.new()
-		lbl.text = LetterContent.render(int(L["template"]), L["slots"])
+		lbl.text = TelegraphContent.render(int(L["template_idx"]), str(L["subject"]), str(L["fact"]), str(L["state"]))
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
 		_list.add_child(lbl)
 

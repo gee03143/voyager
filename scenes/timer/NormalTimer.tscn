@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c6hpbriiaaf2o" path="res://scripts/timer/normaltimer/timer_view.gd" id="1_2r6ew"]
 [ext_resource type="PackedScene" uid="uid://cq7yhqdjngbua" path="res://scenes/timer/CountdownDisplay.tscn" id="2_2r6ew"]
+[ext_resource type="Script" uid="uid://bhttbobcak5i5" path="res://scripts/timer/activity_select.gd" id="2_cvy7g"]
 [ext_resource type="Texture2D" uid="uid://42ognb8rq1fq" path="res://assets/placeholder/play.svg" id="3_wli07"]
 [ext_resource type="Texture2D" uid="uid://c7awmbv8t1nd1" path="res://assets/placeholder/reset.svg" id="4_cvy7g"]
 
@@ -12,6 +13,10 @@ script = ExtResource("1_2r6ew")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=648587023]
 layout_mode = 2
+
+[node name="ActivityButton" type="OptionButton" parent="VBox" unique_id=1560979649]
+layout_mode = 2
+script = ExtResource("2_cvy7g")
 
 [node name="TimeInput" type="HBoxContainer" parent="VBox" unique_id=338233110]
 layout_mode = 2

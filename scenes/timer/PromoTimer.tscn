@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bt2r4k76lwg1r"]
 
 [ext_resource type="Script" uid="uid://dbmhimic6eb4" path="res://scripts/timer/pomo/pomodoro_view.gd" id="1_s7lvo"]
+[ext_resource type="Script" uid="uid://bhttbobcak5i5" path="res://scripts/timer/activity_select.gd" id="2_lsfon"]
 [ext_resource type="Texture2D" uid="uid://42ognb8rq1fq" path="res://assets/placeholder/play.svg" id="3_hdkv5"]
 [ext_resource type="PackedScene" uid="uid://cq7yhqdjngbua" path="res://scenes/timer/CountdownDisplay.tscn" id="3_idk55"]
 [ext_resource type="Texture2D" uid="uid://cjlrqdvs1r2tg" path="res://assets/placeholder/skip.svg" id="4_lsfon"]
@@ -13,6 +14,10 @@ script = ExtResource("1_s7lvo")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=48566559]
 layout_mode = 2
+
+[node name="ActivityButton" type="OptionButton" parent="VBox" unique_id=383582105]
+layout_mode = 2
+script = ExtResource("2_lsfon")
 
 [node name="Config" type="GridContainer" parent="VBox" unique_id=210816297]
 layout_mode = 2

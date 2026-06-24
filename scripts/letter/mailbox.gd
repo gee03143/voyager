@@ -25,19 +25,18 @@ func _process(_delta: float) -> void:
 	shelf.set_badge(_pending.size())
 
 func _on_discovered() -> void:
-	var pool := LetterContent.SEED_LETTERS
-	_pending.append(pool[randi() % pool.size()])
+	_pending.append(TelegraphContent.random_letter())
 	notice.show_notice("편지를 하나 주웠어요 · 집중이 끝나면 열어보세요")
 
 func _on_shelf_pressed() -> void:
-	if not _pending.is_empty():               # 안 읽은 게 있으면 읽기
+	if not _pending.is_empty():
 		_current = _pending.pop_front()
-		_letter_view.show_letter(_current["template"], _current["slots"], "이름 모를 항해자", "어딘가의 바다에서")
-	else:                                      # 없으면 보관함 열기
+		_letter_view.show_letter(_current["template_idx"], _current["subject"], _current["fact"], _current["state"], "이름 모를 항해자", "어딘가의 바다에서")
+	else:
 		_shelf_view.visible = true
 
 func _on_kept() -> void:
 	if _current.is_empty():
 		return
-	Save.letters.add(_current["template"], _current["slots"])
+	Save.letters.add(_current["template_idx"], _current["subject"], _current["fact"], _current["state"], "이름 모를 항해자")
 	_current = {}

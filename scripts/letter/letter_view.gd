@@ -13,8 +13,8 @@ func _ready() -> void:
 	_close_button.pressed.connect(_on_close_pressed)
 
 # 편지 하나를 받아 토큰을 렌더해 표시. (Save·전역 모름 — 받기만 함)
-func show_letter(template_id: int, slots: Array, author: String, meta: String) -> void:
-	_message.text = LetterContent.render(template_id, slots)
+func show_letter(template_idx: int, subject: String, fact: String, state: String, author: String, meta: String) -> void:
+	_message.text = TelegraphContent.render(template_idx, subject, fact, state)
 	_author.text = "— " + author
 	_meta.text = meta
 	visible = true

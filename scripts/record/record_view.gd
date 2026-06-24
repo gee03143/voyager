@@ -60,11 +60,11 @@ func _format_event(e: Dictionary) -> String:
 		"todo":
 			return "\"%s\" 완료." % str(e.get("title", ""))
 		"timer":
-			return "%s 타이머." % _fmt_ms(int(e.get("seconds", 0)))
+			return "%s%s 타이머." % [_subj(e), _fmt_ms(int(e.get("seconds", 0)))]
 		"pomodoro_session":
 			var cnt := int(e.get("focus_count", 0))
 			var each := (int(e.get("seconds", 0)) / cnt) if cnt > 0 else 0
-			return "%d x %s 세션." % [cnt, _fmt_ms(each)]
+			return "%s%d x %s 세션." % [_subj(e), cnt, _fmt_ms(each)]
 		"journal":
 			var t := Save.journal.doc_title(int(e.get("doc_id", 0)))
 			return "일지 작성: %s" % (t if t != "" else "(삭제된 일지)")
@@ -88,6 +88,10 @@ func _make_row(e: Dictionary) -> Control:
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(label)
 	return row
+	
+func _subj(e: Dictionary) -> String:
+	var key := str(e.get("subject", ""))
+	return "%s · " % ActivityVocab.ko(key) if key != "" else ""
 
 func _fmt_ms(secs: int) -> String:    # M:SS
 	return "%d:%02d" % [secs / 60, secs % 60]

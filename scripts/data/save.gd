@@ -1,7 +1,7 @@
 extends Node
 
 const SAVE_PATH := "user://save.json"
-const VERSION := 5
+const VERSION := 7
 const RECORDS_PATH := "user://records.json"
 const RECORDS_VERSION := 1
 const JOURNAL_PATH := "user://journal.json"
@@ -9,6 +9,7 @@ const JOURNAL_VERSION := 1
 
 var voyage := Voyage.new()
 var letters := LetterArchive.new()
+var lexicon := Lexicon.new()
 var activity_log := ActivityLog.new()
 var journal := Journal.new()
 var settings := AppSettings.new()
@@ -51,6 +52,8 @@ func _ready() -> void:
 	voyage.changed.connect(save_game)
 	activity_log.changed.connect(save_records)
 	journal.changed.connect(save_journal)
+	lexicon.changed.connect(save_game)
+	letters.changed.connect(save_game)
 		
 func _accumulate_play_day() -> void:
 	var now_ms := Time.get_ticks_msec()
@@ -83,6 +86,7 @@ func save_game() -> void:
 		"habit_weeks": habit_weeks,
 		"voyage": voyage.to_dict(),
 		"letters": letters.to_dict(),
+		"lexicon": lexicon.to_dict(),
 	}
 	
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -141,6 +145,10 @@ func load_game() -> void:
 	var rl = parsed.get("letters", {})
 	if typeof(rl) == TYPE_DICTIONARY:
 		letters.from_dict(rl)
+	
+	var rlex = parsed.get("lexicon", {})
+	if typeof(rlex) == TYPE_DICTIONARY:
+		lexicon.from_dict(rlex)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
