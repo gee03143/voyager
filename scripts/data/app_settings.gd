@@ -3,6 +3,10 @@ extends RefCounted
 
 signal changed                          # 설정 변경 → 저장 + 뷰 전파
 
+# HUD 위치 설정
+var hud_position: Vector2 = Vector2(-1, -1)   # (-1,-1) = 미설정 → 기본 위치 사용
+var hud_scale: float = 1.0                    # P3b 리사이즈용(지금은 필드만)
+
 # 포모 세션 설정
 var focus_seconds: float = 25 * 60
 var short_break_seconds: float = 5 * 60
@@ -25,6 +29,8 @@ func to_dict() -> Dictionary:
 		"hide_countdown": hide_countdown,
 		"auto_minimize": auto_minimize,
 		"sound_set": sound_set,
+		"hud_position": [hud_position.x, hud_position.y],
+		"hud_scale": hud_scale,
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -37,3 +43,7 @@ func from_dict(d: Dictionary) -> void:
 	hide_countdown = bool(d.get("hide_countdown", hide_countdown))
 	auto_minimize = bool(d.get("auto_minimize", auto_minimize))
 	sound_set = int(d.get("sound_set", sound_set))
+	var hp = d.get("hud_position", null)
+	if typeof(hp) == TYPE_ARRAY and hp.size() == 2:
+		hud_position = Vector2(hp[0], hp[1])
+	hud_scale = float(d.get("hud_scale", hud_scale))

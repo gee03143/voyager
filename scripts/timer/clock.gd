@@ -32,6 +32,7 @@ func _on_focus_finished() -> void:
 
 func _on_timer_finished() -> void:
 	Save.voyage.add_focus(timer.duration)
+	Save.lexicon.unlock_subject(current_activity)
 	Save.activity_log.add("timer", {"seconds": int(timer.duration), "subject": current_activity})
 	Sound.play_set(Save.settings.sound_set)   # 완료음(컨트롤러가 완료를 앎)
 	timer.reset()                             # 완주 → 자동 대기 복귀 (포모와 일관)

@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://cr0qgm1sh3aml"]
+
+[ext_resource type="Script" uid="uid://c43kjbj2wvhly" path="res://scripts/letter/vocab_codex.gd" id="1_dv3or"]
+
+[node name="VocabCodex" type="VBoxContainer" unique_id=1318945697]
+script = ExtResource("1_dv3or")
+
+[node name="Header" type="Label" parent="." unique_id=444787740]
+layout_mode = 2
+text = "활동 어휘 N / 9"
+
+[node name="Grid" type="GridContainer" parent="." unique_id=1912241397]
+layout_mode = 2
+columns = 3

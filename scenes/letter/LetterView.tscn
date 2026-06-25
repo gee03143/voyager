@@ -35,7 +35,7 @@ custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3529412, 0.26666668, 0.15294118, 1)
 theme_override_font_sizes/font_size = 18
-text = "오늘은 천천히, 그러나 멈추지 않고 노를 저었어요. 당신의 항해도 무사하길.
+text = "TEXTTEXTTEXTTEXTTEXTTEXT
 "
 autowrap_mode = 2
 

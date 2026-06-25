@@ -23,6 +23,18 @@ theme_override_constants/margin_bottom = 12
 [node name="VBox" type="VBoxContainer" parent="Margin" unique_id=885989183]
 layout_mode = 2
 
+[node name="Handle" type="Control" parent="Margin/VBox" unique_id=1741758829]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="Margin/VBox/Handle" unique_id=1085217944]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "• • •"
+horizontal_alignment = 1
+
 [node name="RingBox" type="Control" parent="Margin/VBox" unique_id=1873468242]
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
@@ -101,3 +113,20 @@ text = "
 "
 icon = ExtResource("7_fiauw")
 icon_alignment = 1
+
+[node name="GripRow" type="HBoxContainer" parent="Margin/VBox" unique_id=1953942289]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="Margin/VBox/GripRow" unique_id=1908349514]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Grip" type="Control" parent="Margin/VBox/GripRow" unique_id=506721772]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Margin/VBox/GripRow/Grip" unique_id=654576928]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "◢"

@@ -182,9 +182,6 @@ func load_records() -> void:
 	var ra = parsed.get("activity_log", {})
 	if typeof(ra) == TYPE_DICTIONARY:
 		activity_log.from_dict(ra)
-	var rj = parsed.get("journal", {})
-	if typeof(rj) == TYPE_DICTIONARY:
-		journal.from_dict(rj)
 
 func save_journal() -> void:
 	var data := journal.to_dict()        # {groups, docs}
