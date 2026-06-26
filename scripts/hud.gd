@@ -3,8 +3,6 @@ extends PanelContainer
 const ICON_PAUSE := preload("res://assets/placeholder/pause.svg")
 const ICON_PLAY := preload("res://assets/placeholder/play.svg")
 
-@onready var _handle: Control = $Margin/VBox/Handle
-@onready var _grip: Control = $Margin/VBox/GripRow/Grip
 @onready var _ring: RadialProgress = $Margin/VBox/RingBox/Ring
 @onready var _time_label: Label = $Margin/VBox/RingBox/TimeLabel
 @onready var _caption: Label = $Margin/VBox/CaptionRow/Caption
@@ -12,14 +10,7 @@ const ICON_PLAY := preload("res://assets/placeholder/play.svg")
 @onready var _pause_button: Button = $Margin/VBox/Buttons/PauseButton
 @onready var _skip_button: Button = $Margin/VBox/Buttons/SkipButton
 @onready var _reset_button: Button = $Margin/VBox/Buttons/ResetButton
-
-var _dragging := false
-var _drag_start_mouse := Vector2.ZERO
-var _drag_start_pos := Vector2.ZERO
-
-var _resizing := false
-var _resize_start_mouse := Vector2.ZERO
-var _resize_start_scale := 1.0
+@onready var _mover: WidgetMover = $WidgetMover
 
 func _ready() -> void:
 	_pause_button.pressed.connect(Clock.active_toggle)
@@ -32,13 +23,18 @@ func _ready() -> void:
 	Clock.timer.running_changed.connect(_refresh)
 	Clock.timer.timer_finished.connect(_refresh)
 	
-	_handle.gui_input.connect(_on_handle_input)
 	set_anchors_preset(Control.PRESET_TOP_LEFT)     # 자유 위치 기준점 = 좌상단
 	position = _initial_pos()
 	
 	pivot_offset_ratio = Vector2.ZERO                    # 좌상단 기준 스케일(위치 고정)
 	scale = Vector2(Save.settings.hud_scale, Save.settings.hud_scale)   # 저장된 크기 적용
-	_grip.gui_input.connect(_on_grip_input)
+	
+	_mover.moved.connect(func(pos):
+		Save.settings.hud_position = pos
+		Save.settings.changed.emit())
+	_mover.resized.connect(func(s):
+		Save.settings.hud_scale = s
+		Save.settings.changed.emit())
 	
 	_refresh()
 
@@ -99,32 +95,3 @@ func _initial_pos() -> Vector2:
 		return Save.settings.hud_position
 	var vp := get_viewport_rect().size
 	return Vector2(vp.x * 0.6, 24.0)                # 기본: 중앙에서 약간 우상단
-
-func _on_handle_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		_dragging = event.pressed
-		if event.pressed:
-			_drag_start_mouse = get_global_mouse_position()
-			_drag_start_pos = position
-		else:
-			Save.settings.hud_position = position      # 놓을 때 저장
-			Save.settings.changed.emit()
-	elif event is InputEventMouseMotion and _dragging:
-		position = _drag_start_pos + (get_global_mouse_position() - _drag_start_mouse)
-		
-func _on_grip_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
-			_resizing = true
-			_resize_start_mouse = get_global_mouse_position()
-			_resize_start_scale = scale.x
-		else:
-			_resizing = false
-			Save.settings.hud_scale = scale.x          # 놓을 때 저장
-			Save.settings.changed.emit()
-	elif event is InputEventMouseMotion and _resizing:
-		var delta := get_global_mouse_position() - _resize_start_mouse
-		var base := size.x + size.y                    # 미스케일 기준 크기
-		if base > 0.0:
-			var s := clampf(_resize_start_scale + (delta.x + delta.y) / base, 0.6, 2.0)
-			scale = Vector2(s, s)

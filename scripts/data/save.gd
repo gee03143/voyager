@@ -152,10 +152,7 @@ func load_game() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		save_game()
-		save_records()
-		save_journal()
-		get_tree().quit()
+		quit_game()
 		
 func save_records() -> void:
 	_accumulate_play_day()
@@ -202,3 +199,9 @@ func load_journal() -> void:
 	var parsed = JSON.parse_string(text)
 	if typeof(parsed) == TYPE_DICTIONARY:
 		journal.from_dict(parsed)
+		
+func quit_game() -> void:
+	save_game()
+	save_records()
+	save_journal()
+	get_tree().quit()

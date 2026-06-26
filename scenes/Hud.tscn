@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://dxbybywbi8h1y" path="res://assets/placeholder/pause.svg" id="5_gfly3"]
 [ext_resource type="Texture2D" uid="uid://cjlrqdvs1r2tg" path="res://assets/placeholder/skip.svg" id="6_igu3p"]
 [ext_resource type="Texture2D" uid="uid://c7awmbv8t1nd1" path="res://assets/placeholder/reset.svg" id="7_fiauw"]
+[ext_resource type="Script" uid="uid://br2bterkmjqmr" path="res://scripts/commonui/widget_mover.gd" id="8_igu3p"]
 
 [node name="Hud" type="PanelContainer" unique_id=1516792778]
 offset_right = 40.0
@@ -130,3 +131,10 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 text = "◢"
+
+[node name="WidgetMover" type="Node" parent="." unique_id=1204722569 node_paths=PackedStringArray("target", "drag_handle", "resize_grip")]
+script = ExtResource("8_igu3p")
+target = NodePath("..")
+drag_handle = NodePath("../Margin/VBox/Handle")
+resize_grip = NodePath("../Margin/VBox/GripRow/Grip")
+metadata/_custom_type_script = "uid://br2bterkmjqmr"

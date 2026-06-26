@@ -3,6 +3,7 @@ extends Node2D
 @export var dock: Container          # 토글 버튼들의 부모
 @export var panels: Array[Control]   # 도크 버튼 순서대로의 패널 (항해처럼 없으면 비워둠)
 @export var voyage_button: BaseButton
+@export var gear_button: BaseButton      # 옵션 패널 여는 nav 버튼
 
 @onready var haeri_label: Label = $UI/HaeriBadge
 @onready var parallax: ParallaxBackground = $Parallax
@@ -31,6 +32,8 @@ func _ready() -> void:
 			buttons.append(child)
 	if voyage_button != null:
 		buttons.append(voyage_button)        # 같은 그룹 → 한 번에 하나(항해 열면 도크 패널 닫힘)
+	if gear_button != null:
+		buttons.append(gear_button)
 	_nav.setup(buttons, true)
 	_nav.selected.connect(_on_nav_selected)
 	for p in panels:

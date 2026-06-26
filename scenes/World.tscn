@@ -20,6 +20,8 @@
 [ext_resource type="Script" uid="uid://ddvjm3imkk4xn" path="res://scripts/letter/mailbox.gd" id="15_c0d7e"]
 [ext_resource type="Theme" uid="uid://dkaefg3qs4aqg" path="res://assets/themes/nav_theme.tres" id="15_dgldv"]
 [ext_resource type="PackedScene" uid="uid://c04nomxi32dxq" path="res://scenes/record/VoyagePanel.tscn" id="15_rm3lh"]
+[ext_resource type="Script" uid="uid://cbhanm8u4aw7v" path="res://scripts/option/options_menu.gd" id="16_yncth"]
+[ext_resource type="PackedScene" uid="uid://bssssdvptw4vk" path="res://scenes/option/OptionPanel.tscn" id="17_jgbtq"]
 [ext_resource type="PackedScene" uid="uid://dvj2jiisr43e5" path="res://scenes/letter/ShelfView.tscn" id="17_nthub"]
 [ext_resource type="PackedScene" uid="uid://c3mgfxkerd3gr" path="res://scenes/commonui/Notice.tscn" id="18_44lqw"]
 [ext_resource type="Script" uid="uid://chjov2ltlpriw" path="res://scripts/timer/alarm/alarm_banner.gd" id="20_dwmkc"]
@@ -27,11 +29,12 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_44lqw"]
 size = Vector2(107, 79)
 
-[node name="World" type="Node2D" unique_id=1409265880 node_paths=PackedStringArray("dock", "panels", "voyage_button")]
+[node name="World" type="Node2D" unique_id=1409265880 node_paths=PackedStringArray("dock", "panels", "voyage_button", "gear_button")]
 script = ExtResource("1_d1c63")
 dock = NodePath("UI/Dock")
-panels = [NodePath("UI/PanelHost/ClockTab"), NodePath("UI/PanelHost/TodoFrame"), NodePath("UI/PanelHost/HabitFrame"), NodePath("UI/PanelHost/RecordPanel"), NodePath("UI/PanelHost/VoyagePanel")]
+panels = [NodePath("UI/PanelHost/ClockTab"), NodePath("UI/PanelHost/TodoFrame"), NodePath("UI/PanelHost/HabitFrame"), NodePath("UI/PanelHost/RecordPanel"), NodePath("UI/PanelHost/VoyagePanel"), NodePath("UI/PanelHost/OptionFrame")]
 voyage_button = NodePath("UI/VoyageButton")
+gear_button = NodePath("UI/TopRight/GearButton")
 
 [node name="Background" type="CanvasLayer" parent="." unique_id=988105801]
 layer = -10
@@ -198,6 +201,25 @@ offset_top = 128.0
 offset_right = 880.0
 offset_bottom = 488.0
 
+[node name="OptionFrame" type="PanelContainer" parent="UI/PanelHost" unique_id=790630835]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -121.5
+offset_top = -166.5
+offset_right = 121.5
+offset_bottom = 166.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("4_b3faq")
+
+[node name="OptionPanel" parent="UI/PanelHost/OptionFrame" unique_id=1928188083 instance=ExtResource("17_jgbtq")]
+layout_mode = 2
+
 [node name="Dock" type="VBoxContainer" parent="UI" unique_id=1197393021]
 anchors_preset = 4
 anchor_top = 0.5
@@ -228,9 +250,10 @@ text = "기록"
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -40.0
-offset_right = 0.0
-offset_bottom = 51.0
+offset_left = -202.0
+offset_top = 316.0
+offset_right = -18.0
+offset_bottom = 630.0
 grow_horizontal = 0
 pivot_offset = Vector2(-16, 16)
 pivot_offset_ratio = Vector2(1, 0)
@@ -249,13 +272,16 @@ size_flags_vertical = 6
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Mailbox" type="Node" parent="UI" unique_id=309487392 node_paths=PackedStringArray("discovery", "notice", "shelf")]
+[node name="Mailbox" type="Control" parent="UI" unique_id=1786612934 node_paths=PackedStringArray("discovery", "notice", "shelf")]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("15_c0d7e")
 discovery = NodePath("../../Discovery")
 notice = NodePath("LetterNotice")
 shelf = NodePath("../../Shelf")
 
 [node name="LetterNotice" parent="UI/Mailbox" unique_id=990001031 instance=ExtResource("18_44lqw")]
+layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 1.0
@@ -268,6 +294,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="LetterView" parent="UI/Mailbox" unique_id=1631220425 instance=ExtResource("13_nrtoj")]
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -282,12 +309,16 @@ grow_vertical = 2
 
 [node name="ShelfView" parent="UI/Mailbox" unique_id=1866375658 instance=ExtResource("17_nthub")]
 visible = false
+layout_mode = 0
 
-[node name="AlarmBanner" type="Node" parent="UI" unique_id=1199208069 node_paths=PackedStringArray("notice")]
+[node name="AlarmBanner" type="Control" parent="UI" unique_id=1350355191 node_paths=PackedStringArray("notice")]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("20_dwmkc")
 notice = NodePath("AlarmNotice")
 
 [node name="AlarmNotice" parent="UI/AlarmBanner" unique_id=823157935 instance=ExtResource("18_44lqw")]
+layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
 anchor_right = 0.5
@@ -299,5 +330,27 @@ grow_horizontal = 2
 [node name="VoyageButton" type="Button" parent="UI" unique_id=190725123]
 text = "항해"
 
+[node name="TopRight" type="HBoxContainer" parent="UI" unique_id=1917575133]
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+
+[node name="EyeButton" type="Button" parent="UI/TopRight" unique_id=1803387070]
+layout_mode = 2
+text = "👁"
+
+[node name="GearButton" type="Button" parent="UI/TopRight" unique_id=870707567]
+layout_mode = 2
+text = "⚙"
+
 [node name="Discovery" type="Node" parent="." unique_id=1871224704]
 script = ExtResource("14_i4b1j")
+
+[node name="OptionMenu" type="Node" parent="." unique_id=1660594472 node_paths=PackedStringArray("eye_button", "gear_button", "chrome")]
+script = ExtResource("16_yncth")
+eye_button = NodePath("../UI/TopRight/EyeButton")
+gear_button = NodePath("../UI/TopRight/GearButton")
+chrome = [NodePath("../UI/PanelHost"), NodePath("../UI/Dock"), NodePath("../UI/HaeriBadge"), NodePath("../UI/Mailbox"), NodePath("../UI/AlarmBanner"), NodePath("../UI/VoyageButton")]
