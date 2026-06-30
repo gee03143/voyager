@@ -24,10 +24,10 @@ func _ready() -> void:
 	Clock.timer.timer_finished.connect(_refresh)
 	
 	set_anchors_preset(Control.PRESET_TOP_LEFT)     # 자유 위치 기준점 = 좌상단
-	position = _initial_pos()
-	
 	pivot_offset_ratio = Vector2.ZERO                    # 좌상단 기준 스케일(위치 고정)
-	scale = Vector2(Save.settings.hud_scale, Save.settings.hud_scale)   # 저장된 크기 적용
+	_apply_hud_geometry()
+	
+	Save.settings.hud_reset.connect(_apply_hud_geometry)
 	
 	_mover.moved.connect(func(pos):
 		Save.settings.hud_position = pos
@@ -95,3 +95,7 @@ func _initial_pos() -> Vector2:
 		return Save.settings.hud_position
 	var vp := get_viewport_rect().size
 	return Vector2(vp.x * 0.6, 24.0)                # 기본: 중앙에서 약간 우상단
+
+func _apply_hud_geometry() -> void:
+	position = _initial_pos()
+	scale = Vector2(Save.settings.hud_scale, Save.settings.hud_scale)

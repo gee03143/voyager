@@ -58,6 +58,9 @@ func _process(delta: float) -> void:
 	var rough := 1.0 + _ship_speed * 0.6     # 항해 중 더 큰 흔들림
 	ship.position.y = _ship_base_y + sin(_bob_t * BOB_FREQ) * BOB_AMP * rough
 	ship.rotation = sin(_bob_t * BOB_FREQ * 0.5) * ROCK_AMP   # 약간 다른 주기 → 자연스러운 일렁임
+	
+	# fps test code
+	# print(Engine.get_frames_per_second())
 
 func _on_nav_selected(index: int) -> void:
 	for p in panels:

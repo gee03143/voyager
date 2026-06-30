@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://d1fyg3qjp5gr0" path="res://scripts/option/option_panel.gd" id="1_kre35"]
 [ext_resource type="Theme" uid="uid://dkaefg3qs4aqg" path="res://assets/themes/nav_theme.tres" id="2_whkr3"]
+[ext_resource type="PackedScene" uid="uid://u8sgyah1ikwa" path="res://scenes/option/ScreenView.tscn" id="3_7umbu"]
+[ext_resource type="PackedScene" uid="uid://cp46oq26c8olc" path="res://scenes/option/SoundView.tscn" id="3_fhh66"]
 
 [node name="OptionPanel" type="VBoxContainer" unique_id=1928188083]
 script = ExtResource("1_kre35")
@@ -26,10 +28,10 @@ text = "기타"
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ScreenTab" type="VBoxContainer" parent="Host" unique_id=1230424316]
+[node name="ScreenTab" parent="Host" unique_id=113817926 instance=ExtResource("3_7umbu")]
 layout_mode = 2
 
-[node name="SoundTab" type="VBoxContainer" parent="Host" unique_id=624528141]
+[node name="SoundTab" parent="Host" unique_id=2017096723 instance=ExtResource("3_fhh66")]
 visible = false
 layout_mode = 2
 

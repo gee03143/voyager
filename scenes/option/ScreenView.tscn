@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://u8sgyah1ikwa"]
+
+[ext_resource type="Script" uid="uid://dejtx20ng2sqi" path="res://scripts/option/screen_view.gd" id="1_ihjug"]
+
+[node name="ScreenTab" type="VBoxContainer" unique_id=113817926]
+script = ExtResource("1_ihjug")
+
+[node name="WindowModeRow" type="HBoxContainer" parent="." unique_id=1887548487]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="WindowModeRow" unique_id=738363906]
+layout_mode = 2
+text = "윈도우 모드"
+
+[node name="WindowModeOption" type="OptionButton" parent="WindowModeRow" unique_id=172561856]
+layout_mode = 2
+
+[node name="ResolutionRow" type="HBoxContainer" parent="." unique_id=2092261190]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ResolutionRow" unique_id=412326764]
+layout_mode = 2
+text = "해상도"
+
+[node name="ResolutionOption" type="OptionButton" parent="ResolutionRow" unique_id=1968368425]
+layout_mode = 2
+
+[node name="FpsFocusedRow" type="HBoxContainer" parent="." unique_id=136505762]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FpsFocusedRow" unique_id=22563747]
+layout_mode = 2
+text = "프레임 제한 (포커스)"
+
+[node name="FpsFocusedOption" type="OptionButton" parent="FpsFocusedRow" unique_id=851248506]
+layout_mode = 2
+
+[node name="FpsUnfocusedRow" type="HBoxContainer" parent="." unique_id=1285381256]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FpsUnfocusedRow" unique_id=1852499842]
+layout_mode = 2
+text = "프레임 제한 (비포커스)"
+
+[node name="FpsUnfocusedOption" type="OptionButton" parent="FpsUnfocusedRow" unique_id=1444975317]
+layout_mode = 2
+
+[node name="AlwaysOnTopRow" type="HBoxContainer" parent="." unique_id=1671172399]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="AlwaysOnTopRow" unique_id=431009200]
+layout_mode = 2
+text = "항상 위에"
+
+[node name="AlwaysOnTopCheck" type="CheckButton" parent="AlwaysOnTopRow" unique_id=535750081]
+layout_mode = 2
+
+[node name="HudResetButton" type="Button" parent="." unique_id=1361119593]
+layout_mode = 2
+text = "HUD 위치·크기 초기화"

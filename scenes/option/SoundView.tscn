@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://cp46oq26c8olc"]
+
+[ext_resource type="Script" uid="uid://cbms12n0og2x7" path="res://scripts/option/sound_view.gd" id="1_eiobo"]
+
+[node name="SoundTab" type="VBoxContainer" unique_id=2017096723]
+script = ExtResource("1_eiobo")
+
+[node name="VolumeRow" type="HBoxContainer" parent="." unique_id=1479034455]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VolumeRow" unique_id=123367553]
+layout_mode = 2
+text = "음량"
+
+[node name="VolumeSlider" type="HSlider" parent="VolumeRow" unique_id=930041955]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="SoundSetRow" type="HBoxContainer" parent="." unique_id=732599501]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SoundSetRow" unique_id=1616336320]
+layout_mode = 2
+
+[node name="SoundSetOption" type="OptionButton" parent="SoundSetRow" unique_id=624447859]
+layout_mode = 2
+item_count = 2
+popup/item_0/text = "Set 1"
+popup/item_0/id = 0
+popup/item_1/text = "Set 2"
+popup/item_1/id = 1
+
+[node name="PreviewButton" type="Button" parent="SoundSetRow" unique_id=1245819136]
+layout_mode = 2
+text = "▶"
