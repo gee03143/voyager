@@ -1,0 +1,81 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" role="img" font-family="sans-serif">
+  <title>데스크톱 컴패니언(미니) 모드 — 투명·항상 위 작은 창이 바탕화면 위에 떠 있는 컨셉</title>
+  <desc>바탕화면과 작업 창, 작업표시줄 위에, 배와 집중 타이머만 담긴 작고 반투명한 컴패니언 창이 오른쪽 아래에 떠 있어 데스크톱이 배경 너머로 비친다.</desc>
+
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#243140"/><stop offset="100%" stop-color="#161e29"/>
+    </linearGradient>
+    <radialGradient id="cglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe1a0" stop-opacity="0.9"/><stop offset="100%" stop-color="#ffe1a0" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="dt"><rect x="0" y="0" width="800" height="500" rx="10"/></clipPath>
+    <clipPath id="comp"><rect x="560" y="296" width="208" height="150" rx="18"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#dt)">
+    <rect x="0" y="0" width="800" height="500" fill="url(#wall)"/>
+    <path d="M520 500 Q650 380 800 430 L800 500 Z" fill="#2c3a4a" opacity="0.6"/>
+    <path d="M600 500 Q720 420 800 460 L800 500 Z" fill="#33445708" opacity="0.5"/>
+    <circle cx="690" cy="150" r="46" fill="#33424f" opacity="0.5"/>
+
+    <g opacity="0.85">
+      <rect x="28" y="28" width="34" height="28" rx="4" fill="#e7c87a"/><text x="45" y="72" font-size="10" text-anchor="middle" fill="#cdd6df">프로젝트</text>
+      <rect x="30" y="96" width="30" height="34" rx="3" fill="#cfd8e2"/><text x="45" y="146" font-size="10" text-anchor="middle" fill="#cdd6df">메모.txt</text>
+      <rect x="28" y="168" width="34" height="28" rx="4" fill="#9fc0e0"/><text x="45" y="212" font-size="10" text-anchor="middle" fill="#cdd6df">바다</text>
+    </g>
+
+    <g>
+      <rect x="150" y="70" width="380" height="300" rx="8" fill="#1f2630" stroke="#3a4250" stroke-width="1.5"/>
+      <rect x="150" y="70" width="380" height="30" rx="8" fill="#2c3543"/>
+      <circle cx="168" cy="85" r="5" fill="#e06b5a"/><circle cx="184" cy="85" r="5" fill="#e7c266"/><circle cx="200" cy="85" r="5" fill="#7fb37a"/>
+      <text x="270" y="89" font-size="11" fill="#8b97a6">main.gd — Voyager</text>
+      <g font-family="monospace" font-size="11">
+        <text x="168" y="126" fill="#7fa9d6">func</text><text x="200" y="126" fill="#cdd6df">_ready():</text>
+        <text x="184" y="150" fill="#c98fb0">apply</text><text x="222" y="150" fill="#cdd6df">_window_mode()</text>
+        <text x="184" y="174" fill="#c98fb0">apply</text><text x="222" y="174" fill="#cdd6df">_fps(true)</text>
+        <text x="168" y="206" fill="#7fa9d6">var</text><text x="196" y="206" fill="#cdd6df">win = get_window()</text>
+        <line x1="168" y1="232" x2="420" y2="232" stroke="#2c3543" stroke-width="9"/>
+        <line x1="168" y1="256" x2="360" y2="256" stroke="#2c3543" stroke-width="9"/>
+        <line x1="168" y1="280" x2="440" y2="280" stroke="#2c3543" stroke-width="9"/>
+        <line x1="168" y1="304" x2="300" y2="304" stroke="#2c3543" stroke-width="9"/>
+        <line x1="168" y1="328" x2="400" y2="328" stroke="#2c3543" stroke-width="9"/>
+      </g>
+    </g>
+
+    <ellipse cx="664" cy="450" rx="118" ry="14" fill="#000" opacity="0.28"/>
+    <rect x="560" y="296" width="208" height="150" rx="18" fill="#12243a" fill-opacity="0.22" stroke="#ffffff" stroke-opacity="0.20" stroke-width="1.2"/>
+
+    <g clip-path="url(#comp)">
+      <path d="M560 408 Q664 388 768 408 L768 446 L560 446 Z" fill="#4f7fa8" fill-opacity="0.55"/>
+      <path d="M560 408 Q664 388 768 408" fill="none" stroke="#bcd6ea" stroke-width="2" opacity="0.5"/>
+      <circle cx="600" cy="345" r="34" fill="url(#cglow)"/>
+      <g transform="translate(620,406)">
+        <ellipse cx="0" cy="14" rx="30" ry="5" fill="#eaf2f6" opacity="0.5"/>
+        <rect x="-1" y="-30" width="2.4" height="32" fill="#5a4326"/>
+        <polygon points="0,-29 0,-1 -22,-1" fill="#f3ecd8"/><polygon points="1.4,-26 1.4,-1 22,-1" fill="#e4d9c0"/>
+        <path d="M-19 -1 L22 -1 L15 15 L-12 15 Z" fill="#7a5836"/><rect x="-19" y="-2.5" width="41" height="3" fill="#8c6a45"/>
+      </g>
+    </g>
+
+    <g fill="#eef3f7" opacity="0.6"><circle cx="655" cy="312" r="2"/><circle cx="664" cy="312" r="2"/><circle cx="673" cy="312" r="2"/></g>
+
+    <g transform="translate(718,344)">
+      <circle r="26" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="5"/>
+      <circle r="26" fill="none" stroke="#f2d24a" stroke-width="5" stroke-linecap="round"
+              stroke-dasharray="120 163" transform="rotate(-90)"/>
+      <text x="0" y="4" font-size="12" text-anchor="middle" fill="#ffffff" font-weight="600">23:41</text>
+    </g>
+    <text x="718" y="392" font-size="10" text-anchor="middle" fill="#eef3f7" opacity="0.8">집중</text>
+
+    <rect x="0" y="470" width="800" height="30" fill="#1a222d" opacity="0.92"/>
+    <g opacity="0.9">
+      <rect x="352" y="477" width="16" height="16" rx="3" fill="#7fa9d6"/>
+      <rect x="376" y="477" width="16" height="16" rx="3" fill="#cdd6df"/>
+      <rect x="400" y="477" width="16" height="16" rx="3" fill="#7fb37a"/>
+      <rect x="424" y="477" width="16" height="16" rx="3" fill="#e7c266"/>
+      <rect x="448" y="477" width="16" height="16" rx="3" fill="#4f7fa8"/>
+    </g>
+    <text x="760" y="489" font-size="11" fill="#aab4c0">14:22</text>
+  </g>
+</svg>
