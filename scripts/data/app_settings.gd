@@ -30,6 +30,11 @@ var always_on_top: bool = false
 # 사운드 세팅
 var master_volume: float = 1.0
 
+# 컴패니언 모드
+var companion_position: Vector2i = Vector2i(-1, -1)  # (-1,-1) = 미설정 → 화면 우하단
+var auto_enter_companion: bool = true               # 집중 시작 시 자동 진입
+var auto_exit_companion: bool = true                # 집중 종료 시 자동 복귀
+
 func to_dict() -> Dictionary:
 	return {
 		"focus_seconds": focus_seconds,
@@ -48,6 +53,9 @@ func to_dict() -> Dictionary:
 		"fps_unfocused": fps_unfocused,
 		"always_on_top": always_on_top,
 		"master_volume": master_volume,
+		"companion_position": [companion_position.x, companion_position.y],
+		"auto_enter_companion": auto_enter_companion,
+		"auto_exit_companion": auto_exit_companion,
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -60,15 +68,24 @@ func from_dict(d: Dictionary) -> void:
 	hide_countdown = bool(d.get("hide_countdown", hide_countdown))
 	auto_minimize = bool(d.get("auto_minimize", auto_minimize))
 	sound_set = int(d.get("sound_set", sound_set))
+	
 	var hp = d.get("hud_position", null)
 	if typeof(hp) == TYPE_ARRAY and hp.size() == 2:
 		hud_position = Vector2(hp[0], hp[1])
 	hud_scale = float(d.get("hud_scale", hud_scale))
 	window_mode = int(d.get("window_mode", window_mode))
+	
 	var ws = d.get("window_size", null)
 	if typeof(ws) == TYPE_ARRAY and ws.size() == 2:
 		window_size = Vector2i(int(ws[0]), int(ws[1]))
+		
 	fps_focused = int(d.get("fps_focused", fps_focused))
 	fps_unfocused = int(d.get("fps_unfocused", fps_unfocused))
 	always_on_top = bool(d.get("always_on_top", always_on_top))
 	master_volume = clampf(float(d.get("master_volume", master_volume)), 0.0, 1.0)
+	
+	var cp = d.get("companion_position", null)
+	if typeof(cp) == TYPE_ARRAY and cp.size() == 2:
+		companion_position = Vector2i(int(cp[0]), int(cp[1]))
+	auto_enter_companion = bool(d.get("auto_enter_companion", auto_enter_companion))
+	auto_exit_companion = bool(d.get("auto_exit_companion", auto_exit_companion))

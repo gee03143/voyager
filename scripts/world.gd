@@ -40,6 +40,9 @@ func _ready() -> void:
 		if p != null:
 			p.visible = false
 	_ship_base_y = ship.position.y
+	
+	Clock.pomodoro.running_changed.connect(_on_clock_running_changed)
+	Clock.timer.running_changed.connect(_on_clock_running_changed)
 
 
 func _process(delta: float) -> void:
@@ -58,9 +61,6 @@ func _process(delta: float) -> void:
 	var rough := 1.0 + _ship_speed * 0.6     # 항해 중 더 큰 흔들림
 	ship.position.y = _ship_base_y + sin(_bob_t * BOB_FREQ) * BOB_AMP * rough
 	ship.rotation = sin(_bob_t * BOB_FREQ * 0.5) * ROCK_AMP   # 약간 다른 주기 → 자연스러운 일렁임
-	
-	# fps test code
-	# print(Engine.get_frames_per_second())
 
 func _on_nav_selected(index: int) -> void:
 	for p in panels:
@@ -68,3 +68,11 @@ func _on_nav_selected(index: int) -> void:
 			p.visible = false
 	if index >= 0 and index < panels.size() and panels[index] != null:
 		panels[index].visible = true
+		
+func _on_clock_running_changed() -> void:
+	if Save.settings.auto_enter_companion and Clock.is_active() and not Clock.active_paused():
+		_enter_companion()
+
+func _enter_companion() -> void:
+	Screen.enter_companion()
+	get_tree().change_scene_to_file("res://scenes/CompanionMode.tscn")

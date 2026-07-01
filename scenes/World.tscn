@@ -141,6 +141,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="ClockTab" parent="UI/PanelHost" unique_id=1281600236 instance=ExtResource("4_1lgw5")]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 offset_left = 368.0
@@ -169,7 +170,8 @@ layout_mode = 2
 
 [node name="HabitFrame" type="PanelContainer" parent="UI/PanelHost" unique_id=33051302]
 visible = false
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -294,6 +296,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="LetterView" parent="UI/Mailbox" unique_id=1631220425 instance=ExtResource("13_nrtoj")]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

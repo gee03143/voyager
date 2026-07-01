@@ -1,0 +1,142 @@
+[gd_scene format=3 uid="uid://o7785rq72f4s"]
+
+[ext_resource type="Script" uid="uid://ba1hfbqh0qk2j" path="res://scripts/companion_mode.gd" id="1_1pnme"]
+[ext_resource type="Texture2D" uid="uid://dwcwcp4pm2rlk" path="res://assets/placeholder/ship.svg" id="2_7haew"]
+[ext_resource type="Script" uid="uid://blpy0nnod56at" path="res://scripts/habittracker/radial_progress.gd" id="3_7haew"]
+[ext_resource type="Texture2D" uid="uid://6c58asirvn2v" path="res://assets/ocean_background/Ocean_8/1.png" id="4_ocean1"]
+[ext_resource type="Texture2D" uid="uid://ycmaxcbln441" path="res://assets/ocean_background/Ocean_8/2.png" id="5_ocean2"]
+[ext_resource type="Texture2D" uid="uid://bvhgi6w1eykdy" path="res://assets/ocean_background/Ocean_8/3.png" id="6_ocean3"]
+[ext_resource type="Texture2D" uid="uid://bkv87vslddwwo" path="res://assets/ocean_background/Ocean_8/4.png" id="7_ocean4"]
+[ext_resource type="Texture2D" uid="uid://cy7uhj8lp6ars" path="res://assets/ocean_background/Ocean_8/5.png" id="8_ocean5"]
+
+[node name="CompanionMode" type="Node2D" unique_id=1096481318]
+script = ExtResource("1_1pnme")
+
+[node name="Parallax" type="ParallaxBackground" parent="." unique_id=25078079]
+layer = -5
+
+[node name="Layer1" type="ParallaxLayer" parent="Parallax" unique_id=553863431]
+motion_scale = Vector2(0.1, 0.1)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer1" unique_id=36210905]
+scale = Vector2(2, 2)
+texture = ExtResource("4_ocean1")
+centered = false
+
+[node name="Layer2" type="ParallaxLayer" parent="Parallax" unique_id=200000001]
+motion_scale = Vector2(0.25, 0.25)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer2" unique_id=200000002]
+scale = Vector2(2, 2)
+texture = ExtResource("5_ocean2")
+centered = false
+
+[node name="Layer3" type="ParallaxLayer" parent="Parallax" unique_id=200000003]
+motion_scale = Vector2(0.45, 0.45)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer3" unique_id=200000004]
+scale = Vector2(2, 2)
+texture = ExtResource("6_ocean3")
+centered = false
+
+[node name="Layer4" type="ParallaxLayer" parent="Parallax" unique_id=200000005]
+motion_scale = Vector2(0.7, 0.7)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer4" unique_id=200000006]
+scale = Vector2(2, 2)
+texture = ExtResource("7_ocean4")
+centered = false
+
+[node name="Layer5" type="ParallaxLayer" parent="Parallax" unique_id=200000007]
+motion_scale = Vector2(0, 0)
+motion_mirroring = Vector2(1152, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax/Layer5" unique_id=200000008]
+scale = Vector2(2, 2)
+texture = ExtResource("8_ocean5")
+centered = false
+
+[node name="Ship" type="Sprite2D" parent="." unique_id=2032482943]
+position = Vector2(80, 160)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("2_7haew")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1307364608]
+
+[node name="Root" type="Control" parent="UI" unique_id=1854741873]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 280.0
+offset_bottom = 200.0
+mouse_filter = 2
+
+[node name="DragBar" type="Control" parent="UI/Root" unique_id=1185813878]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 24.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="UI/Root/DragBar" unique_id=729310186]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "• • •"
+horizontal_alignment = 1
+
+[node name="ReturnButton" type="Button" parent="UI/Root" unique_id=1539836190]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -81.0
+offset_bottom = 31.0
+grow_horizontal = 0
+text = "◀ 풀 모드"
+
+[node name="RingBox" type="Control" parent="UI/Root" unique_id=136813594]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 168.0
+offset_top = 48.0
+offset_right = 264.0
+offset_bottom = 144.0
+
+[node name="Ring" type="Control" parent="UI/Root/RingBox" unique_id=345301649]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_7haew")
+arc_color = Color(0.8039216, 0.6392157, 0.32156864, 1)
+arc_width = 6.0
+track_ticks = 48
+metadata/_custom_type_script = "uid://blpy0nnod56at"
+
+[node name="TimeLabel" type="Label" parent="UI/Root/RingBox" unique_id=1949475062]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Caption" type="Label" parent="UI/Root" unique_id=401998717]
+layout_mode = 1
+offset_left = 168.0
+offset_top = 148.0
+offset_right = 264.0
+offset_bottom = 171.0
+horizontal_alignment = 1

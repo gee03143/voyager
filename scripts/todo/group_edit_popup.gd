@@ -13,6 +13,7 @@ func _ready() -> void:
 	
 	group_list.token = &"group"
 	group_list.reordered.connect(_on_reordered)
+	hide()
 
 func open() -> void:
 	_rebuild()
