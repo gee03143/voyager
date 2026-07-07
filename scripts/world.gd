@@ -4,6 +4,7 @@ extends Node2D
 @export var panels: Array[Control]   # 도크 버튼 순서대로의 패널 (항해처럼 없으면 비워둠)
 @export var voyage_button: BaseButton
 @export var gear_button: BaseButton      # 옵션 패널 여는 nav 버튼
+@export var companion_button: BaseButton
 
 @onready var haeri_label: Label = $UI/HaeriBadge
 @onready var parallax: ParallaxBackground = $Parallax
@@ -41,8 +42,11 @@ func _ready() -> void:
 			p.visible = false
 	_ship_base_y = ship.position.y
 	
-	Clock.pomodoro.running_changed.connect(_on_clock_running_changed)
-	Clock.timer.running_changed.connect(_on_clock_running_changed)
+	if companion_button != null:
+		companion_button.pressed.connect(_enter_companion)
+	
+	Clock.pomodoro.session_started.connect(_on_focus_session_started)
+	Clock.timer.timer_started.connect(_on_focus_session_started)
 
 
 func _process(delta: float) -> void:
@@ -69,8 +73,8 @@ func _on_nav_selected(index: int) -> void:
 	if index >= 0 and index < panels.size() and panels[index] != null:
 		panels[index].visible = true
 		
-func _on_clock_running_changed() -> void:
-	if Save.settings.auto_enter_companion and Clock.is_active() and not Clock.active_paused():
+func _on_focus_session_started() -> void:
+	if Save.settings.auto_minimize and Clock.is_active() and not Clock.active_paused():
 		_enter_companion()
 
 func _enter_companion() -> void:

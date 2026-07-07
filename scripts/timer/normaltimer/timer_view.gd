@@ -59,7 +59,6 @@ func _on_start_pressed() -> void:
 		if not was_started and _timer.started:
 			_save_settings()
 			_play_alert()
-			_try_minimize()
 	_refresh_controls()
 
 func _save_settings() -> void:

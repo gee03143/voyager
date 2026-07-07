@@ -6,6 +6,7 @@
 [ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="2_e7b51"]
 [ext_resource type="PackedScene" uid="uid://bmq06t54wyo34" path="res://scenes/record/RecordView.tscn" id="3_e7b51"]
 [ext_resource type="PackedScene" uid="uid://425i7ha8epq5" path="res://scenes/record/journal/JournalView.tscn" id="5_e7b51"]
+[ext_resource type="PackedScene" uid="uid://dxvwumqoq31b7" path="res://scenes/record/graph/GraphView.tscn" id="6_hbfed"]
 
 [node name="RecordPanel" type="VBoxContainer" unique_id=1649160020]
 custom_minimum_size = Vector2(640, 360)
@@ -20,6 +21,10 @@ theme = ExtResource("2_8m34n")
 [node name="ActivityButton" type="Button" parent="TabNav" unique_id=622876105]
 layout_mode = 2
 text = "활동"
+
+[node name="GraphButton" type="Button" parent="TabNav" unique_id=1022038198]
+layout_mode = 2
+text = "그래프"
 
 [node name="JournalButton" type="Button" parent="TabNav" unique_id=154052968]
 layout_mode = 2
@@ -45,6 +50,10 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="JournalTab" parent="Content/Host" unique_id=730269896 instance=ExtResource("5_e7b51")]
+[node name="GraphTab" parent="Content/Host" unique_id=730269896 instance=ExtResource("6_hbfed")]
+visible = false
+layout_mode = 2
+
+[node name="JournalTab" parent="Content/Host" unique_id=1445823428 instance=ExtResource("5_e7b51")]
 visible = false
 layout_mode = 2

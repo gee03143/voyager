@@ -83,3 +83,6 @@ static func add_days(iso: String, days: int) -> String:
 static func today_iso() -> String:
 	var t := Time.get_date_dict_from_system()
 	return "%04d-%02d-%02d" % [t.year, t.month, t.day]
+	
+static func format_hours(seconds: float) -> String:
+	return "%dh" % int(round(seconds / 3600.0))

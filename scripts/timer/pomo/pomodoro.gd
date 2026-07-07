@@ -4,6 +4,7 @@ extends Node
 signal segment_changed(index: int)
 signal running_changed
 signal focus_finished
+signal session_started
 signal session_completed
 signal plan_built
 
@@ -45,6 +46,7 @@ func start() -> void:
 	started = true
 	if _handle == null or not _handle.is_valid():
 		_start_segment_timer()      # 첫 시작(standby)
+		session_started.emit()
 	elif _handle.is_paused():
 		_handle.resume()            # 일시정지 → 재개
 	running_changed.emit()

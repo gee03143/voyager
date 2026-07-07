@@ -78,7 +78,6 @@ func _on_start_pressed() -> void:
 		if fresh:
 			_save_settings()
 			_play_alert()
-			_try_minimize()
 	_refresh_controls()
 
 func _on_skip_pressed() -> void:

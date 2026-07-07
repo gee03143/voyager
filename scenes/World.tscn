@@ -29,12 +29,13 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_44lqw"]
 size = Vector2(107, 79)
 
-[node name="World" type="Node2D" unique_id=1409265880 node_paths=PackedStringArray("dock", "panels", "voyage_button", "gear_button")]
+[node name="World" type="Node2D" unique_id=1409265880 node_paths=PackedStringArray("dock", "panels", "voyage_button", "gear_button", "companion_button")]
 script = ExtResource("1_d1c63")
 dock = NodePath("UI/Dock")
 panels = [NodePath("UI/PanelHost/ClockTab"), NodePath("UI/PanelHost/TodoFrame"), NodePath("UI/PanelHost/HabitFrame"), NodePath("UI/PanelHost/RecordPanel"), NodePath("UI/PanelHost/VoyagePanel"), NodePath("UI/PanelHost/OptionFrame")]
 voyage_button = NodePath("UI/VoyageButton")
 gear_button = NodePath("UI/TopRight/GearButton")
+companion_button = NodePath("UI/TopRight/CompanionButton")
 
 [node name="Background" type="CanvasLayer" parent="." unique_id=988105801]
 layer = -10
@@ -340,6 +341,10 @@ anchor_right = 1.0
 offset_left = -40.0
 offset_bottom = 40.0
 grow_horizontal = 0
+
+[node name="CompanionButton" type="Button" parent="UI/TopRight" unique_id=1679061749]
+layout_mode = 2
+text = "🖥"
 
 [node name="EyeButton" type="Button" parent="UI/TopRight" unique_id=1803387070]
 layout_mode = 2

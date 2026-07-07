@@ -17,7 +17,8 @@ var timer_seconds: float = 5 * 60
 
 # 시계 탭 공통 세팅
 var hide_countdown: bool = false        # 카운트다운 숨기기
-var auto_minimize: bool = true         # 활성 시 자동 최소화 (플래그만, 효과는 Week 7)
+var auto_minimize: bool = true         # 활성 시 컴패니언 모드 자동 진입
+var auto_exit_companion: bool = true    # 집중 종료 시 자동 복귀
 var sound_set: int = 0                 # 알람 소리 종류
 
 # 화면 세팅
@@ -32,8 +33,6 @@ var master_volume: float = 1.0
 
 # 컴패니언 모드
 var companion_position: Vector2i = Vector2i(-1, -1)  # (-1,-1) = 미설정 → 화면 우하단
-var auto_enter_companion: bool = true               # 집중 시작 시 자동 진입
-var auto_exit_companion: bool = true                # 집중 종료 시 자동 복귀
 
 func to_dict() -> Dictionary:
 	return {
@@ -44,6 +43,7 @@ func to_dict() -> Dictionary:
 		"timer_seconds": timer_seconds,
 		"hide_countdown": hide_countdown,
 		"auto_minimize": auto_minimize,
+		"auto_exit_companion": auto_exit_companion,
 		"sound_set": sound_set,
 		"hud_position": [hud_position.x, hud_position.y],
 		"hud_scale": hud_scale,
@@ -54,8 +54,6 @@ func to_dict() -> Dictionary:
 		"always_on_top": always_on_top,
 		"master_volume": master_volume,
 		"companion_position": [companion_position.x, companion_position.y],
-		"auto_enter_companion": auto_enter_companion,
-		"auto_exit_companion": auto_exit_companion,
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -67,6 +65,7 @@ func from_dict(d: Dictionary) -> void:
 	timer_seconds = d.get("timer_seconds", timer_seconds)
 	hide_countdown = bool(d.get("hide_countdown", hide_countdown))
 	auto_minimize = bool(d.get("auto_minimize", auto_minimize))
+	auto_exit_companion = bool(d.get("auto_exit_companion", auto_exit_companion))
 	sound_set = int(d.get("sound_set", sound_set))
 	
 	var hp = d.get("hud_position", null)
@@ -87,5 +86,3 @@ func from_dict(d: Dictionary) -> void:
 	var cp = d.get("companion_position", null)
 	if typeof(cp) == TYPE_ARRAY and cp.size() == 2:
 		companion_position = Vector2i(int(cp[0]), int(cp[1]))
-	auto_enter_companion = bool(d.get("auto_enter_companion", auto_enter_companion))
-	auto_exit_companion = bool(d.get("auto_exit_companion", auto_exit_companion))

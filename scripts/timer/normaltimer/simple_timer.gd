@@ -1,6 +1,7 @@
 class_name SimpleTimer
 extends Node
 
+signal timer_started
 signal timer_finished
 signal running_changed
 
@@ -21,6 +22,7 @@ func start() -> void:
 	started = true
 	if _handle == null or not _handle.is_valid():
 		_handle = Timers.set_timer(duration, _on_finished)   # 첫 시작
+		timer_started.emit()
 	elif _handle.is_paused():
 		_handle.resume()       
 	running_changed.emit()

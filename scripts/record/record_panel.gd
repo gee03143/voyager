@@ -3,7 +3,7 @@ extends VBoxContainer
 @onready var tab_nav: HBoxContainer = $TabNav
 @onready var calendar = $Content/Host/ActivityTab/Calendar
 @onready var view = $Content/Host/ActivityTab/RecordView
-@onready var _pages: Array = [$Content/Host/ActivityTab, $Content/Host/JournalTab]
+@onready var _pages: Array = [$Content/Host/ActivityTab, $Content/Host/GraphTab, $Content/Host/JournalTab]
 
 var _nav := ButtonGroupNav.new()
 var _day: String = ""

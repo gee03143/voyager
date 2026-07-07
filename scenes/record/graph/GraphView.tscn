@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://dxvwumqoq31b7"]
+
+[ext_resource type="Script" uid="uid://cbuuo3xps73gh" path="res://scripts/record/graph/graph_view.gd" id="1_3n2fn"]
+[ext_resource type="Script" uid="uid://dbuof527mka6y" path="res://scripts/commonui/bar_chart.gd" id="2_nx4na"]
+
+[node name="GraphView" type="HBoxContainer" unique_id=2069665936]
+custom_minimum_size = Vector2(560, 340)
+offset_right = 560.0
+offset_bottom = 340.0
+theme_override_constants/separation = 12
+script = ExtResource("1_3n2fn")
+
+[node name="YAxisLabels" type="Control" parent="." unique_id=1212325554]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+
+[node name="MaxLabel" type="Label" parent="YAxisLabels" unique_id=1410859613]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="MidLabel" type="Label" parent="YAxisLabels" unique_id=782774022]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ChartCol" type="VBoxContainer" parent="." unique_id=1879706093]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Chart" type="Control" parent="ChartCol" unique_id=648741203]
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_nx4na")
+metadata/_custom_type_script = "uid://dbuof527mka6y"
+
+[node name="DayLabels" type="HBoxContainer" parent="ChartCol" unique_id=1041797406]
+layout_mode = 2
