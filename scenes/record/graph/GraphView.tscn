@@ -11,6 +11,24 @@ offset_bottom = 340.0
 theme_override_constants/separation = 12
 script = ExtResource("1_3n2fn")
 
+[node name="ModeNav" type="HBoxContainer" parent="." unique_id=1924756095]
+layout_mode = 2
+
+[node name="WeekButton" type="Button" parent="ModeNav" unique_id=282850531]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "주"
+
+[node name="MonthButton" type="Button" parent="ModeNav" unique_id=5594530]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "월"
+
+[node name="YearButton" type="Button" parent="ModeNav" unique_id=715285738]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "년"
+
 [node name="WeekNav" type="HBoxContainer" parent="." unique_id=1666339441]
 layout_mode = 2
 

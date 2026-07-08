@@ -75,7 +75,7 @@ func _render_month() -> void:
 	var first_wd := int(Time.get_datetime_dict_from_unix_time(int(first)).weekday)   # 0=일..6=토
 	for i in (first_wd + 6) % 7:        # 월요일 시작 정렬용 선행 빈칸
 		_grid.add_child(_blank())
-	for day in range(1, _days_in_month(_year, _month) + 1):
+	for day in range(1, DateUtil.days_in_month("%04d-%02d-01" % [_year, _month]) + 1):
 		_grid.add_child(_day_cell("%04d-%02d-%02d" % [_year, _month, day], day))
 
 func _day_cell(iso: String, day: int) -> Control:
@@ -119,10 +119,3 @@ func _go_today() -> void:
 	var t := Time.get_date_dict_from_system()
 	_year = t.year; _month = t.month
 	_render_month()
-
-func _days_in_month(y: int, m: int) -> int:
-	var nm := m + 1; var ny := y
-	if nm > 12: nm = 1; ny += 1
-	var a := Time.get_unix_time_from_datetime_dict({"year": y, "month": m, "day": 1, "hour": 0, "minute": 0, "second": 0})
-	var b := Time.get_unix_time_from_datetime_dict({"year": ny, "month": nm, "day": 1, "hour": 0, "minute": 0, "second": 0})
-	return int((b - a) / 86400)

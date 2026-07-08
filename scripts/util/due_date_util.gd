@@ -90,6 +90,19 @@ static func format_hours(seconds: float) -> String:
 static func month_start_iso() -> String:
 	var t := Time.get_date_dict_from_system()
 	return "%04d-%02d-01" % [t.year, t.month]
+	
+static func days_in_month(iso: String) -> int:
+	var p := iso.split("-")
+	var y := int(p[0])
+	var m := int(p[1])
+	var nm := m + 1
+	var ny := y
+	if nm > 12:
+		nm = 1
+		ny += 1
+	var a := Time.get_unix_time_from_datetime_dict({"year": y, "month": m, "day": 1, "hour": 0, "minute": 0, "second": 0})
+	var b := Time.get_unix_time_from_datetime_dict({"year": ny, "month": nm, "day": 1, "hour": 0, "minute": 0, "second": 0})
+	return int((b - a) / 86400)
 
 static func add_months(iso: String, months: int) -> String:
 	var p := iso.split("-")
@@ -101,3 +114,10 @@ static func add_months(iso: String, months: int) -> String:
 static func month_label(iso: String) -> String:
 	var p := iso.split("-")
 	return "%d년 %d월" % [int(p[0]), int(p[1])]
+
+static func year_start_iso() -> String:
+	var t := Time.get_date_dict_from_system()
+	return "%04d-01-01" % t.year
+
+static func year_label(iso: String) -> String:
+	return "%d년" % int(iso.split("-")[0])
