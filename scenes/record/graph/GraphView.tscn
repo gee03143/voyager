@@ -2,41 +2,96 @@
 
 [ext_resource type="Script" uid="uid://cbuuo3xps73gh" path="res://scripts/record/graph/graph_view.gd" id="1_3n2fn"]
 [ext_resource type="Script" uid="uid://dbuof527mka6y" path="res://scripts/commonui/bar_chart.gd" id="2_nx4na"]
+[ext_resource type="Script" uid="uid://qc761vp5l25l" path="res://scripts/commonui/period_nav.gd" id="3_shhkr"]
 
-[node name="GraphView" type="HBoxContainer" unique_id=2069665936]
+[node name="GraphView" type="VBoxContainer" unique_id=1318442920]
 custom_minimum_size = Vector2(560, 340)
 offset_right = 560.0
 offset_bottom = 340.0
 theme_override_constants/separation = 12
 script = ExtResource("1_3n2fn")
 
-[node name="YAxisLabels" type="Control" parent="." unique_id=1212325554]
+[node name="WeekNav" type="HBoxContainer" parent="." unique_id=1666339441]
+layout_mode = 2
+
+[node name="PrevButton" type="Button" parent="WeekNav" unique_id=287638991]
+layout_mode = 2
+text = "◀"
+
+[node name="WeekLabel" type="Label" parent="WeekNav" unique_id=854372587]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+
+[node name="NextButton" type="Button" parent="WeekNav" unique_id=1576565210]
+layout_mode = 2
+text = "▶"
+
+[node name="TodayButton" type="Button" parent="WeekNav" unique_id=409699522]
+layout_mode = 2
+text = "오늘"
+
+[node name="ChartRow" type="HBoxContainer" parent="." unique_id=1502062569]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="YAxisLabels" type="Control" parent="ChartRow" unique_id=1212325554]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 
-[node name="MaxLabel" type="Label" parent="YAxisLabels" unique_id=1410859613]
+[node name="MaxLabel" type="Label" parent="ChartRow/YAxisLabels" unique_id=1410859613]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="MidLabel" type="Label" parent="YAxisLabels" unique_id=782774022]
+[node name="MidLabel" type="Label" parent="ChartRow/YAxisLabels" unique_id=782774022]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="ChartCol" type="VBoxContainer" parent="." unique_id=1879706093]
+[node name="ChartCol" type="VBoxContainer" parent="ChartRow" unique_id=1879706093]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Chart" type="Control" parent="ChartCol" unique_id=648741203]
+[node name="Chart" type="Control" parent="ChartRow/ChartCol" unique_id=648741203]
 layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("2_nx4na")
 metadata/_custom_type_script = "uid://dbuof527mka6y"
 
-[node name="DayLabels" type="HBoxContainer" parent="ChartCol" unique_id=1041797406]
+[node name="DayLabels" type="HBoxContainer" parent="ChartRow/ChartCol" unique_id=1041797406]
 layout_mode = 2
+
+[node name="Legend" type="HBoxContainer" parent="ChartRow/ChartCol" unique_id=1340925996]
+layout_mode = 2
+alignment = 1
+
+[node name="PlaySwatch" type="ColorRect" parent="ChartRow/ChartCol/Legend" unique_id=1371224948]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="PlayLabel" type="Label" parent="ChartRow/ChartCol/Legend" unique_id=2054375137]
+layout_mode = 2
+text = "플레이 시간"
+
+[node name="FocusSwatch" type="ColorRect" parent="ChartRow/ChartCol/Legend" unique_id=351734444]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="FocusLabel" type="Label" parent="ChartRow/ChartCol/Legend" unique_id=212938873]
+layout_mode = 2
+text = "집중 시간"
+
+[node name="PeriodNav" type="Node" parent="." unique_id=527863142 node_paths=PackedStringArray("prev_button", "next_button", "reset_button", "label")]
+script = ExtResource("3_shhkr")
+prev_button = NodePath("../WeekNav/PrevButton")
+next_button = NodePath("../WeekNav/NextButton")
+reset_button = NodePath("../WeekNav/TodayButton")
+label = NodePath("../WeekNav/WeekLabel")
+metadata/_custom_type_script = "uid://qc761vp5l25l"

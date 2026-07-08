@@ -86,3 +86,18 @@ static func today_iso() -> String:
 	
 static func format_hours(seconds: float) -> String:
 	return "%dh" % int(round(seconds / 3600.0))
+
+static func month_start_iso() -> String:
+	var t := Time.get_date_dict_from_system()
+	return "%04d-%02d-01" % [t.year, t.month]
+
+static func add_months(iso: String, months: int) -> String:
+	var p := iso.split("-")
+	var total := int(p[1]) - 1 + months
+	var year := int(p[0]) + int(floor(float(total) / 12.0))
+	var month := ((total % 12) + 12) % 12 + 1
+	return "%04d-%02d-01" % [year, month]
+
+static func month_label(iso: String) -> String:
+	var p := iso.split("-")
+	return "%d년 %d월" % [int(p[0]), int(p[1])]

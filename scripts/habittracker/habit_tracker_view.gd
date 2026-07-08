@@ -3,19 +3,16 @@ extends VBoxContainer
 const HABIT_ROW := preload("res://scenes/habittracker/HabitRow.tscn")
 const SAVE_DEBOUNCE := 0.5
 
-@onready var prev_button: Button = $WeekNav/PrevButton
-@onready var week_label: Label = $WeekNav/WeekLabel
-@onready var next_button: Button = $WeekNav/NextButton
-@onready var today_button: Button = $WeekNav/TodayButton
 @onready var header: HBoxContainer = $Header
 @onready var scroll: ScrollContainer = $ScrollContainer
 @onready var list: ReorderList = $ScrollContainer/List
 @onready var add_button: Button = $AddButton
+@onready var _period_nav: PeriodNav = $PeriodNav
+
 
 var _rows: Array[HabitRow] = []
 var _save_timer: Timer
 var _day_circles: Array[RadialProgress] = []
-var _page: int = 0
 
 func _ready() -> void:
 	_save_timer = Timer.new()
@@ -24,21 +21,26 @@ func _ready() -> void:
 	add_child(_save_timer)
 	_save_timer.timeout.connect(func(): Save.save_game())
 	add_button.pressed.connect(_on_add_pressed)
-	prev_button.pressed.connect(func(): _show_page(_page - 1))
-	next_button.pressed.connect(func(): _show_page(_page + 1))
-	today_button.pressed.connect(func(): _show_page(Save.habit_weeks.size() - 1))
+	_period_nav.refresh_requested.connect(func(): _show_week(_period_nav.current_start()))
 
 	_ensure_current_week()
 	_build_header()
 	list.token = &"habit"
 	list.reordered.connect(_on_reordered)
-	_show_page(Save.habit_weeks.size() - 1)
+	_refresh_valid_starts()
+	_show_week(_period_nav.current_start())
 
 func _ensure_current_week() -> void:
 	var monday := DateUtil.monday_iso()
 	if Save.habit_weeks.is_empty() or Save.habit_weeks[-1]["week_start"] != monday:
 		Save.habit_weeks.append({"week_start": monday, "checks": {}})
 	Save.save_game()
+
+func _refresh_valid_starts() -> void:
+	var starts: Array[String] = []
+	for wk in Save.habit_weeks:
+		starts.append(str(wk["week_start"]))
+	_period_nav.set_valid_starts(starts)
 
 func _build_header() -> void:
 	var handle_spacer := Control.new()
@@ -61,23 +63,19 @@ func _build_header() -> void:
 		header.add_child(col)
 		_day_circles.append(circle)
 
-func _show_page(page: int) -> void:
-	_page = clampi(page, 0, Save.habit_weeks.size() - 1)
-	var week: Dictionary = Save.habit_weeks[_page]
+func _show_week(week_start: String) -> void:
+	var idx := _index_for(week_start)
+	if idx == -1:
+		return
+	var week: Dictionary = Save.habit_weeks[idx]
 	var checks: Dictionary = week.get("checks", {})
 
 	for r in _rows: list.remove_child(r); r.queue_free()
 	_rows.clear()
-	for def in Save.habit_defs:                       # ← defs가 멤버십·순서
+	for def in Save.habit_defs:
 		var did := int(def["id"])
-		_add_row(Habit.from_parts(did, def, checks.get(str(did), [])))   # 기록 없으면 빈 체크
+		_add_row(Habit.from_parts(did, def, checks.get(str(did), [])))
 	_refresh_progress()
-
-	var is_current := _page == Save.habit_weeks.size() - 1
-	var range_text := DateUtil.week_range_label(week["week_start"])
-	week_label.text = ("이번 주 (%s)" % range_text) if is_current else range_text
-	prev_button.disabled = _page <= 0
-	next_button.disabled = is_current
 
 func _add_row(habit: Habit) -> HabitRow:
 	var row := HABIT_ROW.instantiate() as HabitRow
@@ -87,6 +85,11 @@ func _add_row(habit: Habit) -> HabitRow:
 	row.delete_requested.connect(_on_row_delete)
 	_rows.append(row)
 	return row
+	
+func _on_row_delete(row: HabitRow) -> void:
+	_rows.erase(row)
+	row.queue_free()
+	_on_list_changed()
 	
 func _on_add_pressed() -> void:
 	var habit := Habit.new()
@@ -98,11 +101,6 @@ func _on_add_pressed() -> void:
 	await get_tree().process_frame
 	scroll.ensure_control_visible(row)
 
-func _on_row_delete(row: HabitRow) -> void:
-	_rows.erase(row)
-	row.queue_free()
-	_on_list_changed()
-
 func _on_list_changed() -> void:
 	var defs := []
 	var checks := {}
@@ -112,19 +110,10 @@ func _on_list_changed() -> void:
 		if h.checks.has(true):                        # 체크 있는 것만 저장(희소)
 			checks[str(h.id)] = h.checks.duplicate()
 	Save.habit_defs = defs                            # 멤버십·순서·title·active 전역 갱신
-	Save.habit_weeks[_page]["checks"] = checks        # 그 주 체크만
+	var idx := _index_for(_period_nav.current_start())
+	Save.habit_weeks[idx]["checks"] = checks        # 그 주 체크만
 	_refresh_progress()
 	_save_timer.start()
-	
-func _sync_shared_fields() -> void:
-	var defs := {}
-	for it in Save.habit_weeks[_page]["items"]:
-		defs[it["id"]] = {"title": it["title"], "active_days": it["active_days"]}
-	for wk in Save.habit_weeks:
-		for it in wk["items"]:
-			if defs.has(it["id"]):
-				it["title"] = defs[it["id"]]["title"]
-				it["active_days"] = (defs[it["id"]]["active_days"] as Array).duplicate()
 
 func _on_reordered(from: int, to: int) -> void:
 	var r := _rows[from]
@@ -144,3 +133,9 @@ func _refresh_progress() -> void:
 				if r.is_checked(d):
 					done += 1
 		_day_circles[d].value = (float(done) / active) if active > 0 else 0.0
+		
+func _index_for(week_start: String) -> int:
+	for i in Save.habit_weeks.size():
+		if str(Save.habit_weeks[i]["week_start"]) == week_start:
+			return i
+	return -1

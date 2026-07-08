@@ -23,14 +23,17 @@ func _draw() -> void:
 	draw_line(Vector2(0, 0), Vector2(size.x, 0), GRID_COLOR, 1.0)
 	draw_line(Vector2(0, size.y * 0.5), Vector2(size.x, size.y * 0.5), GRID_COLOR, 1.0)
 	draw_line(Vector2(0, size.y), Vector2(size.x, size.y), GRID_COLOR, 1.0)
-	for s in series:                      # 슬라이스2 = 1계열. 2계열(슬라이스4)부터는 칸 안 나눠서 그려야 함
-		var values: Array = s["values"]
-		var color: Color = s["color"]
-		for i in n:
+	var s_count := series.size()
+	var bar_area_w := col_w * (1.0 - BAR_GAP)
+	var bar_w := bar_area_w / s_count
+	for i in n:
+		var col_x := col_w * i + col_w * BAR_GAP * 0.5
+		for si in s_count:
+			var values: Array = series[si]["values"]
+			var color: Color = series[si]["color"]
 			var v := clampf(float(values[i]) / axis_max, 0.0, 1.0)
 			if v <= 0.0:
 				continue
 			var h := size.y * v
-			var w := col_w * (1.0 - BAR_GAP)
-			var x := col_w * i + col_w * BAR_GAP * 0.5
-			draw_rect(Rect2(x, size.y - h, w, h), color)
+			var x := col_x + bar_w * si
+			draw_rect(Rect2(x, size.y - h, bar_w, h), color)

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dx82cfbhmnioh" path="res://scripts/habittracker/habit_tracker_view.gd" id="1_wv8ks"]
 [ext_resource type="Script" uid="uid://d4nofmpdi3kkj" path="res://scripts/commonui/reorder_list.gd" id="2_ih7ui"]
+[ext_resource type="Script" uid="uid://qc761vp5l25l" path="res://scripts/commonui/period_nav.gd" id="3_ks7n1"]
 
 [node name="HabitTrackerView" type="VBoxContainer" unique_id=1593460480]
 offset_right = 40.0
@@ -52,3 +53,11 @@ modulate = Color(1, 1, 1, 0.49803922)
 layout_mode = 2
 text = "셀 우클릭으로 요일 켜기/끄기"
 horizontal_alignment = 1
+
+[node name="PeriodNav" type="Node" parent="." unique_id=907072379 node_paths=PackedStringArray("prev_button", "next_button", "reset_button", "label")]
+script = ExtResource("3_ks7n1")
+prev_button = NodePath("../WeekNav/PrevButton")
+next_button = NodePath("../WeekNav/NextButton")
+reset_button = NodePath("../WeekNav/TodayButton")
+label = NodePath("../WeekNav/WeekLabel")
+metadata/_custom_type_script = "uid://qc761vp5l25l"
