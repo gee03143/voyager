@@ -23,10 +23,14 @@ func _ready() -> void:
 	add_button.pressed.connect(_on_add_pressed)
 	_period_nav.refresh_requested.connect(func(): _show_week(_period_nav.current_start()))
 
-	_ensure_current_week()
 	_build_header()
 	list.token = &"habit"
 	list.reordered.connect(_on_reordered)
+	if not has_meta("pooled"):
+		on_shown()
+
+func on_shown() -> void:
+	_ensure_current_week()
 	_refresh_valid_starts()
 	_show_week(_period_nav.current_start())
 

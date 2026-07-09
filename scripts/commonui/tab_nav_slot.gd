@@ -6,7 +6,7 @@ signal tab_selected(index: int)
 var _nav := ButtonGroupNav.new()
 
 func set_tabs(labels: Array[String]) -> void:
-	clear()
+	_clear_buttons()
 	var buttons: Array = []
 	for label in labels:
 		var b := Button.new()
@@ -19,9 +19,14 @@ func set_tabs(labels: Array[String]) -> void:
 	_nav.select(0)
 
 func clear() -> void:
+	for connection in tab_selected.get_connections():
+		tab_selected.disconnect(connection["callable"])
+	_clear_buttons()
+	_nav = ButtonGroupNav.new()
+
+func _clear_buttons() -> void:
 	for child in get_children():
 		child.queue_free()
-	_nav = ButtonGroupNav.new()
 
 func _on_selected(index: int) -> void:
 	tab_selected.emit(index)

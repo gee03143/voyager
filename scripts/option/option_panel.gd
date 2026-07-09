@@ -10,9 +10,12 @@ func _ready() -> void:
 		nav_slot = TabNavSlot.new()
 		add_child(nav_slot)
 		move_child(nav_slot, 0)
+		attach_nav()
+	quit_button.pressed.connect(Save.quit_game)
+
+func attach_nav() -> void:
 	nav_slot.tab_selected.connect(_on_tab_selected)
 	nav_slot.set_tabs(tab_labels)
-	quit_button.pressed.connect(Save.quit_game)
 
 func _on_tab_selected(index: int) -> void:
 	for i in tab_pages.size():

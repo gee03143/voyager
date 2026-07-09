@@ -90,5 +90,6 @@ func _on_focus_session_started() -> void:
 		_enter_companion()
 
 func _enter_companion() -> void:
+	popup_frame.close()
 	Screen.enter_companion()
 	get_tree().change_scene_to_file("res://scenes/CompanionMode.tscn")

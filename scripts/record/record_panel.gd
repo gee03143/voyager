@@ -13,10 +13,16 @@ func _ready() -> void:
 		nav_slot = TabNavSlot.new()
 		add_child(nav_slot)
 		move_child(nav_slot, 0)
-	nav_slot.tab_selected.connect(_on_tab_selected)
-	nav_slot.set_tabs(tab_labels)
+		attach_nav()
+		on_shown()
 	calendar.day_selected.connect(_on_day_selected)
 	Save.activity_log.changed.connect(_on_changed)
+	
+func attach_nav() -> void:
+	nav_slot.tab_selected.connect(_on_tab_selected)
+	nav_slot.set_tabs(tab_labels)
+
+func on_shown() -> void:
 	_select_day(DateUtil.today_iso())
 
 func _on_tab_selected(index: int) -> void:
