@@ -1,10 +1,10 @@
 extends VBoxContainer
 
-@onready var tab_nav: HBoxContainer = $TabNav
-@onready var stats_tab: VBoxContainer = $Content/Host/StatsTab
-@onready var _pages: Array = [$Content/Host/StatsTab, $Content/Host/ComposerTab, $Content/Host/CodexTab]
+@export var nav_slot: TabNavSlot
+@export var tab_labels: Array[String] = []
+@export var tab_pages: Array[Control] = []
+@onready var stats_tab: VBoxContainer = $StatsTab
 
-var _nav := ButtonGroupNav.new()
 var _focus_label: Label
 var _play_label: Label
 var _haeri_label: Label
@@ -12,17 +12,19 @@ var _count_label: Label
 
 func _ready() -> void:
 	_build_stats()
-	_nav.setup_from(tab_nav, false)
-	_nav.selected.connect(_on_tab_selected)
+	if nav_slot == null:
+		nav_slot = TabNavSlot.new()
+		add_child(nav_slot)
+		move_child(nav_slot, 0)
+	nav_slot.tab_selected.connect(_on_tab_selected)
+	nav_slot.set_tabs(tab_labels)
 	Save.voyage.changed.connect(_refresh_stats)
 	Save.activity_log.changed.connect(_refresh_stats)
-	visibility_changed.connect(func(): if visible: _refresh_stats())
 	_refresh_stats()
-	_nav.select(0)
 
 func _on_tab_selected(index: int) -> void:
-	for i in _pages.size():
-		_pages[i].visible = (i == index)
+	for i in tab_pages.size():
+		tab_pages[i].visible = (i == index)
 
 func _build_stats() -> void:
 	_focus_label = _add_stat()

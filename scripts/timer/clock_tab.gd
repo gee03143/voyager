@@ -1,15 +1,17 @@
 extends HBoxContainer
 
-@onready var nav: VBoxContainer = $NavBar
-@onready var pages: TabContainer = $Pages
-
-var _nav := ButtonGroupNav.new()
+@export var nav_slot: TabNavSlot
+@export var tab_labels: Array[String] = []
+@export var tab_pages: Array[Control] = []
 
 func _ready() -> void:
-	_nav.setup_from(nav)
-	_nav.selected.connect(_on_nav_selected)
-	_nav.select(0)
+	if nav_slot == null:
+		nav_slot = TabNavSlot.new()
+		add_child(nav_slot)
+		move_child(nav_slot, 0)
+	nav_slot.tab_selected.connect(_on_tab_selected)
+	nav_slot.set_tabs(tab_labels)
 
-func _on_nav_selected(index: int) -> void:
-	if index >= 0 and index < pages.get_tab_count():
-		pages.current_tab = index
+func _on_tab_selected(index: int) -> void:
+	for i in tab_pages.size():
+		tab_pages[i].visible = (i == index)

@@ -1,25 +1,27 @@
 extends VBoxContainer
 
-@onready var tab_nav: HBoxContainer = $TabNav
-@onready var calendar = $Content/Host/ActivityTab/Calendar
-@onready var view = $Content/Host/ActivityTab/RecordView
-@onready var _pages: Array = [$Content/Host/ActivityTab, $Content/Host/GraphTab, $Content/Host/JournalTab]
+@export var nav_slot: TabNavSlot
+@export var tab_labels: Array[String] = []
+@export var tab_pages: Array[Control] = []
+@onready var calendar = $ActivityTab/Calendar
+@onready var view = $ActivityTab/RecordView
 
-var _nav := ButtonGroupNav.new()
 var _day: String = ""
 
 func _ready() -> void:
-	_nav.setup_from(tab_nav, false)
-	_nav.selected.connect(_on_tab_selected)
+	if nav_slot == null:
+		nav_slot = TabNavSlot.new()
+		add_child(nav_slot)
+		move_child(nav_slot, 0)
+	nav_slot.tab_selected.connect(_on_tab_selected)
+	nav_slot.set_tabs(tab_labels)
 	calendar.day_selected.connect(_on_day_selected)
 	Save.activity_log.changed.connect(_on_changed)
-	visibility_changed.connect(_on_visibility)
 	_select_day(DateUtil.today_iso())
-	_nav.select(0)
 
 func _on_tab_selected(index: int) -> void:
-	for i in _pages.size():
-		_pages[i].visible = (i == index)
+	for i in tab_pages.size():
+		tab_pages[i].visible = (i == index)
 
 func _on_day_selected(iso: String) -> void:
 	_day = iso
@@ -29,11 +31,6 @@ func _on_changed() -> void:
 	calendar.refresh()
 	if _day != "":
 		view.render_day(_day)
-
-func _on_visibility() -> void:
-	if visible:
-		calendar.refresh()
-		_select_day(DateUtil.today_iso())
 
 func _select_day(iso: String) -> void:
 	_day = iso

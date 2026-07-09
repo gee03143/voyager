@@ -27,7 +27,6 @@ func setup_from(container: Node, allow_close: bool = false) -> void:        # ì»
 			buttons.append(child)
 	setup(buttons, allow_close)
 
-
 func _on_group_pressed(button: BaseButton) -> void:
 	selected.emit(_buttons.find(button))
 

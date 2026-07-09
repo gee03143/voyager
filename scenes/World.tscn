@@ -4,24 +4,20 @@
 [ext_resource type="Texture2D" uid="uid://dwcwcp4pm2rlk" path="res://assets/placeholder/ship.svg" id="2_7g83o"]
 [ext_resource type="Texture2D" uid="uid://6c58asirvn2v" path="res://assets/ocean_background/Ocean_8/1.png" id="2_ygioq"]
 [ext_resource type="Texture2D" uid="uid://ycmaxcbln441" path="res://assets/ocean_background/Ocean_8/2.png" id="3_pdh0q"]
-[ext_resource type="PackedScene" uid="uid://cg7wgy7ywwqqo" path="res://scenes/timer/ClockTab.tscn" id="4_1lgw5"]
 [ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="4_b3faq"]
 [ext_resource type="Texture2D" uid="uid://bvhgi6w1eykdy" path="res://assets/ocean_background/Ocean_8/3.png" id="4_nrtoj"]
-[ext_resource type="PackedScene" uid="uid://buc68m4bpnu7y" path="res://scenes/todo/TodoTab.tscn" id="5_hlk0d"]
 [ext_resource type="Texture2D" uid="uid://bkv87vslddwwo" path="res://assets/ocean_background/Ocean_8/4.png" id="5_i4b1j"]
-[ext_resource type="PackedScene" uid="uid://de6n57hebkgrg" path="res://scenes/habittracker/HabitTrackerView.tscn" id="6_0uv0p"]
 [ext_resource type="Texture2D" uid="uid://cy7uhj8lp6ars" path="res://assets/ocean_background/Ocean_8/5.png" id="6_c0d7e"]
 [ext_resource type="PackedScene" uid="uid://dbitpeq18sx2o" path="res://scenes/Hud.tscn" id="7_0uv0p"]
 [ext_resource type="Script" uid="uid://ljhbwe5jg3ae" path="res://scripts/letter/shelf.gd" id="8_rpuxp"]
 [ext_resource type="Texture2D" uid="uid://bvuuoah6i7535" path="res://assets/placeholder/island.svg" id="9_nthub"]
+[ext_resource type="Script" uid="uid://b1nes8rb5vx1" path="res://scripts/commonui/popup_frame.gd" id="10_4q8dg"]
+[ext_resource type="Script" uid="uid://trgf44c8f1u" path="res://scripts/commonui/tab_nav_slot.gd" id="10_jgbtq"]
 [ext_resource type="PackedScene" uid="uid://ccedlq84ygyas" path="res://scenes/letter/LetterView.tscn" id="13_nrtoj"]
-[ext_resource type="PackedScene" uid="uid://tmafopdrdnt5" path="res://scenes/record/RecordPanel.tscn" id="14_30fn3"]
 [ext_resource type="Script" uid="uid://g177ddhfcxdg" path="res://scripts/discovery/discovery.gd" id="14_i4b1j"]
 [ext_resource type="Script" uid="uid://ddvjm3imkk4xn" path="res://scripts/letter/mailbox.gd" id="15_c0d7e"]
 [ext_resource type="Theme" uid="uid://dkaefg3qs4aqg" path="res://assets/themes/nav_theme.tres" id="15_dgldv"]
-[ext_resource type="PackedScene" uid="uid://c04nomxi32dxq" path="res://scenes/record/VoyagePanel.tscn" id="15_rm3lh"]
 [ext_resource type="Script" uid="uid://cbhanm8u4aw7v" path="res://scripts/option/options_menu.gd" id="16_yncth"]
-[ext_resource type="PackedScene" uid="uid://bssssdvptw4vk" path="res://scenes/option/OptionPanel.tscn" id="17_jgbtq"]
 [ext_resource type="PackedScene" uid="uid://dvj2jiisr43e5" path="res://scenes/letter/ShelfView.tscn" id="17_nthub"]
 [ext_resource type="PackedScene" uid="uid://c3mgfxkerd3gr" path="res://scenes/commonui/Notice.tscn" id="18_44lqw"]
 [ext_resource type="Script" uid="uid://chjov2ltlpriw" path="res://scripts/timer/alarm/alarm_banner.gd" id="20_dwmkc"]
@@ -29,13 +25,13 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_44lqw"]
 size = Vector2(107, 79)
 
-[node name="World" type="Node2D" unique_id=1409265880 node_paths=PackedStringArray("dock", "panels", "voyage_button", "gear_button", "companion_button")]
+[node name="World" type="Node2D" unique_id=1409265880 node_paths=PackedStringArray("dock", "voyage_button", "gear_button", "companion_button", "popup_frame")]
 script = ExtResource("1_d1c63")
 dock = NodePath("UI/Dock")
-panels = [NodePath("UI/PanelHost/ClockTab"), NodePath("UI/PanelHost/TodoFrame"), NodePath("UI/PanelHost/HabitFrame"), NodePath("UI/PanelHost/RecordPanel"), NodePath("UI/PanelHost/VoyagePanel"), NodePath("UI/PanelHost/OptionFrame")]
 voyage_button = NodePath("UI/VoyageButton")
 gear_button = NodePath("UI/TopRight/GearButton")
 companion_button = NodePath("UI/TopRight/CompanionButton")
+popup_frame = NodePath("UI/PanelHost/PopupFrame")
 
 [node name="Background" type="CanvasLayer" parent="." unique_id=988105801]
 layer = -10
@@ -141,87 +137,41 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="ClockTab" parent="UI/PanelHost" unique_id=1281600236 instance=ExtResource("4_1lgw5")]
+[node name="PopupFrame" type="Control" parent="UI/PanelHost" unique_id=1326499226]
 visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -288.0
+offset_right = 400.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("10_4q8dg")
+
+[node name="NavSlot" type="HBoxContainer" parent="UI/PanelHost/PopupFrame" unique_id=1757038692]
 layout_mode = 1
 anchors_preset = -1
-offset_left = 368.0
-offset_top = 190.0
-offset_right = 368.0
-offset_bottom = 190.0
+anchor_right = 1.0
+offset_bottom = 48.0
+grow_horizontal = 2
+theme = ExtResource("15_dgldv")
+script = ExtResource("10_jgbtq")
 
-[node name="TodoFrame" type="PanelContainer" parent="UI/PanelHost" unique_id=383183230]
-visible = false
+[node name="ContentBox" type="PanelContainer" parent="UI/PanelHost/PopupFrame" unique_id=1649052732]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -241.0
-offset_top = -191.5
-offset_right = 241.0
-offset_bottom = 191.5
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 48.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("4_b3faq")
-
-[node name="TodoView" parent="UI/PanelHost/TodoFrame" unique_id=1298183729 instance=ExtResource("5_hlk0d")]
-layout_mode = 2
-
-[node name="HabitFrame" type="PanelContainer" parent="UI/PanelHost" unique_id=33051302]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -121.5
-offset_top = -166.5
-offset_right = 121.5
-offset_bottom = 166.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("4_b3faq")
-
-[node name="HabitTrackerView" parent="UI/PanelHost/HabitFrame" unique_id=1593460480 instance=ExtResource("6_0uv0p")]
-layout_mode = 2
-
-[node name="RecordPanel" parent="UI/PanelHost" unique_id=1649160020 instance=ExtResource("14_30fn3")]
-visible = false
-layout_mode = 0
-offset_left = 240.0
-offset_top = 128.0
-offset_right = 880.0
-offset_bottom = 488.0
-
-[node name="VoyagePanel" parent="UI/PanelHost" unique_id=1936060229 instance=ExtResource("15_rm3lh")]
-visible = false
-layout_mode = 0
-offset_left = 240.0
-offset_top = 128.0
-offset_right = 880.0
-offset_bottom = 488.0
-
-[node name="OptionFrame" type="PanelContainer" parent="UI/PanelHost" unique_id=790630835]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -121.5
-offset_top = -166.5
-offset_right = 121.5
-offset_bottom = 166.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("4_b3faq")
-
-[node name="OptionPanel" parent="UI/PanelHost/OptionFrame" unique_id=1928188083 instance=ExtResource("17_jgbtq")]
-layout_mode = 2
 
 [node name="Dock" type="VBoxContainer" parent="UI" unique_id=1197393021]
 anchors_preset = 4

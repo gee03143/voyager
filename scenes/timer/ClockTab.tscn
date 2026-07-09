@@ -2,60 +2,28 @@
 
 [ext_resource type="PackedScene" uid="uid://bt2r4k76lwg1r" path="res://scenes/timer/PromoTimer.tscn" id="1_7acyi"]
 [ext_resource type="Script" uid="uid://rqx7h6rhy827" path="res://scripts/timer/clock_tab.gd" id="1_x1od2"]
-[ext_resource type="Theme" uid="uid://dkaefg3qs4aqg" path="res://assets/themes/nav_theme.tres" id="2_jevdb"]
-[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="2_marps"]
 [ext_resource type="PackedScene" uid="uid://jfww1o0hswu7" path="res://scenes/timer/NormalTimer.tscn" id="2_x1od2"]
 [ext_resource type="PackedScene" uid="uid://bw6mwyph0cd2q" path="res://scenes/timer/AlarmView.tscn" id="4_1c1or"]
 [ext_resource type="PackedScene" uid="uid://bixwrmbaykoda" path="res://scenes/timer/settings_view.tscn" id="5_j8guo"]
 
-[node name="ClockTab" type="HBoxContainer" unique_id=1281600236]
+[node name="ClockTab" type="HBoxContainer" unique_id=1281600236 node_paths=PackedStringArray("tab_pages")]
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_x1od2")
+tab_labels = Array[String](["세션", "타이머", "알람", "설정"])
+tab_pages = [NodePath("PomodoroView"), NodePath("TimerView"), NodePath("AlarmView"), NodePath("SettingsView")]
 
-[node name="NavBar" type="VBoxContainer" parent="." unique_id=1443296133]
-layout_mode = 2
-theme = ExtResource("2_jevdb")
-
-[node name="SessionButton" type="Button" parent="NavBar" unique_id=237835619]
-layout_mode = 2
-text = " 세션"
-
-[node name="TimerButton" type="Button" parent="NavBar" unique_id=748744949]
-layout_mode = 2
-text = "타이머"
-
-[node name="AlarmButton" type="Button" parent="NavBar" unique_id=216339813]
-layout_mode = 2
-text = "알람"
-
-[node name="SettingButton" type="Button" parent="NavBar" unique_id=1844104058]
-layout_mode = 2
-text = "설정"
-
-[node name="Pages" type="TabContainer" parent="." unique_id=2083036606]
-custom_minimum_size = Vector2(356, 267)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("2_marps")
-current_tab = 2
-tabs_visible = false
-
-[node name="PomodoroView" parent="Pages" unique_id=2053074751 instance=ExtResource("1_7acyi")]
+[node name="PomodoroView" parent="." unique_id=2053074751 instance=ExtResource("1_7acyi")]
 visible = false
 layout_mode = 2
-metadata/_tab_index = 0
 
-[node name="TimerView" parent="Pages" unique_id=262628283 instance=ExtResource("2_x1od2")]
+[node name="TimerView" parent="." unique_id=262628283 instance=ExtResource("2_x1od2")]
 visible = false
 layout_mode = 2
-metadata/_tab_index = 1
 
-[node name="AlarmView" parent="Pages" unique_id=1237746273 instance=ExtResource("4_1c1or")]
+[node name="AlarmView" parent="." unique_id=1237746273 instance=ExtResource("4_1c1or")]
 layout_mode = 2
-metadata/_tab_index = 2
 
-[node name="SettingsView" parent="Pages" unique_id=1076172766 instance=ExtResource("5_j8guo")]
+[node name="SettingsView" parent="." unique_id=1076172766 instance=ExtResource("5_j8guo")]
 visible = false
 layout_mode = 2
-metadata/_tab_index = 3

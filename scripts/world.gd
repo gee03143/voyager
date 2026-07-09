@@ -1,10 +1,27 @@
 extends Node2D
 
 @export var dock: Container          # 토글 버튼들의 부모
-@export var panels: Array[Control]   # 도크 버튼 순서대로의 패널 (항해처럼 없으면 비워둠)
 @export var voyage_button: BaseButton
 @export var gear_button: BaseButton      # 옵션 패널 여는 nav 버튼
 @export var companion_button: BaseButton
+
+@export var popup_frame: PopupFrame
+
+const CLOCK_SCENE := preload("res://scenes/timer/ClockTab.tscn")
+const TODO_SCENE := preload("res://scenes/todo/TodoTab.tscn")
+const HABIT_SCENE := preload("res://scenes/habittracker/HabitTrackerView.tscn")
+const RECORD_SCENE := preload("res://scenes/record/RecordPanel.tscn")
+const VOYAGE_SCENE := preload("res://scenes/record/VoyagePanel.tscn")
+const OPTION_SCENE := preload("res://scenes/option/OptionPanel.tscn")
+
+const DYNAMIC_SCENES := {
+	0: CLOCK_SCENE,
+	1: TODO_SCENE,
+	2: HABIT_SCENE,
+	3: RECORD_SCENE,
+	4: VOYAGE_SCENE,
+	5: OPTION_SCENE,
+}
 
 @onready var haeri_label: Label = $UI/HaeriBadge
 @onready var parallax: ParallaxBackground = $Parallax
@@ -37,9 +54,6 @@ func _ready() -> void:
 		buttons.append(gear_button)
 	_nav.setup(buttons, true)
 	_nav.selected.connect(_on_nav_selected)
-	for p in panels:
-		if p != null:
-			p.visible = false
 	_ship_base_y = ship.position.y
 	
 	if companion_button != null:
@@ -67,11 +81,9 @@ func _process(delta: float) -> void:
 	ship.rotation = sin(_bob_t * BOB_FREQ * 0.5) * ROCK_AMP   # 약간 다른 주기 → 자연스러운 일렁임
 
 func _on_nav_selected(index: int) -> void:
-	for p in panels:
-		if p != null:
-			p.visible = false
-	if index >= 0 and index < panels.size() and panels[index] != null:
-		panels[index].visible = true
+	popup_frame.close()
+	if DYNAMIC_SCENES.has(index):
+		popup_frame.show_scene(DYNAMIC_SCENES[index])
 		
 func _on_focus_session_started() -> void:
 	if Save.settings.auto_minimize and Clock.is_active() and not Clock.active_paused():

@@ -1,49 +1,24 @@
 [gd_scene format=3 uid="uid://c04nomxi32dxq"]
 
 [ext_resource type="Script" uid="uid://dab3bmcc8w6vn" path="res://scripts/record/voyage/voyage_panel.gd" id="1_vu6kc"]
-[ext_resource type="Theme" uid="uid://dkaefg3qs4aqg" path="res://assets/themes/nav_theme.tres" id="2_dv120"]
-[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="2_ub6g1"]
 [ext_resource type="PackedScene" uid="uid://cr0qgm1sh3aml" path="res://scenes/record/VocabCodex.tscn" id="4_dv120"]
 [ext_resource type="PackedScene" uid="uid://cad8niq4h6ncf" path="res://scenes/letter/ComposerView.tscn" id="6_ygq2m"]
 
-[node name="VoyagePanel" type="VBoxContainer" unique_id=1649160020]
+[node name="VoyagePanel" type="VBoxContainer" unique_id=1649160020 node_paths=PackedStringArray("tab_pages")]
 custom_minimum_size = Vector2(640, 360)
 offset_right = 18.0
 offset_bottom = 39.0
 script = ExtResource("1_vu6kc")
+tab_labels = Array[String](["통계", "편지", "도감"])
+tab_pages = [NodePath("StatsTab"), NodePath("ComposerTab"), NodePath("CodexTab")]
 
-[node name="TabNav" type="HBoxContainer" parent="." unique_id=95565593]
-layout_mode = 2
-theme = ExtResource("2_dv120")
-
-[node name="StatsButton" type="Button" parent="TabNav" unique_id=552069832]
-layout_mode = 2
-text = "통계"
-
-[node name="ComposerButton" type="Button" parent="TabNav" unique_id=749761205]
-layout_mode = 2
-text = "편지"
-
-[node name="CodexButton" type="Button" parent="TabNav" unique_id=154052968]
-layout_mode = 2
-text = "도감
-"
-
-[node name="Content" type="PanelContainer" parent="." unique_id=455626373]
-layout_mode = 2
-theme_override_styles/panel = ExtResource("2_ub6g1")
-
-[node name="Host" type="VBoxContainer" parent="Content" unique_id=725952999]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="StatsTab" type="VBoxContainer" parent="Content/Host" unique_id=1177846438]
+[node name="StatsTab" type="VBoxContainer" parent="." unique_id=1177846438]
 visible = false
 layout_mode = 2
 
-[node name="ComposerTab" parent="Content/Host" unique_id=1576559014 instance=ExtResource("6_ygq2m")]
+[node name="ComposerTab" parent="." unique_id=1576559014 instance=ExtResource("6_ygq2m")]
 visible = false
 layout_mode = 2
 
-[node name="CodexTab" parent="Content/Host" unique_id=1318945697 instance=ExtResource("4_dv120")]
+[node name="CodexTab" parent="." unique_id=1318945697 instance=ExtResource("4_dv120")]
 layout_mode = 2

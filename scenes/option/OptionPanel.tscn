@@ -1,44 +1,25 @@
 [gd_scene format=3 uid="uid://bssssdvptw4vk"]
 
 [ext_resource type="Script" uid="uid://d1fyg3qjp5gr0" path="res://scripts/option/option_panel.gd" id="1_kre35"]
-[ext_resource type="Theme" uid="uid://dkaefg3qs4aqg" path="res://assets/themes/nav_theme.tres" id="2_whkr3"]
 [ext_resource type="PackedScene" uid="uid://u8sgyah1ikwa" path="res://scenes/option/ScreenView.tscn" id="3_7umbu"]
 [ext_resource type="PackedScene" uid="uid://cp46oq26c8olc" path="res://scenes/option/SoundView.tscn" id="3_fhh66"]
 
-[node name="OptionPanel" type="VBoxContainer" unique_id=1928188083]
+[node name="OptionPanel" type="VBoxContainer" unique_id=1928188083 node_paths=PackedStringArray("tab_pages")]
 script = ExtResource("1_kre35")
+tab_labels = Array[String](["화면", "사운드", "기타"])
+tab_pages = [NodePath("ScreenTab"), NodePath("SoundTab"), NodePath("EtcTab")]
 
-[node name="TabNav" type="HBoxContainer" parent="." unique_id=943754325]
-layout_mode = 2
-theme = ExtResource("2_whkr3")
-
-[node name="ScreenButton" type="Button" parent="TabNav" unique_id=889813196]
-layout_mode = 2
-text = "화면"
-
-[node name="SoundButton" type="Button" parent="TabNav" unique_id=262232695]
-layout_mode = 2
-text = "사운드"
-
-[node name="EtcButton" type="Button" parent="TabNav" unique_id=949342030]
-layout_mode = 2
-text = "기타"
-
-[node name="Host" type="VBoxContainer" parent="." unique_id=1788775324]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="ScreenTab" parent="Host" unique_id=113817926 instance=ExtResource("3_7umbu")]
+[node name="ScreenTab" parent="." unique_id=113817926 instance=ExtResource("3_7umbu")]
 layout_mode = 2
 
-[node name="SoundTab" parent="Host" unique_id=2017096723 instance=ExtResource("3_fhh66")]
+[node name="SoundTab" parent="." unique_id=2017096723 instance=ExtResource("3_fhh66")]
 visible = false
 layout_mode = 2
 
-[node name="EtcTab" type="VBoxContainer" parent="Host" unique_id=137565292]
+[node name="EtcTab" type="VBoxContainer" parent="." unique_id=137565292]
 visible = false
 layout_mode = 2
 
-[node name="QuitButton" type="Button" parent="Host/EtcTab" unique_id=427873432]
+[node name="QuitButton" type="Button" parent="EtcTab" unique_id=427873432]
 layout_mode = 2
 text = "게임 종료"
