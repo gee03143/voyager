@@ -10,11 +10,10 @@
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_x1od2")
-tab_labels = Array[String](["세션", "타이머", "알람", "설정"])
+tab_labels = Array[String](["CLOCK_TAB_SESSION", "CLOCK_TAB_TIMER", "CLOCK_TAB_ALARM", "CLOCK_TAB_SETTINGS"])
 tab_pages = [NodePath("PomodoroView"), NodePath("TimerView"), NodePath("AlarmView"), NodePath("SettingsView")]
 
 [node name="PomodoroView" parent="." unique_id=2053074751 instance=ExtResource("1_7acyi")]
-visible = false
 layout_mode = 2
 
 [node name="TimerView" parent="." unique_id=262628283 instance=ExtResource("2_x1od2")]
@@ -22,6 +21,7 @@ visible = false
 layout_mode = 2
 
 [node name="AlarmView" parent="." unique_id=1237746273 instance=ExtResource("4_1c1or")]
+visible = false
 layout_mode = 2
 
 [node name="SettingsView" parent="." unique_id=1076172766 instance=ExtResource("5_j8guo")]

@@ -1,0 +1,26 @@
+keys,ko,en
+VOYAGE_BUTTON,항해,Voyage
+CLOCK_BUTTON,시계,Clock
+TODO_BUTTON,할일,Todo
+HABIT_BUTTON,습관,Habit
+RECORD_BUTTON,기록,Record
+VOYAGE_TAB_STATS,통계,Stats
+VOYAGE_TAB_LETTER,편지,Letters
+VOYAGE_TAB_CODEX,도감,Codex
+VOYAGE_STAT_FOCUS,누적 집중: {time},Total focus: {time}
+VOYAGE_STAT_PLAY,누적 플레이: {time},Total play: {time}
+VOYAGE_STAT_DISTANCE,항해 거리: {distance} leagues,Voyage distance: {distance} leagues
+VOYAGE_STAT_COUNT,총 활동: {count}건,Total activities: {count}
+CLOCK_TAB_SESSION,세션,Session
+CLOCK_TAB_TIMER,타이머,Timer
+CLOCK_TAB_ALARM,알람,Alarm
+CLOCK_TAB_SETTINGS,설정,Settings
+CLOCK_POMO_FOCUS,집중,Focus
+CLOCK_POMO_SHORT_BREAK,짧은 휴식,Short Break
+CLOCK_POMO_LONG_BREAK,긴 휴식,Long Break
+CLOCK_POMO_REPEAT,반복,Repeat
+CLOCK_POMO_PHASE_LABEL,{type}  ·  {current} / {total} 구간,{type}  ·  {current} / {total} segments
+SUFFIX_SEC,초,Sec
+SUFFIX_MIN,분,Min
+SUFFIX_HOUR,시,Hr
+SUFFIX_CNT,회,Rep

@@ -185,19 +185,19 @@ theme = ExtResource("15_dgldv")
 
 [node name="ClockButton" type="Button" parent="UI/Dock" unique_id=839608971]
 layout_mode = 2
-text = "시계"
+text = "CLOCK_BUTTON"
 
 [node name="TodoButton" type="Button" parent="UI/Dock" unique_id=1402855475]
 layout_mode = 2
-text = "할일"
+text = "TODO_BUTTON"
 
 [node name="HabitButton" type="Button" parent="UI/Dock" unique_id=801797632]
 layout_mode = 2
-text = "습관"
+text = "HABIT_BUTTON"
 
 [node name="RecordButton" type="Button" parent="UI/Dock" unique_id=712370477]
 layout_mode = 2
-text = "기록"
+text = "RECORD_BUTTON"
 
 [node name="Hud" parent="UI" unique_id=1516792778 instance=ExtResource("7_0uv0p")]
 anchors_preset = 1
@@ -282,7 +282,7 @@ offset_bottom = 23.0
 grow_horizontal = 2
 
 [node name="VoyageButton" type="Button" parent="UI" unique_id=190725123]
-text = "항해"
+text = "VOYAGE_BUTTON"
 
 [node name="TopRight" type="HBoxContainer" parent="UI" unique_id=1917575133]
 anchors_preset = -1

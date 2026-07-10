@@ -35,9 +35,9 @@ func set_progress(ratio: float) -> void:   # 활성 구간 동안만 호출
 func _symbol(type: int) -> String:
 	match type:
 		Pomodoro.SegmentType.FOCUS:
-			return "집중"
+			return TranslationServer.translate("CLOCK_POMO_FOCUS")
 		Pomodoro.SegmentType.SHORT_BREAK:
-			return "휴식"
+			return TranslationServer.translate("CLOCK_POMO_SHORT_BREAK")
 		Pomodoro.SegmentType.LONG_BREAK:
-			return "긴휴식"
-	return "?"
+			return TranslationServer.translate("CLOCK_POMO_LONG_BREAK")
+	return ""

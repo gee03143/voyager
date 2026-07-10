@@ -125,11 +125,11 @@ func _advance() -> void:
 static func type_name(type: int) -> String:
 	match type:
 		SegmentType.FOCUS:
-			return "집중"
+			return TranslationServer.translate("CLOCK_POMO_FOCUS")
 		SegmentType.SHORT_BREAK:
-			return "짧은 휴식"
+			return TranslationServer.translate("CLOCK_POMO_SHORT_BREAK")
 		SegmentType.LONG_BREAK:
-			return "긴 휴식"
+			return TranslationServer.translate("CLOCK_POMO_LONG_BREAK")
 	return ""
 
 func current_total() -> float:

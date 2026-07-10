@@ -43,10 +43,10 @@ func _add_stat() -> Label:
 
 func _refresh_stats() -> void:
 	var v := Save.voyage
-	_focus_label.text = "누적 집중: %s" % _fmt_hm(int(v.total_focus_seconds))
-	_play_label.text = "누적 플레이: %s" % _fmt_hm(int(v.total_play_seconds))
-	_haeri_label.text = "항해 거리: %.1f leagues" % v.voyage_distance
-	_count_label.text = "총 활동: %d건" % Save.activity_log.events.size()
+	_focus_label.text = tr("VOYAGE_STAT_FOCUS").format({"time": _fmt_hm(int(v.total_focus_seconds))})
+	_play_label.text = tr("VOYAGE_STAT_PLAY").format({"time": _fmt_hm(int(v.total_play_seconds))})
+	_haeri_label.text = tr("VOYAGE_STAT_DISTANCE").format({"distance": "%.1f" % v.voyage_distance})
+	_count_label.text = tr("VOYAGE_STAT_COUNT").format({"count": Save.activity_log.events.size()})
 
 func _fmt_hm(total: int) -> String:
 	return "%dh %02dm" % [total / 3600, (total % 3600) / 60]

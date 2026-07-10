@@ -135,3 +135,15 @@
 - **`Clock` (autoload, 세션 컨트롤러)** — `Pomodoro`/`SimpleTimer` 인스턴스 **소유**(뷰에서 분리). `Timers`로 타이밍, active 세션 추적, `focus_finished`/타이머완료 → `Save.voyage.add_focus`(슬라이스 ③). 뷰는 `Clock.pomodoro` 등에 **바인딩**(생성·소유 X), 표시는 폴링. **컨트롤러 계층**: `Save` 앎.
 - **영속성 경계(사용자 결정)**: 진행 중 포모/타이머 세션 = **휘발성**(프로세스 종료 시 소멸, Save 직렬화 X). 알람 = **영속**(`Save.alarms`) → 성격이 달라 **`TimerManager`에 귀속 안 함**. `AlarmClock`(벽시계 폴링)은 별도로 두고 "알람 전역화"로 autoload화 + 갭 catch-up.
 - **autoload 등록 순서**: `Save`, `Sound`, **`Timers`**, **`Clock`**(Clock이 Timers·Save 참조하므로 뒤).
+
+## 팝업 셸 통일 — PopupFrame/Pooling (Week 5 중, 완료)
+> 발단: 6개 팝업 패널(시계/할일/습관/기록/항해/옵션)이 각자 다른 크기·위치·서브탭 방식(TabContainer vs 직접 visible)을 써서, 탭 전환 시 크기가 들쭉날쭉하던 문제.
+
+- **구조**: `PanelHost > PopupFrame(Control, 800×528 고정 anchor) > [NavSlot(HBox, 위쪽 48px), ContentBox(PanelContainer, 800×480, panel_bg)]`. 6개 패널 전부 이 구조 하나를 공유(개별 Frame 폐기).
+- **`TabNavSlot`**(`scripts/commonui/tab_nav_slot.gd`): 서브탭 있는 패널(시계·기록·항해·옵션)이 `tab_labels: Array[String]` + `tab_pages: Array[Control]`(export, **Dictionary 아님** — 인스펙터로 편집한 Dictionary는 저장 시 키를 알파벳순으로 재배열해버림, 실제 버그로 확인됨)을 주면 `set_tabs()`가 그때그때 버튼 생성. `clear()`(외부 `tab_selected` 리스너 해제)와 `set_tabs()`(버튼만 재생성) 책임을 분리 — 안 나누면 패널 전환마다 이전 리스너가 안 끊겨 "이미 연결됨" 에러.
+- **패널 구조 평탄화**: `Content`/`Host` 같은 중간 래퍼 전부 제거, 서브탭 페이지가 패널 루트의 직계 자식. 배경은 `ContentBox`가 대신하므로 개별 `Content`(PanelContainer) 불필요.
+- **생애주기 훅**(Unreal `NativeOnInitialized`/`NativeConstruct` 대응, 사용자 제안): `_ready()`=1회 생성, `attach_nav()`=NavSlot 연결(패널 전환마다 재호출), `on_shown()`/`on_hidden()`=보일 때/숨을 때마다(선택적, `has_method` 체크로 안전 호출 — `PopupFrame`이 매 전환마다 명시적으로 부름). 독립 실행(F6 단독 테스트) 대비: `nav_slot == null`이면 `_ready()`가 폴백 `TabNavSlot`을 직접 만들고 `attach_nav()`도 그 자리에서 호출.
+- **Pooling**(`scripts/util/panel_pool.gd`, autoload `PanelPool`): `show_scene()`마다 destroy/재생성하던 걸 인스턴스 재사용으로 전환. **컴패니언 모드가 `change_scene_to_file`로 World 전체를 갈아치워서 PopupFrame 자체가 사라짐** → pool을 PopupFrame이 아니라 오토로드에 둬야 생존(Save/Clock과 같은 이유로 오토로드 채택). `world.gd:_enter_companion()`은 씬 전환 전 `popup_frame.close()`로 열려있던 패널을 먼저 pool에 반납(안 하면 씬과 함께 파괴됨).
+- **`world.gd:_on_nav_selected`**: 기존 `panels`(Array[Control]) 배열 완전히 제거, `popup_frame.close()` → `popup_frame.show_scene(scene)` 하나로 통일.
+- **현재 상태(완료, F6 확인됨)**: Clock/Todo/Habit/Record/Voyage/Option 6개 전부 이 구조로 통일.
+- **다음(설계만 확정, 미적용)**: `world.gd`가 도크 인덱스↔씬을 `DYNAMIC_SCENES` 딕셔너리로 하드코딩 중 — **`DockButton`(commonui, `extends Button` + `@export var scene: PackedScene`)으로 교체 예정**. 각 도크 버튼이 자기 씬을 직접 들고 있게 해서, 버튼 순서/추가와 무관하게 매칭이 깨지지 않도록.

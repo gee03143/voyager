@@ -25,41 +25,37 @@ columns = 4
 
 [node name="FocusLabel" type="Label" parent="VBox/Config" unique_id=47230403]
 layout_mode = 2
-text = "집중"
+text = "CLOCK_POMO_FOCUS"
 
 [node name="ShortBreakLabel" type="Label" parent="VBox/Config" unique_id=98134465]
 layout_mode = 2
-text = "짧은 휴식"
+text = "CLOCK_POMO_SHORT_BREAK"
 
 [node name="LongBreakLabel" type="Label" parent="VBox/Config" unique_id=369984813]
 layout_mode = 2
-text = "긴 휴식"
+text = "CLOCK_POMO_LONG_BREAK"
 
 [node name="CountPabel" type="Label" parent="VBox/Config" unique_id=1671949110]
 layout_mode = 2
-text = "반복"
+text = "CLOCK_POMO_REPEAT"
 
 [node name="FocusSpin" type="SpinBox" parent="VBox/Config" unique_id=1692087131]
 layout_mode = 2
 max_value = 180.0
-suffix = "분"
 
 [node name="ShortBreakSpin" type="SpinBox" parent="VBox/Config" unique_id=952149375]
 layout_mode = 2
 max_value = 180.0
-suffix = "분"
 
 [node name="LongBreakSpin" type="SpinBox" parent="VBox/Config" unique_id=841983408]
 layout_mode = 2
 max_value = 180.0
-suffix = "분"
 
 [node name="CountSpin" type="SpinBox" parent="VBox/Config" unique_id=478338213]
 layout_mode = 2
 min_value = 1.0
 max_value = 12.0
 value = 1.0
-suffix = "회"
 
 [node name="PhaseLabel" type="Label" parent="VBox" unique_id=436305482]
 layout_mode = 2

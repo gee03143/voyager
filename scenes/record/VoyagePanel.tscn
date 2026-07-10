@@ -9,7 +9,7 @@ custom_minimum_size = Vector2(640, 360)
 offset_right = 18.0
 offset_bottom = 39.0
 script = ExtResource("1_vu6kc")
-tab_labels = Array[String](["통계", "편지", "도감"])
+tab_labels = Array[String](["VOYAGE_TAB_STATS", "VOYAGE_TAB_LETTER", "VOYAGE_TAB_CODEX"])
 tab_pages = [NodePath("StatsTab"), NodePath("ComposerTab"), NodePath("CodexTab")]
 
 [node name="StatsTab" type="VBoxContainer" parent="." unique_id=1177846438]

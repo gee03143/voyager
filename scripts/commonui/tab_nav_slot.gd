@@ -10,7 +10,7 @@ func set_tabs(labels: Array[String]) -> void:
 	var buttons: Array = []
 	for label in labels:
 		var b := Button.new()
-		b.text = label
+		b.text = tr(label)
 		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		add_child(b)
 		buttons.append(b)

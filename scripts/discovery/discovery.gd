@@ -18,5 +18,5 @@ func _process(_delta: float) -> void:
 	if interval <= 0.0:                              # 오설정 시 무한 루프 방지
 		return
 	while Save.voyage.voyage_distance >= _next_at:   # 한 프레임에 여러 임계 넘어도 모두
-		discovered.emit()
+		#discovered.emit()
 		_next_at += interval

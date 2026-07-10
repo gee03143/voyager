@@ -32,6 +32,11 @@ func _ready() -> void:
 	short_break_spin.value = Save.settings.short_break_seconds / 60.0
 	long_break_spin.value = Save.settings.long_break_seconds / 60.0
 	count_spin.value = Save.settings.total_focus_count
+	
+	focus_spin.suffix = tr("SUFFIX_MIN")
+	short_break_spin.suffix = tr("SUFFIX_MIN")
+	long_break_spin.suffix = tr("SUFFIX_MIN")
+	count_spin.suffix = tr("SUFFIX_CNT")
 
 	focus_spin.value_changed.connect(_on_config_changed)
 	short_break_spin.value_changed.connect(_on_config_changed)
@@ -90,7 +95,11 @@ func _on_stop_pressed() -> void:
 func _on_segment_changed(i: int) -> void:
 	var type := pomodoro.segment_type_at(i)
 	display.set_total(pomodoro.duration_of(type))
-	phase_label.text = "%s  ·  %d / %d 구간" % [Pomodoro.type_name(type), i + 1, pomodoro.segment_count()]
+	phase_label.text = TranslationServer.translate("CLOCK_POMO_PHASE_LABEL").format({
+		"type": Pomodoro.type_name(type),
+		"current": i + 1,
+		"total": pomodoro.segment_count(),
+	})
 	_update_chip_states()
 	_refresh_controls()
 
