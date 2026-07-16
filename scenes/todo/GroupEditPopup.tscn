@@ -17,7 +17,7 @@ offset_bottom = 105.0
 
 [node name="TitleLabel" type="Label" parent="VBox" unique_id=1794689476]
 layout_mode = 2
-text = "목록 편집"
+text = "TODO_GROUP_EDIT_TITLE"
 
 [node name="GroupList" type="VBoxContainer" parent="VBox" unique_id=102821393]
 layout_mode = 2
@@ -26,8 +26,8 @@ metadata/_custom_type_script = "uid://d4nofmpdi3kkj"
 
 [node name="AddGroupButton" type="Button" parent="VBox" unique_id=1614778401]
 layout_mode = 2
-text = "+ 새 목록 추가"
+text = "TODO_GROUP_ADD_BUTTON"
 
 [node name="CloseButton" type="Button" parent="VBox" unique_id=1717096304]
 layout_mode = 2
-text = "목록 확인"
+text = "TODO_GROUP_CLOSE_BUTTON"

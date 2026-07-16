@@ -26,6 +26,10 @@ func _ready() -> void:
 	hours_spin.value_changed.connect(_on_time_changed)
 	minutes_spin.value_changed.connect(_on_time_changed)
 	seconds_spin.value_changed.connect(_on_time_changed)
+	
+	hours_spin.suffix = tr("SUFFIX_HOUR")
+	minutes_spin.suffix = tr("SUFFIX_MIN")
+	seconds_spin.suffix = tr("SUFFIX_SEC")
 
 	display.set_total(_timer.duration)
 	_refresh_controls()

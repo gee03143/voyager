@@ -20,7 +20,27 @@ CLOCK_POMO_SHORT_BREAK,짧은 휴식,Short Break
 CLOCK_POMO_LONG_BREAK,긴 휴식,Long Break
 CLOCK_POMO_REPEAT,반복,Repeat
 CLOCK_POMO_PHASE_LABEL,{type}  ·  {current} / {total} 구간,{type}  ·  {current} / {total} segments
+ALARM_ADD_BUTTON,새 알림 추가,Add Alarm
+CLOCK_SETTINGS_AUTO_MINIMIZE,활성 시 자동 최소화,Auto-minimize when active
+CLOCK_SETTINGS_AUTO_MAXIMIZE,비활성 시 자동 최대화,Auto-maximize when inactive
+CLOCK_SETTINGS_HIDE_COUNTDOWN,카운트다운 숨기기,Hide countdown
+TODO_DEFAULT_GROUP_NAME,기본,Default
+TODO_EMPTY_PLACEHOLDER,(할 일 입력),(Enter task)
+TODO_NEW_GROUP_NAME,새 목록,New List
+TODO_GROUP_EDIT_TITLE,목록 편집,Edit Lists
+TODO_GROUP_ADD_BUTTON,+ 새 목록 추가,+ Add New List
+TODO_GROUP_CLOSE_BUTTON,목록 확인,Done
+TODO_ADD_BUTTON,+ 새로운 과제 추가하기,+ Add New Task
+TODO_SORT_LABEL,정렬: {name},Sort: {name}
+TODO_SORT_MANUAL,수동,Manual
+TODO_SORT_DUE,마감일,Due Date
+TODO_SORT_NAME,이름,Name
+TODO_SORT_DONE,완료상태,Status
 SUFFIX_SEC,초,Sec
 SUFFIX_MIN,분,Min
 SUFFIX_HOUR,시,Hr
 SUFFIX_CNT,회,Rep
+OPTION_DISABLED,끄기,Disabled
+OPTION_ENABLED,켜기,Enabled
+ALARM_NOTICE,알람 · {hour}:{minute},Alarm · {hour}:{minute}
+ALARM_NOTICE_WITH_LABEL,알람 · {hour}:{minute} · {label},Alarm · {hour}:{minute} · {label}

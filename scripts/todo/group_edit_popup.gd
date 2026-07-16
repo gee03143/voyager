@@ -35,12 +35,15 @@ func _add_group_row(index: int) -> void:
 
 	var name_edit := LineEdit.new()
 	name_edit.text = g.name
+	name_edit.placeholder_text = TranslationServer.translate("TODO_DEFAULT_GROUP_NAME")
+	name_edit.editable = not g.is_default
 	name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_edit.text_changed.connect(func(t): _on_rename(index, t))
 	row.add_child(name_edit)
 
 	var del := Button.new()
 	del.text = "✕"
+	del.visible = not g.is_default
 	del.disabled = Save.todo_groups.size() <= 1      # 마지막 그룹은 삭제 불가
 	del.pressed.connect(func(): _on_delete(index))
 	row.add_child(del)
@@ -49,9 +52,9 @@ func _add_group_row(index: int) -> void:
 
 func _on_add_group() -> void:
 	var g := TodoGroup.new()
-	g.name = "새 목록"
+	g.name = TranslationServer.translate("TODO_NEW_GROUP_NAME")
 	Save.todo_groups.append(g)
-	_rebuild()                                # 구조 변경 → 팝업 목록 다시 그림
+	_rebuild()
 	groups_changed.emit()
 
 func _on_rename(index: int, new_name: String) -> void:

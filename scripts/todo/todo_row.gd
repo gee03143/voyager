@@ -106,7 +106,7 @@ func _show_display() -> void:
 func _render() -> void:
 	var safe := _text.replace("[", "[lb]")   # 사용자 텍스트의 BBCode 주입 방지
 	if _text.is_empty():
-		text_display.text = "(할 일 입력)"
+		text_display.text = TranslationServer.translate("TODO_EMPTY_PLACEHOLDER")
 		text_display.modulate.a = 0.5
 	elif _done:
 		text_display.text = "[s]%s[/s]" % safe

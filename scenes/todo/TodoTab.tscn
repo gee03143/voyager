@@ -25,15 +25,15 @@ size_flags_horizontal = 3
 
 [node name="SortKeyButton" type="MenuButton" parent="Header" unique_id=93822661]
 layout_mode = 2
-text = "정렬"
+text = "TODO_SORT_LABEL"
 item_count = 4
-popup/item_0/text = "수동"
+popup/item_0/text = "TODO_SORT_MANUAL"
 popup/item_0/id = 0
-popup/item_1/text = "마감일"
+popup/item_1/text = "TODO_SORT_DUE"
 popup/item_1/id = 1
-popup/item_2/text = "이름"
+popup/item_2/text = "TODO_SORT_NAME"
 popup/item_2/id = 2
-popup/item_3/text = "완료상태"
+popup/item_3/text = "TODO_SORT_DONE"
 popup/item_3/id = 3
 
 [node name="SortDirButton" type="Button" parent="Header" unique_id=1526471254]
@@ -66,4 +66,4 @@ layout_mode = 2
 
 [node name="AddButton" type="Button" parent="." unique_id=1400148124]
 layout_mode = 2
-text = "+ 새로운 과제 추가하기"
+text = "TODO_ADD_BUTTON"

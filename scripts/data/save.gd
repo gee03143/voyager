@@ -1,11 +1,13 @@
 extends Node
 
 const SAVE_PATH := "user://save.json"
-const VERSION := 7
+const VERSION := 8
 const RECORDS_PATH := "user://records.json"
 const RECORDS_VERSION := 1
 const JOURNAL_PATH := "user://journal.json"
 const JOURNAL_VERSION := 1
+const TODO_PATH := "user://todo.json"
+const TODO_VERSION := 1
 
 var voyage := Voyage.new()
 var letters := LetterArchive.new()
@@ -32,8 +34,12 @@ func _ready() -> void:
 		load_records()
 	if FileAccess.file_exists(JOURNAL_PATH):
 		load_journal()
+	if FileAccess.file_exists(TODO_PATH):
+		load_todo()
 	if todo_groups.is_empty():
-		todo_groups.append(TodoGroup.new())
+		var g := TodoGroup.new()
+		g.is_default = true
+		todo_groups.append(g)
 	current_group_index = clampi(current_group_index, 0, todo_groups.size() - 1)
 	_play_base_seconds = voyage.total_play_seconds
 	_session_start_ms = Time.get_ticks_msec()
@@ -48,6 +54,7 @@ func _ready() -> void:
 	save_game()
 	save_records()
 	save_journal()
+	save_todo()
 	settings.changed.connect(save_game)
 	voyage.changed.connect(save_game)
 	activity_log.changed.connect(save_records)
@@ -67,21 +74,14 @@ func _local_day_iso() -> String:
 
 func save_game() -> void:
 	voyage.total_play_seconds = _play_base_seconds + (Time.get_ticks_msec() - _session_start_ms) / 1000.0
-	# alarms
 	var alarm_dicts := []
 	for a in alarms:
 		alarm_dicts.append(a.to_dict())
-	
-	# todos
-	var todo_group_dicts := []
-	for t in todo_groups:
-		todo_group_dicts.append(t.to_dict())
 	
 	var data := {
 		"version": VERSION,
 		"settings": settings.to_dict(),
 		"alarms": alarm_dicts,
-		"todo_groups": todo_group_dicts,
 		"habit_defs": habit_defs,
 		"habit_weeks": habit_weeks,
 		"voyage": voyage.to_dict(),
@@ -108,7 +108,6 @@ func load_game() -> void:
 	if typeof(parsed) != TYPE_DICTIONARY:
 		push_warning("Fail to parse save file - Use DEfault Value")
 		return
-	# var v = parsed.get("version", 1)으로 마이그레이션 분기 가능, 1은 version 넘버
 	var s = parsed.get("settings", {})
 	if typeof(s) == TYPE_DICTIONARY:
 		settings.from_dict(s)
@@ -118,14 +117,15 @@ func load_game() -> void:
 		if typeof(d) == TYPE_DICTIONARY:
 			alarms.append(Alarm.from_dict(d))
 			
-	todo_groups.clear()
-	if parsed.has("todo_groups"):
+	if parsed.has("todo_groups"):                     # todo.json 분리 전 구버전 데이터 → 마이그레이션
 		for d in parsed.get("todo_groups", []):
 			if typeof(d) == TYPE_DICTIONARY:
 				todo_groups.append(TodoGroup.from_dict(d))
+		if not todo_groups.is_empty() and not todo_groups[0].is_default:
+			todo_groups[0].is_default = true           # 구버전엔 is_default 없었음 → 첫 그룹을 기본으로 지정
 	elif parsed.has("todos"):
 		var g := TodoGroup.new()
-		g.name = "기본"
+		g.is_default = true
 		g.sort_key = int(parsed.get("todos_sort_key", 0))
 		g.sort_desc = bool(parsed.get("todos_sort_desc", false))
 		for d in parsed.get("todos", []):
@@ -199,9 +199,39 @@ func load_journal() -> void:
 	var parsed = JSON.parse_string(text)
 	if typeof(parsed) == TYPE_DICTIONARY:
 		journal.from_dict(parsed)
+
+func save_todo() -> void:
+	var todo_group_dicts := []
+	for t in todo_groups:
+		todo_group_dicts.append(t.to_dict())
+	var data := {
+		"version": TODO_VERSION,
+		"todo_groups": todo_group_dicts,
+	}
+	var file := FileAccess.open(TODO_PATH, FileAccess.WRITE)
+	if file == null:
+		push_warning("Fail to Save todo: %s" % FileAccess.get_open_error())
+		return
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+
+func load_todo() -> void:
+	var file := FileAccess.open(TODO_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var text := file.get_as_text()
+	file.close()
+	var parsed = JSON.parse_string(text)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	todo_groups.clear()
+	for d in parsed.get("todo_groups", []):
+		if typeof(d) == TYPE_DICTIONARY:
+			todo_groups.append(TodoGroup.from_dict(d))
 		
 func quit_game() -> void:
 	save_game()
 	save_records()
 	save_journal()
+	save_todo()
 	get_tree().quit()

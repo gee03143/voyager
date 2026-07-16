@@ -2,7 +2,7 @@ class_name TodoSort
 extends RefCounted
 
 enum Key { MANUAL, DUE, NAME, DONE }
-const NAMES := ["수동", "마감일", "이름", "완료상태"]
+const NAMES := ["TODO_SORT_MANUAL", "TODO_SORT_DUE", "TODO_SORT_NAME", "TODO_SORT_DONE"]
 
 var _desc := false
 var _idx := {}                          # 동순위 tiebreak = 수동 순서

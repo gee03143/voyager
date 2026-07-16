@@ -25,4 +25,4 @@ metadata/_custom_type_script = "uid://d4nofmpdi3kkj"
 
 [node name="AddButton" type="Button" parent="." unique_id=1768961754]
 layout_mode = 2
-text = "새 알림 추가"
+text = "ALARM_ADD_BUTTON"

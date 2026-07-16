@@ -34,7 +34,7 @@ func _ready() -> void:
 	_save_timer.one_shot = true
 	_save_timer.wait_time = SAVE_DEBOUNCE
 	add_child(_save_timer)
-	_save_timer.timeout.connect(func(): Save.save_game())
+	_save_timer.timeout.connect(func(): Save.save_todo())
 	add_button.pressed.connect(_on_add_pressed)
 	
 	_due_popup = DUE_POPUP.instantiate()
@@ -133,7 +133,7 @@ func _on_sort_dir_toggled() -> void:
 
 func _update_sort_ui() -> void:
 	var manual := _sort_key == TodoSort.Key.MANUAL
-	sort_key_button.text = "정렬: %s" % TodoSort.NAMES[_sort_key]
+	sort_key_button.text = tr("TODO_SORT_LABEL").format({"name": tr(TodoSort.NAMES[_sort_key])})
 	sort_dir_button.text = "🔽" if _sort_desc else "🔼"
 	sort_dir_button.visible = not manual       # 수동엔 방향 없음
 	for r in _rows:
@@ -152,7 +152,7 @@ func _apply_sort() -> void:
 func _refresh_group_dropdown() -> void:
 	group_option.clear()
 	for i in Save.todo_groups.size():
-		group_option.add_item(Save.todo_groups[i].name, i)
+		group_option.add_item(Save.todo_groups[i].display_name(), i)
 	group_option.select(Save.current_group_index)
 
 func _on_group_selected(idx: int) -> void:
