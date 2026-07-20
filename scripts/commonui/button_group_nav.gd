@@ -5,6 +5,7 @@ signal selected(index: int)
 
 var _group := ButtonGroup.new()
 var _buttons: Array[BaseButton] = []
+var _current_index := -1
 
 func setup(buttons: Array, allow_close: bool = false) -> void:
 	_group.allow_unpress = allow_close
@@ -28,10 +29,15 @@ func setup_from(container: Node, allow_close: bool = false) -> void:        # �
 	setup(buttons, allow_close)
 
 func _on_group_pressed(button: BaseButton) -> void:
+	var index := _buttons.find(button)
+	if index == _current_index:          # 이미 활성인 버튼 재클릭 → _on_toggled 쪽이 처리
+		return
+	_current_index = index
 	selected.emit(_buttons.find(button))
 
 func _on_toggled(pressed: bool, index: int) -> void:
 	if not pressed and not _any_pressed():
+		_current_index = -1
 		selected.emit(-1)         	
 
 func _any_pressed() -> bool:
@@ -43,5 +49,6 @@ func _any_pressed() -> bool:
 func select(index: int) -> void:
 	if index < 0 or index >= _buttons.size():
 		return
+	_current_index = index
 	_buttons[index].set_pressed_no_signal(true)   # 시각 토글만, 신호는 직접
 	selected.emit(index)

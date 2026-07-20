@@ -26,6 +26,7 @@ func clear() -> void:
 
 func _clear_buttons() -> void:
 	for child in get_children():
+		remove_child(child)
 		child.queue_free()
 
 func _on_selected(index: int) -> void:
