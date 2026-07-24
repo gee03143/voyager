@@ -4,51 +4,32 @@ extends PopupPanel
 signal confirmed(iso: String)
 
 @onready var title_label: Label = $VBox/TitleLabel
-@onready var input: LineEdit = $VBox/Input
-@onready var error_label: Label = $VBox/ErrorLabel
+@onready var calendar: DueCalendar = $VBox/DueCalendar
 @onready var ok_button: Button = $VBox/HBox/OKButton
 @onready var cancel_button: Button = $VBox/HBox/CancelButton
+@onready var delete_button: Button = $VBox/HBox/DeleteButton
+
+var _pending_iso: String = ""
 
 func _ready() -> void:
 	ok_button.pressed.connect(_on_ok)
 	cancel_button.pressed.connect(hide)
-	input.text_submitted.connect(func(_t): _on_ok())
+	delete_button.pressed.connect(_on_delete)
+	calendar.day_selected.connect(_on_day_selected)
 
 func open_for(current_iso: String, task_text: String) -> void:
-	title_label.text = "마감일 설정: %s" % task_text
-	input.text = current_iso
-	error_label.text = ""
+	title_label.text = tr("TODO_DUE_POPUP_TITLE").format({"task": task_text})
+	_pending_iso = current_iso
+	calendar.set_selected(current_iso)
 	popup_centered()
-	input.grab_focus()
+
+func _on_day_selected(iso: String) -> void:
+	_pending_iso = iso
 
 func _on_ok() -> void:
-	var t := input.text.strip_edges()
-	if t.is_empty():
-		confirmed.emit("")            # 비우면 마감일 제거
-		hide()
-		return
-	var iso := _normalize(t)
-	if iso.is_empty():
-		error_label.text = "YYYY-MM-DD 형식으로 입력하세요 (예: 2026-06-13)"
-		return
-	confirmed.emit(iso)
+	confirmed.emit(_pending_iso)
 	hide()
 
-func _normalize(t: String) -> String:
-	var p := t.split("-")
-	if p.size() != 3:
-		return ""
-	if not (p[0].is_valid_int() and p[1].is_valid_int() and p[2].is_valid_int()):
-		return ""
-	var y := int(p[0])
-	var m := int(p[1])
-	var d := int(p[2])
-	if y < 1 or m < 1 or m > 12 or d < 1 or d > _days_in_month(y, m):
-		return ""
-	return "%04d-%02d-%02d" % [y, m, d]
-
-func _days_in_month(y: int, m: int) -> int:
-	var days := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-	if m == 2 and (y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)):
-		return 29
-	return days[m - 1]
+func _on_delete() -> void:
+	confirmed.emit("")
+	hide()

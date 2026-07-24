@@ -47,6 +47,7 @@ layout_mode = 2
 
 [node name="Actions" type="HBoxContainer" parent="HBox/RightSlot" unique_id=352152012]
 layout_mode = 2
+alignment = 2
 
 [node name="DueButton" type="Button" parent="HBox/RightSlot/Actions" unique_id=12485494]
 layout_mode = 2

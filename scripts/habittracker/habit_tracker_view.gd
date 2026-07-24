@@ -53,11 +53,11 @@ func _build_header() -> void:
 	var spacer := Control.new()
 	spacer.custom_minimum_size.x = HabitGrid.NAME_W      # 항목명 열만큼 비움
 	header.add_child(spacer)
-	for d in HabitGrid.DAY_NAMES:
+	for d in DateUtil.DAY_NAME_KEYS:
 		var col := VBoxContainer.new()
 		col.custom_minimum_size.x = HabitGrid.DAY_W
 		var lbl := Label.new()
-		lbl.text = d
+		lbl.text = TranslationServer.translate(d)
 		lbl.custom_minimum_size.x = HabitGrid.DAY_W
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col.add_child(lbl)
@@ -98,7 +98,7 @@ func _on_row_delete(row: HabitRow) -> void:
 func _on_add_pressed() -> void:
 	var habit := Habit.new()
 	habit.id = Habit._generate_new_id()
-	habit.title = "새 습관 %d" % (Save.habit_defs.size() + 1)
+	habit.title = TranslationServer.translate("HABIT_NEW_NAME").format({"n": Save.habit_defs.size() + 1})
 	var row := _add_row(habit)
 	_on_list_changed()
 	row.name_edit.grab_focus()

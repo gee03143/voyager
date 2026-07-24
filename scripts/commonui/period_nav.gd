@@ -4,9 +4,9 @@ extends Node
 enum Unit { WEEK, MONTH, YEAR }
 
 const CURRENT_PREFIX := {
-	Unit.WEEK: "이번 주",
-	Unit.MONTH: "이번 달",
-	Unit.YEAR: "올해",
+	Unit.WEEK: "PERIOD_NAV_THIS_WEEK",
+	Unit.MONTH: "PERIOD_NAV_THIS_MONTH",
+	Unit.YEAR: "PERIOD_NAV_THIS_YEAR",
 }
 
 signal refresh_requested
@@ -94,7 +94,7 @@ func _update() -> void:
 		is_current = _start == _default_start()
 	var range_text := _range_text()
 	if label != null:
-		label.text = ("%s (%s)" % [CURRENT_PREFIX[unit], range_text]) if is_current else range_text
+		label.text = ("%s (%s)" % [TranslationServer.translate(CURRENT_PREFIX[unit]), range_text]) if is_current else range_text
 	if next_button != null:
 		next_button.disabled = is_current
 	if prev_button != null:

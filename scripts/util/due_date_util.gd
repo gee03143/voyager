@@ -1,6 +1,8 @@
 class_name DateUtil
 extends RefCounted
 
+const DAY_NAME_KEYS := ["DATE_MON", "DATE_TUE", "DATE_WED", "DATE_THU", "DATE_FRI", "DATE_SAT", "DATE_SUN"]  # 월요일 시작 — month_grid()와 순서 일치 필수
+
 # "YYYY-MM-DD" → 오늘까지 남은 일수 (음수=지남). 빈/형식오류는 호출부에서 거른다.
 static func days_until(iso: String) -> int:
 	var p := iso.split("-")
@@ -20,9 +22,9 @@ static func format_due(iso: String) -> String:
 		return iso
 	var days := days_until(iso)
 	if days == 0:
-		return "오늘"
+		return TranslationServer.translate("DATE_TODAY")
 	if days == 1:
-		return "내일"
+		return TranslationServer.translate("DATE_TOMORROW")
 	var year := int(p[0])
 	if year == Time.get_date_dict_from_system().year:
 		return "%d/%d" % [int(p[1]), int(p[2])]            # 올해 → 월/일
@@ -32,9 +34,9 @@ static func format_due(iso: String) -> String:
 static func format_day(iso: String) -> String:
 	var d := days_until(iso)
 	if d == 0:
-		return "오늘"
+		return TranslationServer.translate("DATE_TODAY")
 	if d == -1:
-		return "어제"
+		return TranslationServer.translate("DATE_YESTERDAY")
 	var p := iso.split("-")
 	if p.size() != 3:
 		return iso
@@ -113,11 +115,24 @@ static func add_months(iso: String, months: int) -> String:
 
 static func month_label(iso: String) -> String:
 	var p := iso.split("-")
-	return "%d년 %d월" % [int(p[0]), int(p[1])]
+	return TranslationServer.translate("DATE_MONTH_LABEL").format({"year": int(p[0]), "month": int(p[1])})
 
 static func year_start_iso() -> String:
 	var t := Time.get_date_dict_from_system()
 	return "%04d-01-01" % t.year
 
 static func year_label(iso: String) -> String:
-	return "%d년" % int(iso.split("-")[0])
+	return TranslationServer.translate("DATE_YEAR_LABEL").format({"year": int(iso.split("-")[0])})
+
+static func month_grid(iso: String) -> Array:
+	var p := iso.split("-")
+	var y := int(p[0])
+	var m := int(p[1])
+	var first := Time.get_unix_time_from_datetime_dict({"year": y, "month": m, "day": 1, "hour": 0, "minute": 0, "second": 0})
+	var first_wd := int(Time.get_datetime_dict_from_unix_time(int(first)).weekday)   # 0=일..6=토
+	var grid: Array = []
+	for i in (first_wd + 6) % 7:        # 월요일 시작 정렬용 선행 빈칸
+		grid.append("")
+	for day in range(1, days_in_month("%04d-%02d-01" % [y, m]) + 1):
+		grid.append("%04d-%02d-%02d" % [y, m, day])
+	return grid

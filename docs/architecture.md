@@ -19,16 +19,17 @@
   - 메커니즘(`Pomodoro`, `SimpleTimer`, `AlarmClock`; 지속시간 타이밍은 `TimerManager`)은 `Save`/전역을 **모름** — 재사용·테스트 가능. (`CountDown`은 `TimerManager`로 대체·삭제됨, Week 4)
   - 뷰/컨트롤러가 `Save` 를 알고 배선
 - **공통 뷰 동작은 `ClockToolView`** (베이스, `extends Control`): `_apply_settings`(카운트다운 표시), `_try_minimize`, `_play_alert`, `_is_active`(virtual override)
+- **정적 구조는 씬, 가변 콘텐츠만 코드 생성**: 개수·구조가 고정인 노드(네비 버튼, 요일 헤더 등)는 `.tscn`에 미리 배치하고 스크립트는 `@onready`로 연결만 한다. 코드로 `add_child` 생성한 노드는 에디터 정적 뷰에 안 보여서 리사이즈 등 편집 시 혼란을 유발(사례: 팝업 크기를 실제 필요보다 훨씬 작게 잘못 잡음) → 개수가 실행 중 실제로 바뀌는 콘텐츠만 코드 생성 유지(예: 달력 날짜 셀).
 - **저장 정책**
   - 세션 duration = **save-on-start** (시작=커밋, "돌린 설정만 저장")
   - 전역 설정 = **save-on-change** (`AppSettings.changed` → `Save` 자동저장 + 뷰 라이브 전파)
   - 알람 = 변경 시 **디바운스 저장(0.5s)**
-- **"하나만 보고 일반화 안 함"** → 두 번째 사례에서 베이스 추출
+- **"하나만 보고 일반화 안 함"** → 두 번째 사례에서 베이스 추출. 단, 기준은 **재사용 횟수가 아니라 겹치는 로직의 위험도**(어긋나기 쉬운 계산인가) — 두 번째 사례라도 로직이 단순하면 각자 구현이 낫다. (예: Due/Record 캘린더는 요일정렬 계산=`DateUtil.month_grid()`만 공유, 위젯 자체(Control)는 독립 유지 — 용도가 달라 억지로 묶으면 나중에 풀어야 함)
 - **틱(`_process`)엔 연출만**: 데스크톱 컴패니언이라 백그라운드/최소화에서 `_process`가 throttle/pause될 수 있다. **시간·카운트 등 측정/누적 로직을 틱에서 하지 말 것**(delta 합산 X) → 모노토닉 클럭(`Time.get_ticks_msec()`) 차이로 계산. `ticked` 같은 표시 갱신만 틱 허용. 콜백 발화 자체는 루프 재개 시점에 일어남(지연은 불가피하나 측정값은 클럭이라 정확).
   - **클럭 선택**: 지속시간(duration) 타이머 = **모노토닉**(`Time.get_ticks_msec`, OS 수면 중 멈춤=집중 아님이라 맞음). 벽시계 시각 도달(알람) = **시스템 시각**(`Time.get_time_dict_from_system`).
   - **틱-안전 감사(Week 4, 완료)**: ① `CountDown`(countdown.gd) = delta 누적형 → **전역 `TimerManager`로 대체**(노드 폐기, 클럭 타이밍은 매니저 코어로 흡수 — 아래 "타이밍 인프라"). ② `AlarmClock` = 클럭 읽기라 드리프트 없으나 1초 폴링이 "매 분 최소 1회 실행" 가정 → 서스펜드로 분 건너뛰면 그 분 알람 유실 → **갭 catch-up을 "알람 전역화"에서 fire-late 정책과 함께 보강(완료)**.
 - 알람: UI **12시간+오전/오후**, 내부 **24시간**
-- 다국어: 원본문자열=키, 나중에 일괄 `tr()`; 지금은 문장 통째 포맷 유지(조각 연결 금지)
+- 다국어: 원본문자열=키(UPPER_SNAKE), `localization/translations.csv`(keys,ko,en) → `.translation` 리소스. 스크립트에서는 **`TranslationServer.translate()`** 사용 — `tr()`은 `Object` 인스턴스 메서드라 static 함수·비-Node 클래스(`RefCounted` 등)에서 실패(이번 세션에 실제 파싱 에러로 확인). `.tscn`의 정적 `text` 프로퍼티는 키 문자열 그대로 넣어 엔진 auto-translate에 위임. 문장 통째 포맷 유지(조각 연결 금지), 동적 값은 `{placeholder}` + `.format()`.
 - 미래 서버/sync 대비: 단일 진실(`Save`)·JSON·`version` 필드.
 - **안정 ID/타임스탬프는 도입 보류** (Week 2 결정): Todo 도입 시점엔 목적이 가설(sync·참조)에 기대 희미하다고 판단 → 알람처럼 스냅샷 방식으로 간다.
   진짜 도입 트리거 = **항목을 정체성으로 다뤄야 할 때** (① 다른 컨텐츠가 항목을 참조 ② 시간/이벤트 너머 추적: 데일리 반복 리셋·활동로그·서버 sync).
@@ -51,8 +52,8 @@
 - 포모: `scripts/timer/pomo/{pomodoro.gd, pomodoro_view.gd, pomo_segment_chip.gd}`
 - 타이머: `scripts/timer/normaltimer/{simple_timer.gd, timer_view.gd}`
 - 알람: `scripts/timer/alarm/{alarm.gd, alarm_clock.gd, alarm_row.gd, alarm_view.gd}`
-- Todo: `scripts/todo/{todo.gd, todo_group.gd, todo_view.gd, todo_row.gd, todo_sort.gd, due_popup.gd, group_edit_popup.gd}`
-- 공통UI: `scripts/commonui/{drag_handle.gd, reorder_list.gd, line_edit_auto_blur.gd}` · 유틸: `scripts/util/due_date_util.gd`(`DateUtil`)
+- Todo: `scripts/todo/{todo.gd, todo_group.gd, todo_view.gd, todo_row.gd, todo_sort.gd, due_popup.gd, due_calendar.gd, group_edit_popup.gd}`
+- 공통UI: `scripts/commonui/{drag_handle.gd, reorder_list.gd, line_edit_auto_blur.gd, period_nav.gd}` · 유틸: `scripts/util/due_date_util.gd`(`DateUtil`) · 다국어: `localization/translations.csv`
 - 씬: `scenes/timer/*.tscn`, `scenes/todo/*.tscn`
 - 에셋: `assets/sounds/Piano_Ui_Set{1,2}.wav`, `assets/placeholder/*.svg`
 
@@ -147,3 +148,14 @@
 - **`world.gd:_on_nav_selected`**: 기존 `panels`(Array[Control]) 배열 완전히 제거, `popup_frame.close()` → `popup_frame.show_scene(scene)` 하나로 통일.
 - **현재 상태(완료, F6 확인됨)**: Clock/Todo/Habit/Record/Voyage/Option 6개 전부 이 구조로 통일.
 - **다음(설계만 확정, 미적용)**: `world.gd`가 도크 인덱스↔씬을 `DYNAMIC_SCENES` 딕셔너리로 하드코딩 중 — **`DockButton`(commonui, `extends Button` + `@export var scene: PackedScene`)으로 교체 예정**. 각 도크 버튼이 자기 씬을 직접 들고 있게 해서, 버튼 순서/추가와 무관하게 매칭이 깨지지 않도록.
+
+## Due 캘린더 + 다국어(i18n) 정리 (Week 5 중, 완료, 2026-07-24)
+> 발단: Todo 마감일 입력이 YYYY-MM-DD 텍스트 직접 입력이라 사용성이 나쁨.
+
+- **마감일 입력 = 캘린더 팝업**: `DuePopup`(제목+`DueCalendar`+확인/취소/마감일삭제)으로 교체, `LineEdit` 파싱·포맷 에러 로직 전부 제거. `confirmed(iso)` 시그널 계약 유지 → `todo_view.gd` 무변경.
+- **`DueCalendar`**: `RecordCalendar`와 나란한 독립 위젯(Control 베이스 공유 안 함 — 히트맵 색칠 vs 선택+확정으로 용도가 갈려서). 오늘 날짜는 별도 테두리로 강조.
+- **공유 지점 = `DateUtil`만**: 요일정렬+날짜리스트 계산(`month_grid()`)과 요일명 키(`DAY_NAME_KEYS`)만 `DateUtil`로 추출해 `RecordCalendar`/`DueCalendar`/습관트래커/그래프뷰 4곳이 공유(원래 각자 중복 정의돼 있던 걸 통합). 판단 기준은 위 아키텍처 원칙 참고("재사용 횟수 아니라 위험도").
+- **씬 구조 전환**: `RecordCalendar.tscn`/`DueCalendar.tscn` 둘 다 네비(◀/월라벨/▶/오늘)·요일헤더를 씬에 직접 배치, 날짜 셀(개수 가변)만 코드 생성 유지.
+- **회귀 1건(수정됨)**: 그리드 간격을 부모 폭 기준으로 역산하며 `resized` 시그널에 연결했다가, 자기 크기 변경이 자기 시그널을 다시 트리거하는 피드백 루프로 **게임 프리즈** 발생 → `resized` 연결 제거, `_ready()`/`set_selected()` 등 정해진 시점에만 재계산하도록 되돌림(실시간 리사이즈 대응은 포기, 열 때마다 최신값 반영으로 충분하다고 판단).
+- **다국어 정리**: Todo(팝업·캘린더)·Record(캘린더·`record_view`·그래프뷰)·습관트래커(`habit_grid`/`habit_row`/`habit_tracker_view`)·공용 `period_nav` 전반의 하드코딩 한글 문자열을 `localization/translations.csv` 키로 교체. `tr()`이 static 함수·비-Node 클래스에서 실패하는 걸 확인해 **`TranslationServer.translate()`로 통일**.
+- **미해결(범위 밖으로 보류)**: `ActivityVocab`(`scripts/letter/phrasebook/activity_vocab.gd`)이 `ko()`만 있고 영어 대응이 아예 없음 — 편지/전보체 어휘 데이터 모델 자체를 확장해야 해서 이번 정리엔 안 묶음.

@@ -26,7 +26,7 @@ func render_day(date_iso: String) -> void:
 	var entries := _entries_for(date_iso)
 	if entries.is_empty():
 		var empty := Label.new()
-		empty.text = "기록이 없습니다."
+		empty.text = TranslationServer.translate("RECORD_EMPTY")
 		empty.modulate.a = 0.5
 		list.add_child(empty)
 		return
@@ -58,16 +58,16 @@ func _entries_for(date_iso: String) -> Array:
 func _format_event(e: Dictionary) -> String:
 	match str(e.get("type", "")):
 		"todo":
-			return "\"%s\" 완료." % str(e.get("title", ""))
+			return TranslationServer.translate("RECORD_EVENT_TODO").format({"title": str(e.get("title", ""))})
 		"timer":
-			return "%s%s 타이머." % [_subj(e), _fmt_ms(int(e.get("seconds", 0)))]
+			return TranslationServer.translate("RECORD_EVENT_TIMER").format({"subj": _subj(e), "time": _fmt_ms(int(e.get("seconds", 0)))})
 		"pomodoro_session":
 			var cnt := int(e.get("focus_count", 0))
 			var each := (int(e.get("seconds", 0)) / cnt) if cnt > 0 else 0
-			return "%s%d x %s 세션." % [_subj(e), cnt, _fmt_ms(each)]
+			return TranslationServer.translate("RECORD_EVENT_POMO").format({"subj": _subj(e), "count": cnt, "time": _fmt_ms(each)})
 		"journal":
 			var t := Save.journal.doc_title(int(e.get("doc_id", 0)))
-			return "일지 작성: %s" % (t if t != "" else "(삭제된 일지)")
+			return TranslationServer.translate("RECORD_EVENT_JOURNAL").format({"title": t if t != "" else TranslationServer.translate("RECORD_JOURNAL_DELETED")})
 	return ""
 
 func _make_row(e: Dictionary) -> Control:

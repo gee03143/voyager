@@ -1,6 +1,5 @@
 extends VBoxContainer
 
-const DAY_NAMES := ["월", "화", "수", "목", "금", "토", "일"]
 const AXIS_STEP := 2.0 * 3600.0
 const PLAY_COLOR := Color("e8dcc4")
 const FOCUS_COLOR := Color("8bc34a")
@@ -98,7 +97,7 @@ func _rebuild_day_labels(days: Array[String]) -> void:
 	var use_day_number := _period_nav.unit == PeriodNav.Unit.MONTH
 	for i in days.size():
 		var lbl := Label.new()
-		lbl.text = str(i + 1) if use_day_number else DAY_NAMES[i]
+		lbl.text = str(i + 1) if use_day_number else TranslationServer.translate(DateUtil.DAY_NAME_KEYS[i])
 		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_day_labels.add_child(lbl)

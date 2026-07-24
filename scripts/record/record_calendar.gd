@@ -2,39 +2,32 @@ extends VBoxContainer
 
 signal day_selected(iso: String)
 
-const DAY_NAMES := ["월", "화", "수", "목", "금", "토", "일"]
 const HEAT_LOW := Color("4caf50")    # 활동 적음 = 연한 초록
 const HEAT_HIGH := Color("114415ff")   # 활동 많음 = 진한 초록
+
+@onready var _month_label: Label = $Nav/MonthLabel
+@onready var _header: GridContainer = $Header
+@onready var _grid: GridContainer = $Grid
+@onready var _prev_button: Button = $Nav/PrevButton
+@onready var _next_button: Button = $Nav/NextButton
+@onready var _today_button: Button = $Nav/TodayButton
 
 var _year: int
 var _month: int
 var _selected: String = ""
-var _month_label: Label
-var _grid: GridContainer
 var _counts: Dictionary = {}     # {iso: 활동 수}
 
 func _ready() -> void:
 	var t := Time.get_date_dict_from_system()
 	_year = t.year
 	_month = t.month
-	_build_chrome()
+	_prev_button.pressed.connect(_prev_month)
+	_next_button.pressed.connect(_next_month)
+	_today_button.pressed.connect(_go_today)
+	_today_button.text = TranslationServer.translate("DATE_TODAY")
+	for i in DateUtil.DAY_NAME_KEYS.size():
+		(_header.get_child(i) as Label).text = TranslationServer.translate(DateUtil.DAY_NAME_KEYS[i])
 	refresh()
-
-func _build_chrome() -> void:
-	var nav := HBoxContainer.new()
-	add_child(nav)
-	var prev := Button.new(); prev.text = "◀"; prev.pressed.connect(_prev_month); nav.add_child(prev)
-	_month_label = Label.new(); _month_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_month_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; nav.add_child(_month_label)
-	var nxt := Button.new(); nxt.text = "▶"; nxt.pressed.connect(_next_month); nav.add_child(nxt)
-	var today := Button.new(); today.text = "오늘"; today.pressed.connect(_go_today); nav.add_child(today)
-	var header := GridContainer.new(); header.columns = 7; add_child(header)
-	for n in DAY_NAMES:
-		var lbl := Label.new(); lbl.text = n
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lbl.custom_minimum_size.x = 32
-		header.add_child(lbl)
-	_grid = GridContainer.new(); _grid.columns = 7; add_child(_grid)
 
 func refresh() -> void:                 # 활동 수 재집계 + 다시 그림
 	_recount()
@@ -70,13 +63,12 @@ func _recount() -> void:
 func _render_month() -> void:
 	for c in _grid.get_children():
 		c.queue_free()
-	_month_label.text = "%d년 %d월" % [_year, _month]
-	var first := Time.get_unix_time_from_datetime_dict({"year": _year, "month": _month, "day": 1, "hour": 0, "minute": 0, "second": 0})
-	var first_wd := int(Time.get_datetime_dict_from_unix_time(int(first)).weekday)   # 0=일..6=토
-	for i in (first_wd + 6) % 7:        # 월요일 시작 정렬용 선행 빈칸
-		_grid.add_child(_blank())
-	for day in range(1, DateUtil.days_in_month("%04d-%02d-01" % [_year, _month]) + 1):
-		_grid.add_child(_day_cell("%04d-%02d-%02d" % [_year, _month, day], day))
+	_month_label.text = DateUtil.month_label("%04d-%02d-01" % [_year, _month])
+	for slot in DateUtil.month_grid("%04d-%02d-01" % [_year, _month]):
+		if slot.is_empty():
+			_grid.add_child(_blank())
+		else:
+			_grid.add_child(_day_cell(slot, int(slot.split("-")[2])))
 
 func _day_cell(iso: String, day: int) -> Control:
 	var b := Button.new()

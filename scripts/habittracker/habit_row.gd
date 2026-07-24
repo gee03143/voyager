@@ -75,4 +75,4 @@ func _render_cell(i: int) -> void:
 	cb.disabled = not _active[i]             # 비활성 = 회색 비활성 모양
 	cb.modulate.a = 1.0 if _active[i] else 0.4
 	var wrap := cb.get_parent() as Control
-	wrap.tooltip_text = "우클릭: 이 요일 끄기" if _active[i] else "우클릭: 이 요일 켜기"
+	wrap.tooltip_text = TranslationServer.translate("HABIT_DAY_TOGGLE_OFF" if _active[i] else "HABIT_DAY_TOGGLE_ON")

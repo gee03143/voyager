@@ -4,3 +4,100 @@
 
 [node name="RecordCalendar" type="VBoxContainer" unique_id=2011657158]
 script = ExtResource("1_y1myj")
+
+[node name="Nav" type="HBoxContainer" parent="." unique_id=1807156655]
+layout_mode = 2
+
+[node name="PrevButton" type="Button" parent="Nav" unique_id=1494083153]
+layout_mode = 2
+text = "◀"
+
+[node name="MonthLabel" type="Label" parent="Nav" unique_id=790408727]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+
+[node name="NextButton" type="Button" parent="Nav" unique_id=1925440645]
+layout_mode = 2
+text = "▶"
+
+[node name="TodayButton" type="Button" parent="Nav" unique_id=177888695]
+layout_mode = 2
+
+[node name="Header" type="GridContainer" parent="." unique_id=830454414]
+layout_mode = 2
+columns = 7
+
+[node name="Label" type="Label" parent="Header" unique_id=284842374]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="Header" unique_id=2039722874]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="Header" unique_id=167466511]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="Header" unique_id=1499622540]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label5" type="Label" parent="Header" unique_id=1497063935]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label6" type="Label" parent="Header" unique_id=2040972680]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label7" type="Label" parent="Header" unique_id=1640671994]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Grid" type="GridContainer" parent="." unique_id=129130381]
+layout_mode = 2
+columns = 7
+
+[node name="Label" type="Label" parent="Grid" unique_id=1339733394]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="Grid" unique_id=1339571982]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="Grid" unique_id=229662065]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="Grid" unique_id=663045618]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label5" type="Label" parent="Grid" unique_id=159445537]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label6" type="Label" parent="Grid" unique_id=1661532491]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Label7" type="Label" parent="Grid" unique_id=2077431545]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+horizontal_alignment = 1

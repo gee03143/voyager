@@ -44,3 +44,31 @@ OPTION_DISABLED,끄기,Disabled
 OPTION_ENABLED,켜기,Enabled
 ALARM_NOTICE,알람 · {hour}:{minute},Alarm · {hour}:{minute}
 ALARM_NOTICE_WITH_LABEL,알람 · {hour}:{minute} · {label},Alarm · {hour}:{minute} · {label}
+DATE_TODAY,오늘,Today
+DATE_TOMORROW,내일,Tomorrow
+DATE_YESTERDAY,어제,Yesterday
+DATE_MON,월,Mon
+DATE_TUE,화,Tue
+DATE_WED,수,Wed
+DATE_THU,목,Thu
+DATE_FRI,금,Fri
+DATE_SAT,토,Sat
+DATE_SUN,일,Sun
+DATE_MONTH_LABEL,{year}년 {month}월,{month}/{year}
+DATE_YEAR_LABEL,{year}년,{year}
+TODO_DUE_POPUP_TITLE,마감일 설정: {task},Set due date: {task}
+TODO_DUE_CONFIRM,확인,Confirm
+TODO_DUE_CANCEL,취소,Cancel
+TODO_DUE_DELETE,마감일 삭제,Clear
+RECORD_EMPTY,기록이 없습니다.,No records.
+RECORD_EVENT_TODO,{title} 완료.,{title} completed.
+RECORD_EVENT_TIMER,{subj}{time} 타이머.,{subj}{time} timer.
+RECORD_EVENT_POMO,{subj}{count} x {time} 세션.,{subj}{count} x {time} sessions.
+RECORD_EVENT_JOURNAL,일지 작성: {title},Journal: {title}
+RECORD_JOURNAL_DELETED,(삭제된 일지),(deleted journal)
+HABIT_DAY_TOGGLE_OFF,우클릭: 이 요일 끄기,Right-click: turn off this day
+HABIT_DAY_TOGGLE_ON,우클릭: 이 요일 켜기,Right-click: turn on this day
+HABIT_NEW_NAME,새 습관 {n},New habit {n}
+PERIOD_NAV_THIS_WEEK,이번 주,This week
+PERIOD_NAV_THIS_MONTH,이번 달,This month
+PERIOD_NAV_THIS_YEAR,올해,This year
