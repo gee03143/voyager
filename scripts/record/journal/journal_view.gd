@@ -25,6 +25,8 @@ var _filter_mode: String = "groups"    # "groups" | "dates" | "one"
 var _filter_gid: int = 0               # "one"일 때 대상(0=그룹 없음만)
 var _filter_specs: Array = []          # filter_option 인덱스 → spec
 
+var _group_ids: Array = []             # group_option 인덱스 → 실제 group_id (OptionButton id는 32비트라 randi id를 못 담음)
+
 func _ready() -> void:
 	_save_timer = Timer.new()
 	_save_timer.one_shot = true
@@ -115,19 +117,21 @@ func _set_editor_enabled(on: bool) -> void:
 # --- 그룹 드롭다운 ---
 func _refresh_group_dropdown() -> void:
 	group_option.clear()
-	group_option.add_item("그룹 없음", 0)
+	_group_ids = [0]
+	group_option.add_item("그룹 없음")
 	for g in Save.journal.groups:
-		group_option.add_item(str(g.get("name", "")), int(g.get("id", 0)))
+		group_option.add_item(str(g.get("name", "")))
+		_group_ids.append(int(g.get("id", 0)))
 	var cur := _group_of(_current_id)
-	for i in group_option.item_count:
-		if group_option.get_item_id(i) == cur:
+	for i in _group_ids.size():
+		if _group_ids[i] == cur:
 			group_option.select(i)
 			break
 
 func _on_group_selected(index: int) -> void:
 	if _current_id == 0:
 		return
-	var gid := group_option.get_item_id(index)
+	var gid = _group_ids[index]
 	Save.journal.update_doc(_current_id, title_edit.text, body_edit.text, gid)
 	_rebuild_list()
 	
@@ -137,12 +141,14 @@ func _on_add_group() -> void:
 	_group_name_edit.text = ""
 	_group_dialog.popup_centered()
 	_group_name_edit.grab_focus()
+	_group_name_edit.select_all()
 
 func _on_rename_group(gid: int, current_name: String) -> void:
 	_dialog_group_id = gid
 	_group_name_edit.text = current_name
 	_group_dialog.popup_centered()
 	_group_name_edit.grab_focus()
+	_group_name_edit.select_all()
 
 func _on_group_dialog_confirmed() -> void:
 	var name := _group_name_edit.text.strip_edges()
