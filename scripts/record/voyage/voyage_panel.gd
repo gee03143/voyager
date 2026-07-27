@@ -17,8 +17,9 @@ func _ready() -> void:
 		add_child(nav_slot)
 		move_child(nav_slot, 0)
 		attach_nav()
-	Save.voyage.changed.connect(_refresh_stats)
-	Save.activity_log.changed.connect(_refresh_stats)
+	_refresh_stats()
+	
+func _process(_delta: float) -> void:
 	_refresh_stats()
 	
 func attach_nav() -> void:
@@ -43,8 +44,11 @@ func _add_stat() -> Label:
 
 func _refresh_stats() -> void:
 	var v := Save.voyage
-	_focus_label.text = tr("VOYAGE_STAT_FOCUS").format({"time": _fmt_hm(int(v.total_focus_seconds))})
-	_play_label.text = tr("VOYAGE_STAT_PLAY").format({"time": _fmt_hm(int(v.total_play_seconds))})
+	var focus_preview := v.total_focus_seconds
+	if Clock.is_focusing():
+		focus_preview += Clock.active_total() - Clock.active_time_left()
+	_focus_label.text = tr("VOYAGE_STAT_FOCUS").format({"time": _fmt_hm(int(focus_preview))})
+	_play_label.text = tr("VOYAGE_STAT_PLAY").format({"time": _fmt_hm(int(Save.current_play_seconds()))})
 	_haeri_label.text = tr("VOYAGE_STAT_DISTANCE").format({"distance": "%.1f" % v.voyage_distance})
 	_count_label.text = tr("VOYAGE_STAT_COUNT").format({"count": Save.activity_log.events.size()})
 

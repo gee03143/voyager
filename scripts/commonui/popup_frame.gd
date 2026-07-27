@@ -12,7 +12,8 @@ func show_scene(scene: PackedScene) -> void:
 	_content.set("nav_slot", nav_slot)
 	if _content.has_method("attach_nav"):
 		_content.attach_nav()
-	content_box.add_child(_content)
+	_content.reparent(content_box)
+	_content.visible = true
 	if _content.has_method("on_shown"):
 		_content.on_shown()
 	visible = true
@@ -22,6 +23,7 @@ func close() -> void:
 	if _content != null:
 		if _content.has_method("on_hidden"):
 			_content.on_hidden()
-		content_box.remove_child(_content)
+		_content.visible = false
+		_content.reparent(PanelPool)
 		_content = null
 	visible = false

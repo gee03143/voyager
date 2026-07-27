@@ -72,6 +72,9 @@ func _local_day_iso() -> String:
 	var t := Time.get_date_dict_from_system()     # 로컬 날짜(habit과 동일 기준)
 	return "%04d-%02d-%02d" % [t.year, t.month, t.day]
 
+func current_play_seconds() -> float:
+	return _play_base_seconds + (Time.get_ticks_msec() - _session_start_ms) / 1000.0
+
 func save_game() -> void:
 	voyage.total_play_seconds = _play_base_seconds + (Time.get_ticks_msec() - _session_start_ms) / 1000.0
 	var alarm_dicts := []

@@ -34,6 +34,7 @@ func refresh() -> void:                 # 활동 수 재집계 + 다시 그림
 	_render_month()
 
 func set_selected(iso: String) -> void: # 패널이 선택일 동기화(신호 없이)
+	_recount()
 	_selected = iso
 	var p := iso.split("-")
 	if p.size() == 3 and (int(p[0]) != _year or int(p[1]) != _month):
