@@ -1,0 +1,60 @@
+<svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <rect x="0" y="0" width="900" height="560" fill="#ffffff"/>
+
+  <!-- outer app frame -->
+  <rect x="30" y="30" width="840" height="500" rx="10" fill="#ffffff" stroke="#2b2b2b" stroke-width="2"/>
+
+  <!-- title bar -->
+  <rect x="30" y="30" width="840" height="28" rx="10" fill="#eeeeee" stroke="#2b2b2b" stroke-width="2"/>
+  <circle cx="48" cy="44" r="4" fill="#bbbbbb"/>
+  <circle cx="62" cy="44" r="4" fill="#bbbbbb"/>
+  <circle cx="76" cy="44" r="4" fill="#bbbbbb"/>
+  <text x="450" y="48" font-size="12" fill="#666666" text-anchor="middle">Voyage</text>
+
+  <!-- sidebar -->
+  <rect x="30" y="58" width="130" height="472" fill="#f7f7f7" stroke="#2b2b2b" stroke-width="2"/>
+  <rect x="46" y="80" width="98" height="30" rx="6" fill="#e2e2e2"/>
+  <text x="95" y="99" font-size="12" fill="#444444" text-anchor="middle">홈</text>
+  <rect x="46" y="120" width="98" height="30" rx="6" fill="#ffffff" stroke="#dddddd"/>
+  <text x="95" y="139" font-size="12" fill="#777777" text-anchor="middle">할일 · 습관</text>
+  <rect x="46" y="160" width="98" height="30" rx="6" fill="#ffffff" stroke="#dddddd"/>
+  <text x="95" y="179" font-size="12" fill="#777777" text-anchor="middle">타이머</text>
+  <rect x="46" y="200" width="98" height="30" rx="6" fill="#ffffff" stroke="#dddddd"/>
+  <text x="95" y="219" font-size="12" fill="#777777" text-anchor="middle">기록</text>
+  <text x="95" y="440" font-size="11" fill="#999999" text-anchor="middle">사이드바</text>
+  <text x="95" y="456" font-size="11" fill="#999999" text-anchor="middle">(도구 진입, 고정)</text>
+
+  <!-- pomodoro timer widget, sidebar bottom -->
+  <rect x="42" y="466" width="106" height="52" rx="8" fill="#ffffff" stroke="#2b2b2b" stroke-width="1.5"/>
+  <circle cx="66" cy="492" r="12" fill="none" stroke="#d9534f" stroke-width="2.5"/>
+  <path d="M66 484 L66 492 L72 496" fill="none" stroke="#d9534f" stroke-width="2" stroke-linecap="round"/>
+  <text x="112" y="489" font-size="13" fill="#333333" text-anchor="middle">18:42</text>
+  <text x="112" y="503" font-size="9" fill="#999999" text-anchor="middle">집중 중</text>
+  <text x="95" y="537" font-size="11" fill="#999999" text-anchor="middle">포모 타이머 (상시)</text>
+
+  <!-- fixed banner -->
+  <rect x="160" y="58" width="710" height="110" fill="#fdf3e7" stroke="#2b2b2b" stroke-width="2"/>
+  <circle cx="205" cy="113" r="26" fill="#ffffff" stroke="#d9a86c" stroke-width="2"/>
+  <text x="205" y="118" font-size="18" text-anchor="middle">🐦</text>
+  <rect x="250" y="90" width="220" height="34" rx="14" fill="#ffffff" stroke="#d9a86c"/>
+  <text x="360" y="112" font-size="12" fill="#8a5a2b" text-anchor="middle">"오늘은 뭐부터 해볼까?"</text>
+  <text x="820" y="180" font-size="11" fill="#b98a4a" text-anchor="end">고정 배너</text>
+  <text x="820" y="196" font-size="11" fill="#b98a4a" text-anchor="end">(컴패니언 상주, 패널 전환에도 유지)</text>
+
+  <!-- content area -->
+  <rect x="160" y="168" width="710" height="362" fill="#ffffff" stroke="#2b2b2b" stroke-width="2"/>
+  <rect x="184" y="192" width="330" height="26" rx="4" fill="#eeeeee"/>
+  <rect x="184" y="230" width="280" height="16" rx="4" fill="#f2f2f2"/>
+  <rect x="184" y="256" width="310" height="16" rx="4" fill="#f2f2f2"/>
+  <rect x="184" y="282" width="220" height="16" rx="4" fill="#f2f2f2"/>
+
+  <!-- optional right panel, dashed -->
+  <rect x="540" y="192" width="306" height="316" fill="#fafafa" stroke="#999999" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="693" y="216" font-size="12" fill="#888888" text-anchor="middle">한눈에 보기 (선택)</text>
+  <rect x="562" y="232" width="262" height="70" rx="4" fill="#eeeeee"/>
+  <text x="693" y="258" font-size="10" fill="#999999" text-anchor="middle">주간 무드 그래프</text>
+  <rect x="562" y="316" width="262" height="60" rx="4" fill="#eeeeee"/>
+  <text x="693" y="342" font-size="10" fill="#999999" text-anchor="middle">최근 저널 스니펫</text>
+
+  <text x="515" y="512" font-size="11" fill="#999999" text-anchor="middle">콘텐츠 영역 (패널 스왑)</text>
+</svg>

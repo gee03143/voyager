@@ -1,11 +1,15 @@
 # Voyage 프로젝트 컨텍스트
 
 ## 프로젝트
-- **Voyage**: Godot 4.6 생산성 앱 (포모도로/Todo + 항해 테마, 데스크톱 컴패니언)
-- 경로: `C:\Users\NHN\Documents\voyager` (Vrem/Unreal 과 무관한 별도 저장소)
+- **Voyage**: Godot 4.6 self-care 저널 컴패니언 앱 (할일/습관/뽀모도로/저널 + 컴패니언)
+- 경로: `C:\Users\NHN\Documents\voyager`
 - 사용자: Unreal/C++ 경험 많음, Godot 입문
-- **상세 설계·현재 상태**: `docs/architecture.md` · **로드맵**: `docs/roadmap.md`
-  → 세션 시작 시 이 두 파일을 먼저 읽고 진행
+- **문서 3종, 세션 시작 시 먼저 읽을 것**:
+  - `README.md` — 프로젝트 소개, 의도·방향성(뭘 할 수 있는지/안 하는지, 컴패니언 설계)
+  - `implementation.md` — 기술 상태(지금 코드에 실제로 있는 것 — 데이터 모델, 셸 구조, 파일 경로 등)
+  - `roadmap.md` — 계획(착수 순서, 주차)
+- ⚠️ **구버전 문서(상주 월드 셸·병 속 편지 시절)는 정본 아님** — 사용자가 별도로 deprecated 표시함, 과거 결정 근거 확인이 필요할 때만 참고
+- ⚠️ **README와 코드 상태가 어긋나는 지점이 있음** — `implementation.md`의 ⚠️ 표시 항목 먼저 확인할 것. 특히: (1) 월드(패럴랙스·배·항해 거리)가 코드에서 아직 안 걷힘, (2) always-on-top 컴패니언 모드는 README상 "보류"지만 실제로는 이미 구현되어 동작 중.
 
 ## 작업 규칙 (반드시 지킬 것)
 1. **코드는 사용자가 직접 타이핑** — `.gd`/`.tscn` 직접 편집 금지, 코드는 *텍스트로 제시*만.
@@ -23,26 +27,13 @@
    - 선택지를 제시할 때 "최소/권장"으로 유도해 산출물을 줄이지 말 것.
 
 ## 아키텍처 원칙 (확립됨)
-- **메커니즘 vs 뷰/컨트롤러 분리**: 메커니즘(`Countdown`/`Pomodoro`/`SimpleTimer`/`AlarmClock`)은
+- **메커니즘 vs 뷰/컨트롤러 분리**: 메커니즘(`Pomodoro`/`SimpleTimer`/`AlarmClock`, 지속시간 타이밍은 `Timers`)은
   `Save`·전역을 **모름**(재사용·테스트 가능). 뷰/컨트롤러가 `Save`를 알고 배선한다
 - **공통 뷰 동작은 베이스로 추출**(`ClockToolView`). 원칙: "하나만 보고 일반화 안 함 → **두 번째 사례에서** 추출"
 - **저장 정책**: 세션 duration = save-on-start / 전역 설정 = save-on-change(`AppSettings.changed`→`Save`) /
-  알람 = 디바운스 저장(0.5s)
-- 결합도: 알림은 **signal**, 단일 진실은 **`Save`**(autoload)
+  알람·Todo·습관 = 디바운스 저장(0.5s)
+- 결합도: 알림은 **signal**, 단일 진실은 **`Save`**(autoload) — 단, 저장 파일 자체는 `save.json`/`records.json`/`journal.json`/`todo.json` 4개로 분리됨(상세 `implementation.md`)
 - 다국어: 원본 문자열=키, 문장 통째로 포맷(조각 연결 금지)
 - 미래 서버/sync 대비: 단일 진실(`Save`)·JSON·`version` 필드.
-  **안정 ID**: Todo·알람은 스냅샷(ID 없음) 유지. **습관(Week 3)에서 ID 도입**(randi 정수, `habit_defs` 키) — "주를 가로지르는 반복 정체성"이 트리거. 도입 기준 = 항목을 정체성으로 다뤄야 할 때(반복·참조·sync). 상세 `docs/architecture.md`.
+  **안정 ID**: Todo·알람은 스냅샷(ID 없음) 유지. 습관·저널·기록·편지는 ID 도입(`IdGen`, randi 정수). 도입 기준 = 항목을 정체성으로 다뤄야 할 때(반복·참조·sync). 상세 `implementation.md`.
 
-## 데이터 / 오토로드
-- `Save` (autoload, `user://save.json`, `version`) — 단일 진실
-- `AppSettings` (데이터 백, `changed` 시그널)
-- `Sound` (autoload, AudioStreamPlayer)
-
-## 현재 진행
-- Week 1 완료 (시계 탭: 포모/타이머/알람/설정 + `ClockToolView` 공통 베이스)
-- **Week 2 완료**: Todo 레퍼런스 프론트 전체 — 추가/체크/취소선/삭제·마감일(상대표기 오늘/내일/날짜)·정렬·다중그룹 CRUD·진행도·드래그·호버·스크롤. 전부 F6 동작.
-- **Week 3 완료**:
-  - ✅ 드래그 정렬·재사용화 — `DragHandle`/`ReorderList`(`scripts/commonui`)를 **태스크·그룹·알람 3사례**에 적용. 호버·스크롤·`DateUtil`(`scripts/util`)·`LineEditAutoBlur`(`commonui`) 추출.
-  - ✅ **습관 트래커(데일리)** — 주간 그리드·요일 활성화(우클릭)·달성도 원형·주간 페이지네이션·백필. 모델: `Save.habit_defs`(단일출처 `{id,title,active_days}`) + `habit_weeks`(주별 희소 체크). **안정 ID 도입**(randi). 상세 `docs/architecture.md`.
-- **Week 4 완료**: 상주 월드 셸(월드 바탕 + 도구 팝업) + 항해. autoload `Timers`/`Clock`/`Alarms`, 도크+패널(`ButtonGroupNav`), 상시 타이머 HUD, 셸 폴리시. **항해 = 집중 중에만 실시간 전진**(`Clock.is_focusing`), `voyage_distance`(감성 거리, `total_focus_seconds` 통계와 분리), Ocean_8 패럴랙스(레이어별 `motion_offset` fmod). **⑥ 발견 = 병 속 편지 받기 루프**(다이제틱 항구 선반 오브젝트 → 토큰 템플릿+슬롯 열람 → `LetterArchive` 영속 보관; 범용 `Discovery`+`Mailbox`+`Shelf`+`LetterView`+`ShelfView`). **알람 전역화**(autoload `Alarms`: 패널 닫아도 발화 + 공용 `Notice` 배너 + 갭 catch-up). **⭐ 다음 = Week 5**(지도·섬 도감·어휘 해금). 보류(블로커 아님): 위젯 열린 채 집중 자동시작 처리(재논의)·`Discovery.interval` 튜닝·자잘 정리. 상세 architecture "발견 콘텐츠"/"Week 4 구현 결과"·roadmap.
-- 단계별 상세는 `docs/architecture.md`, `docs/roadmap.md` 참고

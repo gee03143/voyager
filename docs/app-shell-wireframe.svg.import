@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d0jlicf6ked5s"
-path="res://.godot/imported/voyager_desktop_companion_mode.svg-0a8fa3314208f02ff95a954c9812b8b0.ctex"
+uid="uid://ra05ccxqk3mn"
+path="res://.godot/imported/app-shell-wireframe.svg-c7973826dfa161e4efe6b548285a9f62.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/voyager_desktop_companion_mode.svg"
-dest_files=["res://.godot/imported/voyager_desktop_companion_mode.svg-0a8fa3314208f02ff95a954c9812b8b0.ctex"]
+source_file="res://docs/app-shell-wireframe.svg"
+dest_files=["res://.godot/imported/app-shell-wireframe.svg-c7973826dfa161e4efe6b548285a9f62.ctex"]
 
 [params]
 
