@@ -1,0 +1,154 @@
+[gd_scene format=3 uid="uid://drbksltg435d4"]
+
+[ext_resource type="Script" uid="uid://dur1jdpuv612v" path="res://scripts/main_shell.gd" id="1_nq7m8"]
+[ext_resource type="Script" uid="uid://da6f63m8ecp3e" path="res://scripts/timer/mini_timer.gd" id="2_i1y7h"]
+[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="2_rp2pc"]
+[ext_resource type="Texture2D" uid="uid://b8aqhfvxna5b2" path="res://assets/placeholder/companion.svg" id="4_6572n"]
+
+[node name="MainShell" type="HBoxContainer" unique_id=1558229445]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_nq7m8")
+
+[node name="Sidebar" type="PanelContainer" parent="." unique_id=632687558]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Sidebar" unique_id=1804232097]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="Sidebar/Margin" unique_id=1045931167]
+layout_mode = 2
+
+[node name="Logo" type="HBoxContainer" parent="Sidebar/Margin/VBox" unique_id=1565578462]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Sidebar/Margin/VBox/Logo" unique_id=1379704896]
+layout_mode = 2
+text = "Voyage"
+horizontal_alignment = 1
+
+[node name="NavList" type="VBoxContainer" parent="Sidebar/Margin/VBox" unique_id=1569992781]
+layout_mode = 2
+
+[node name="HomeButton" type="Button" parent="Sidebar/Margin/VBox/NavList" unique_id=2011978474]
+layout_mode = 2
+size_flags_vertical = 3
+text = "HOME_BUTTON"
+
+[node name="TodoButton" type="Button" parent="Sidebar/Margin/VBox/NavList" unique_id=775201740]
+layout_mode = 2
+size_flags_vertical = 3
+text = "TODO_BUTTON"
+
+[node name="HabitButton" type="Button" parent="Sidebar/Margin/VBox/NavList" unique_id=836523181]
+layout_mode = 2
+size_flags_vertical = 3
+text = "HABIT_BUTTON"
+
+[node name="TimerButton" type="Button" parent="Sidebar/Margin/VBox/NavList" unique_id=1091239849]
+layout_mode = 2
+size_flags_vertical = 3
+text = "TIMER_BUTTON"
+
+[node name="RecordButton" type="Button" parent="Sidebar/Margin/VBox/NavList" unique_id=1879060455]
+layout_mode = 2
+size_flags_vertical = 3
+text = "RECORD_BUTTON"
+
+[node name="Spacer" type="Control" parent="Sidebar/Margin/VBox" unique_id=1946651947]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SettingsButton" type="Button" parent="Sidebar/Margin/VBox" unique_id=1820077664]
+layout_mode = 2
+text = "⚙"
+
+[node name="MiniTimer" type="PanelContainer" parent="Sidebar/Margin/VBox" unique_id=1277431073]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_rp2pc")
+script = ExtResource("2_i1y7h")
+
+[node name="OuterVBox" type="VBoxContainer" parent="Sidebar/Margin/VBox/MiniTimer" unique_id=46813662]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox" unique_id=1165944317]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "CLOCK_POMO_TITLE"
+
+[node name="HBox" type="HBoxContainer" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox" unique_id=1808172107]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox/HBox" unique_id=539439316]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "⏱"
+vertical_alignment = 1
+
+[node name="VBox" type="VBoxContainer" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox/HBox" unique_id=1111681450]
+layout_mode = 2
+
+[node name="TimeLabel" type="Label" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox/HBox/VBox" unique_id=1925746927]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox/HBox/VBox" unique_id=472465824]
+layout_mode = 2
+
+[node name="MainColumn" type="VBoxContainer" parent="." unique_id=563068884]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Banner" type="PanelContainer" parent="MainColumn" unique_id=2069580132]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="MainColumn/Banner" unique_id=1726159006]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="HBox" type="HBoxContainer" parent="MainColumn/Banner/Margin" unique_id=139226794]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="AvatarSlot" type="PanelContainer" parent="MainColumn/Banner/Margin/HBox" unique_id=1017584856]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="MainColumn/Banner/Margin/HBox/AvatarSlot" unique_id=1662206769]
+layout_mode = 2
+texture = ExtResource("4_6572n")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Bubble" type="PanelContainer" parent="MainColumn/Banner/Margin/HBox" unique_id=1203916371]
+layout_mode = 2
+
+[node name="BubbleMargin" type="MarginContainer" parent="MainColumn/Banner/Margin/HBox/Bubble" unique_id=77722992]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="MessageLabel" type="Label" parent="MainColumn/Banner/Margin/HBox/Bubble/BubbleMargin" unique_id=2047877076]
+layout_mode = 2
+text = "BANNER_PLACEHOLDER_MESSAGE"
+
+[node name="BodyRow" type="HBoxContainer" parent="MainColumn" unique_id=686737686]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContentArea" type="PanelContainer" parent="MainColumn/BodyRow" unique_id=1771624963]
+layout_mode = 2
+size_flags_horizontal = 3

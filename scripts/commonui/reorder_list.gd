@@ -90,3 +90,6 @@ func clear_items() -> void:
 	for c in _rows():
 		remove_child(c)
 		c.queue_free()
+		
+func hide_indicator() -> void:
+	_indicator.visible = false

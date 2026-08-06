@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://cl4x4p2fb8jve"]
+
+[ext_resource type="Script" uid="uid://b1nes8rb5vx1" path="res://scripts/commonui/popup_frame.gd" id="1_waoc6"]
+[ext_resource type="Theme" uid="uid://dkaefg3qs4aqg" path="res://assets/themes/nav_theme.tres" id="2_0bbp1"]
+[ext_resource type="Script" uid="uid://trgf44c8f1u" path="res://scripts/commonui/tab_nav_slot.gd" id="3_cd0eo"]
+[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="4_3c0pw"]
+
+[node name="PopupFrame" type="Control" unique_id=114446996]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -288.0
+offset_right = 400.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_waoc6")
+
+[node name="NavSlot" type="HBoxContainer" parent="." unique_id=1581088554]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_bottom = 48.0
+grow_horizontal = 2
+theme = ExtResource("2_0bbp1")
+script = ExtResource("3_cd0eo")
+
+[node name="ContentBox" type="PanelContainer" parent="." unique_id=1523094762]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("4_3c0pw")

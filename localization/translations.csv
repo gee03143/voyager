@@ -1,6 +1,8 @@
 keys,ko,en
+HOME_BUTTON,홈,Home
 VOYAGE_BUTTON,항해,Voyage
 CLOCK_BUTTON,시계,Clock
+TIMER_BUTTON,타이머,Timer
 TODO_BUTTON,할일,Todo
 HABIT_BUTTON,습관,Habit
 RECORD_BUTTON,기록,Record
@@ -15,10 +17,13 @@ CLOCK_TAB_SESSION,세션,Session
 CLOCK_TAB_TIMER,타이머,Timer
 CLOCK_TAB_ALARM,알람,Alarm
 CLOCK_TAB_SETTINGS,설정,Settings
+CLOCK_POMO_TITLE,뽀모도로,Pomodoro
 CLOCK_POMO_FOCUS,집중,Focus
 CLOCK_POMO_SHORT_BREAK,짧은 휴식,Short Break
 CLOCK_POMO_LONG_BREAK,긴 휴식,Long Break
+CLOCK_POMO_IDLE,진행 없음,No session
 CLOCK_POMO_REPEAT,반복,Repeat
+CLOCK_POMO_STATUS,{type} 중,{type}
 CLOCK_POMO_PHASE_LABEL,{type}  ·  {current} / {total} 구간,{type}  ·  {current} / {total} segments
 ALARM_ADD_BUTTON,새 알림 추가,Add Alarm
 CLOCK_SETTINGS_AUTO_MINIMIZE,활성 시 자동 최소화,Auto-minimize when active
@@ -72,3 +77,8 @@ HABIT_NEW_NAME,새 습관 {n},New habit {n}
 PERIOD_NAV_THIS_WEEK,이번 주,This week
 PERIOD_NAV_THIS_MONTH,이번 달,This month
 PERIOD_NAV_THIS_YEAR,올해,This year
+BANNER_PLACEHOLDER_MESSAGE,오늘은 뭐부터 해볼까?,What should we start with today?
+TODO_SMART_TODAY,오늘,Today
+TODO_SMART_NEXT7,다음 7일,Next 7 days
+TODO_LISTS_SECTION,리스트,Lists
+TODO_DONE_SECTION,완료,Done

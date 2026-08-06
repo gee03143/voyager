@@ -2,6 +2,7 @@ extends Node
 
 enum Mode { FULLSCREEN, BORDERLESS, WINDOWED }
 
+const MAIN_MIN_SIZE := Vector2i(850, 600)
 const COMPANION_SIZE := Vector2i(280, 200)
 
 var _pre_companion_window_mode: int = Mode.WINDOWED
@@ -11,6 +12,7 @@ func _ready() -> void:
 	apply_window_mode()
 	apply_fps(true)                          # 부팅 = 포커스 상태
 	apply_always_on_top()
+	DisplayServer.window_set_min_size(MAIN_MIN_SIZE)
 
 func _notification(what: int) -> void:
 	match what:
@@ -65,6 +67,8 @@ func enter_companion() -> void:
 
 func exit_companion() -> void:
 	_save_companion_position()
+	DisplayServer.window_set_min_size(MAIN_MIN_SIZE)
+	apply_always_on_top()
 
 	get_window().transparent = false
 	RenderingServer.set_default_clear_color(Color(0.1, 0.1, 0.1, 1))

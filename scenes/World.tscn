@@ -4,15 +4,13 @@
 [ext_resource type="Texture2D" uid="uid://dwcwcp4pm2rlk" path="res://assets/placeholder/ship.svg" id="2_7g83o"]
 [ext_resource type="Texture2D" uid="uid://6c58asirvn2v" path="res://assets/ocean_background/Ocean_8/1.png" id="2_ygioq"]
 [ext_resource type="Texture2D" uid="uid://ycmaxcbln441" path="res://assets/ocean_background/Ocean_8/2.png" id="3_pdh0q"]
-[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="4_b3faq"]
 [ext_resource type="Texture2D" uid="uid://bvhgi6w1eykdy" path="res://assets/ocean_background/Ocean_8/3.png" id="4_nrtoj"]
 [ext_resource type="Texture2D" uid="uid://bkv87vslddwwo" path="res://assets/ocean_background/Ocean_8/4.png" id="5_i4b1j"]
 [ext_resource type="Texture2D" uid="uid://cy7uhj8lp6ars" path="res://assets/ocean_background/Ocean_8/5.png" id="6_c0d7e"]
 [ext_resource type="PackedScene" uid="uid://dbitpeq18sx2o" path="res://scenes/Hud.tscn" id="7_0uv0p"]
 [ext_resource type="Script" uid="uid://ljhbwe5jg3ae" path="res://scripts/letter/shelf.gd" id="8_rpuxp"]
 [ext_resource type="Texture2D" uid="uid://bvuuoah6i7535" path="res://assets/placeholder/island.svg" id="9_nthub"]
-[ext_resource type="Script" uid="uid://b1nes8rb5vx1" path="res://scripts/commonui/popup_frame.gd" id="10_4q8dg"]
-[ext_resource type="Script" uid="uid://trgf44c8f1u" path="res://scripts/commonui/tab_nav_slot.gd" id="10_jgbtq"]
+[ext_resource type="PackedScene" uid="uid://cl4x4p2fb8jve" path="res://scenes/commonui/PopupFrame.tscn" id="10_44lqw"]
 [ext_resource type="PackedScene" uid="uid://ccedlq84ygyas" path="res://scenes/letter/LetterView.tscn" id="13_nrtoj"]
 [ext_resource type="Script" uid="uid://g177ddhfcxdg" path="res://scripts/discovery/discovery.gd" id="14_i4b1j"]
 [ext_resource type="Script" uid="uid://ddvjm3imkk4xn" path="res://scripts/letter/mailbox.gd" id="15_c0d7e"]
@@ -137,41 +135,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="PopupFrame" type="Control" parent="UI/PanelHost" unique_id=1326499226]
-visible = false
+[node name="PopupFrame" parent="UI/PanelHost" unique_id=114446996 instance=ExtResource("10_44lqw")]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -288.0
-offset_right = 400.0
-offset_bottom = 240.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("10_4q8dg")
-
-[node name="NavSlot" type="HBoxContainer" parent="UI/PanelHost/PopupFrame" unique_id=1757038692]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 1.0
-offset_bottom = 48.0
-grow_horizontal = 2
-theme = ExtResource("15_dgldv")
-script = ExtResource("10_jgbtq")
-
-[node name="ContentBox" type="PanelContainer" parent="UI/PanelHost/PopupFrame" unique_id=1649052732]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 48.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("4_b3faq")
 
 [node name="Dock" type="VBoxContainer" parent="UI" unique_id=1197393021]
 anchors_preset = 4
