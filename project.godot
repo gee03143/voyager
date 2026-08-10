@@ -35,7 +35,7 @@ window/vsync/vsync_mode=0
 [internationalization]
 
 locale/translations=PackedStringArray("res://localization/translations.ko.translation", "res://localization/translations.en.translation")
-locale/test="en"
+locale/test="kr"
 
 [physics]
 

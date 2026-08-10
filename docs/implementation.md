@@ -1,6 +1,6 @@
 # Voyage — Implementation
 
-> 인수인계/컨텍스트 파악용 기술 문서. **상태**를 기록한다(지금 코드에 실제로 있는 것). 계획은 `roadmap.md`, 의도·방향성은 `README.md` 참고.
+> 인수인계/컨텍스트 파악용 기술 문서. **상태**를 기록한다(지금 코드에 실제로 있는 것). 계획·백로그는 사용자가 별도 관리(repo 문서 없음), 의도·방향성은 `README.md` 참고.
 
 ## 1. 개요
 
@@ -40,7 +40,7 @@
 - **`LetterArchive`**: `entries`(`id`/`template_idx`/`subject`/`fact`/`state`/`author`/`ts` — 전보체 형식). `author` 빈 문자열=보낸 것, 아니면 받은 것.
 - **`Lexicon`**: `subjects`(해금된 subject key 배열, 영구·안 줄어듦).
 
-⚠️ **참고**: `letters`/`lexicon`/`voyage.voyage_distance`는 README.md 기준으론 컨셉상 폐기 대상이지만, 이 데이터 모델·저장 경로는 **코드에 아직 그대로 남아있음**(제거 안 됨). 셸 리팩토링 시 같이 정리할지 별도 결정 필요 — roadmap.md 참고.
+⚠️ **참고**: `letters`/`lexicon`/`voyage.voyage_distance`는 README.md 기준으론 컨셉상 폐기 대상이지만, 이 데이터 모델·저장 경로는 **코드에 아직 그대로 남아있음**(제거 안 됨) — 스키마 정리·마이그레이션은 의도적으로 안 함(letters/lexicon은 편지 UI 제거 후 방치, `voyage_distance`는 `CompanionMode.gd`가 계속 적립해서 쓰는 값이라 죽은 필드 아님).
 
 ### 공통 유틸리티
 - **`IdGen`**(`scripts/util/id_gen.gd`): `randi()` 기반 안정 ID 생성기. `fresh(used: Dictionary) -> int`가 `used`(사용 중 id 집합)와 충돌 안 나는 새 id를 반환(0도 제외). `ActivityLog`/`Journal`/`LetterArchive`/습관(`Habit._generate_new_id`)이 공통으로 씀.
