@@ -99,7 +99,30 @@
 - 도크 버튼(`dock` 자식 + `voyage_button`/`gear_button`)을 `ButtonGroupNav`로 묶어 `_on_nav_selected`에서 `DYNAMIC_SCENES` 딕셔너리(인덱스→씬, 하드코딩)로 `popup_frame.show_scene()` 호출.
 - `companion_button` 클릭 또는 `Save.settings.auto_minimize`가 켜진 상태에서 포커스 세션 시작 시 `_enter_companion()` 자동 호출.
 
-⚠️ **README.md 기준 컴패니언 셸(고정 배너, 배경 없음)과 지금 코드는 다름** — 코드는 아직 리팩토링 전, 패럴랙스·배·항해 거리 전부 살아있는 상태. 셸 전환 작업은 착수 전.
+⚠️ **README.md 기준 컴패니언 셸(고정 배너, 배경 없음)과 지금 코드는 다름** — `World.tscn`(현재 `run/main_scene`)엔 패럴랙스·배·항해 거리가 여전히 살아있음. 다만 셸 전환 자체는 착수됨 — 아래 `MainShell` 항목에 Todo/Habit/Timer가 이미 이전됐고, World.tscn의 구 팝업 경로(`ClockTab` 등)도 병행 존재. 아직 `MainShell`이 실제 진입점으로 전환되진 않음(에디터에서 `MainShell.tscn`을 직접 "현재 씬 실행"해서 확인하는 단계).
+
+### `MainShell` (`scripts/main_shell.gd`, `scenes/MainShell.tscn`) — 셸 전환 목표 씬
+README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlot 없는 콘텐츠 스왑)의 실제 구현체.
+
+- **구조**: `Sidebar`(로고 + `NavList` + 하단 `SettingsButton`·`MiniTimer`) + `MainColumn`(`Banner`(컴패니언 아바타+말풍선) + `BodyRow/ContentArea`).
+- **콘텐츠 스왑**: `_nav`(`ButtonGroupNav`)가 `NavList` 버튼을 인덱스로 관리, `_on_nav_selected(index)`가 `CONTENT_SCENES[index]`를 `PanelPool.get_instance()`로 얻어 `content_area`에 reparent. `PopupFrame`의 `NavSlot`(서브탭) 패턴은 의도적으로 안 씀(롤백 이력 있음).
+- **`CONTENT_SCENES`**: `1: TodoListView.tscn`, `2: HabitTrackerView.tscn`, `3: TimerDashboard.tscn`(이번 세션 추가). NavList 순번은 Home(0)/Todo(1)/Habit(2)/Timer(3)/Record(4) — **Home(0)·Record(4)는 아직 매핑 안 됨**(빈 화면).
+- **`SettingsButton`(⚙)**: `NavList` 바깥의 별도 형제 노드라 `_nav`에 안 묶여 있음 — **클릭해도 아직 아무 동작 안 함**(미배선).
+
+### `TimerDashboard` (`scenes/timer/TimerDashboard.tscn`) — 카드형 타이머 페이지
+`ClockTab.tscn`(팝업용 4탭: 세션/타이머/알람/설정) 전체를 대체하는 게 아니라 **그중 세션·타이머 둘만** 카드 형태로 MainShell용으로 새로 구성한 씬. 스크립트 없음(정적 배치).
+
+- 루트 `HBoxContainer`(가로 배치, 카드 폭은 콘텐츠 기준 자연 크기 — 강제 50/50 아님), 카드 2장(`PomoCard`/`TimerCard`, `PanelContainer` + `panel_bg.tres` 스타일) 각각 헤더(아이콘+제목) + 기존 `PromoTimer.tscn`/`NormalTimer.tscn` 인스턴스를 그대로 재사용(뷰 스크립트 변경 없이 씬 구성만으로 이식됨).
+- **알람·설정(옵션 3종: 자동 최소화/컴패니언 자동 복귀/카운트다운 숨김)은 의도적으로 카드화 안 함** — 기존 `AlarmView`/`SettingsView`·`Save.settings` 필드는 그대로 살아있고 기능도 안 끊김(설정 3종은 향후 폐기 후보로 판단돼 옮길 위치 미정, 보류).
+- `card_bg.tres`(화이트+테두리 스타일, `assets/`)는 초안으로 만들었으나 최종적으로 `panel_bg.tres`(사이드바 MiniTimer와 동일 스타일)로 교체되어 **현재 미사용 상태**로 남아있음.
+
+### 포모도로 타임라인 — 4칩 슬라이딩 윈도우 (`pomodoro_view.gd`)
+반복 횟수(N, 최대 12)가 늘어나면 세그먼트 수가 `2N`(FOCUS+SHORT_BREAK 교대 반복 + 마지막 LONG_BREAK)이 되어, 칩을 전부 나열하면 카드 폭을 넘어서는 문제가 있었음 — `_build_window()`가 항상 최대 4칩만 그리도록 재설계됨(구 `_rebuild_timeline`+`_update_chip_states` 대체):
+
+- **슬라이딩 구간**(남은 세그먼트 ≥2): 현재+다음+다다음 실칩 3개 + 나머지 개수를 나타내는 "+N" 칩(`PomoSegmentChip.setup_count()`, 상태 없는 텍스트 전용 칩).
+- **꼬리 고정 구간**(끝까지 4개 이하로 남으면): 마지막 4개 세그먼트를 고정 표시, active 표시만 왼쪽→오른쪽으로 이동(칩이 슬라이드/축소되지 않음).
+- 진행 중인 칩 추적은 배열 인덱스(`_chips[pomodoro.index]`) 대신 `_active_chip` 참조로 변경(윈도우가 더 이상 세그먼트 인덱스와 1:1이 아니므로).
+- `plan_built` 시그널 구독은 제거됨(`build_plan()`이 항상 `segment_changed(0)`를 동반 발신하므로 중복 리빌드 방지 — `pomodoro.gd` 자체는 미수정).
 
 ### 컴패니언 모드 (`scripts/companion_mode.gd` + `scripts/display/screen.gd`)
 **이미 구현되어 있음.** `world.gd:_enter_companion()` → `Screen.enter_companion()` 호출 후 `get_tree().change_scene_to_file("res://scenes/CompanionMode.tscn")`로 씬 전체 전환.

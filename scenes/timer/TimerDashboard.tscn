@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://det7at5c3m3ct"]
+
+[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="1_ljcji"]
+[ext_resource type="PackedScene" uid="uid://bt2r4k76lwg1r" path="res://scenes/timer/PromoTimer.tscn" id="2_q6ish"]
+[ext_resource type="PackedScene" uid="uid://jfww1o0hswu7" path="res://scenes/timer/NormalTimer.tscn" id="3_e1qwh"]
+
+[node name="TimerDashboard" type="HBoxContainer" unique_id=1835851703]
+offset_right = 709.0
+offset_bottom = 270.0
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="PomoCard" type="PanelContainer" parent="." unique_id=153113417]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = ExtResource("1_ljcji")
+
+[node name="VBox" type="VBoxContainer" parent="PomoCard" unique_id=1724473478]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="PomoCard/VBox" unique_id=1212313145]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="Label" parent="PomoCard/VBox/Header" unique_id=1910815048]
+layout_mode = 2
+text = "⏳"
+
+[node name="Title" type="Label" parent="PomoCard/VBox/Header" unique_id=890412256]
+layout_mode = 2
+text = "CLOCK_TAB_SESSION"
+
+[node name="PomodoroView" parent="PomoCard/VBox" unique_id=283874525 instance=ExtResource("2_q6ish")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TimerCard" type="PanelContainer" parent="." unique_id=634686076]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = ExtResource("1_ljcji")
+
+[node name="VBox" type="VBoxContainer" parent="TimerCard" unique_id=2125232997]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="TimerCard/VBox" unique_id=98238552]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="Label" parent="TimerCard/VBox/Header" unique_id=2106013724]
+layout_mode = 2
+text = "⏱"
+
+[node name="Title" type="Label" parent="TimerCard/VBox/Header" unique_id=369008135]
+layout_mode = 2
+text = "CLOCK_TAB_TIMER"
+
+[node name="TimerView" parent="TimerCard/VBox" unique_id=949782713 instance=ExtResource("3_e1qwh")]
+layout_mode = 2
+size_flags_vertical = 3

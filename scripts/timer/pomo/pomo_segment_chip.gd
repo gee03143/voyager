@@ -7,15 +7,25 @@ enum State { PENDING, ACTIVE, DONE }
 @onready var bar: ProgressBar = $VBox/Bar
 
 var _type: int = 0
+var _is_count: bool = false
 
 func setup(type: int) -> void:
+	_is_count = false
 	_type = type
 	bar.show_percentage = false      # "%" 텍스트 숨김
 	bar.max_value = 1.0
 	bar.value = 0.0
 	icon.text = _symbol(type)
 
+func setup_count(remaining: int) -> void:    # 윈도우 밖에 남은 개수 칩("+N")
+	_is_count = true
+	bar.visible = false
+	modulate = Color(1, 1, 1, 0.5)
+	icon.text = "+%d" % remaining
+
 func set_state(state: int) -> void:
+	if _is_count:
+		return                       # 카운트 칩은 상태 없음 — 항상 같은 모습
 	match state:
 		State.PENDING:
 			modulate = Color(1, 1, 1, 0.4)   # 흐리게

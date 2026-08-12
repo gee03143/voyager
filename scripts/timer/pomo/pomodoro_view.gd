@@ -3,6 +3,7 @@ extends ClockToolView
 const SEGMENT_CHIP := preload("res://scenes/timer/PomoSegmentChip.tscn")
 const ICON_PAUSE := preload("res://assets/placeholder/pause.svg")
 const ICON_PLAY := preload("res://assets/placeholder/play.svg")
+const WINDOW_SIZE := 4     # 타임라인에 한 번에 보여줄 칩 개수(현재+다음+다다음+나머지)
 
 @onready var phase_label: Label = $VBox/PhaseLabel
 @onready var timeline: HBoxContainer = $VBox/Timeline
@@ -16,13 +17,13 @@ const ICON_PLAY := preload("res://assets/placeholder/play.svg")
 
 var pomodoro: Pomodoro
 var _chips: Array[PomoSegmentChip] = []
+var _active_chip: PomoSegmentChip = null
 
 func _ready() -> void:
 	pomodoro = Clock.pomodoro
 	pomodoro.segment_changed.connect(_on_segment_changed)
 	pomodoro.running_changed.connect(_refresh_controls)
 	pomodoro.focus_finished.connect(_on_focus_finished)
-	pomodoro.plan_built.connect(_rebuild_timeline)
 
 	start_button.pressed.connect(_on_start_pressed)
 	skip_button.pressed.connect(_on_skip_pressed)
@@ -43,7 +44,6 @@ func _ready() -> void:
 	long_break_spin.value_changed.connect(_on_config_changed)
 	count_spin.value_changed.connect(_on_config_changed)
 	
-	_rebuild_timeline()
 	_on_segment_changed(pomodoro.index)
 	
 	_init_clock_tool()
@@ -53,10 +53,10 @@ func _process(_delta: float) -> void:
 		return
 	var t := pomodoro.time_left()
 	display.render(t)
-	if pomodoro.index < _chips.size():
+	if _active_chip != null:
 		var total := pomodoro.duration_of(pomodoro.segment_type_at(pomodoro.index))
 		if total > 0.0:
-			_chips[pomodoro.index].set_progress((total - t) / total)
+			_active_chip.set_progress((total - t) / total)
 	
 func _on_config_changed(_v: float) -> void:
 	if pomodoro.started:
@@ -100,7 +100,7 @@ func _on_segment_changed(i: int) -> void:
 		"current": i + 1,
 		"total": pomodoro.segment_count(),
 	})
-	_update_chip_states()
+	_build_window()
 	_refresh_controls()
 
 func _on_focus_finished() -> void:
@@ -117,27 +117,48 @@ func _refresh_controls() -> void:
 	long_break_spin.editable = not locked
 	count_spin.editable = not locked
 	
-func _rebuild_timeline() -> void:
+# 현재 위치 기준 윈도우(최대 4칩)를 다시 그림.
+# - 여유 있을 때: 현재+다음+다다음+"+N"(나머지 개수)
+# - 꼬리 구간(끝까지 4개 이하로 남으면): 마지막 4개를 고정 표시, active만 이동
+func _build_window() -> void:
 	for chip in _chips:
 		chip.queue_free()
 	_chips.clear()
-	for i in pomodoro.segment_count():
+	_active_chip = null
+
+	var total := pomodoro.segment_count()
+	var idx := pomodoro.index
+	var indices: Array[int] = []
+	var count_after := 0
+
+	if total <= WINDOW_SIZE or idx >= total - WINDOW_SIZE:
+		var start: int = max(0, total - WINDOW_SIZE)
+		for i in range(start, total):
+			indices.append(i)
+	else:
+		indices = [idx, idx + 1, idx + 2]
+		count_after = total - (idx + 3)
+
+	for i in indices:
 		var chip := SEGMENT_CHIP.instantiate() as PomoSegmentChip
 		timeline.add_child(chip)          # 먼저 트리에 넣어야 chip 의 @onready 가 준비됨
 		chip.setup(pomodoro.segment_type_at(i))
-		_chips.append(chip)
-	_update_chip_states()
-	
-func _update_chip_states() -> void:
-	for i in _chips.size():
 		var state: int
-		if pomodoro.finished or i < pomodoro.index:
+		if i < idx:
 			state = PomoSegmentChip.State.DONE
-		elif i == pomodoro.index:
+		elif i == idx:
 			state = PomoSegmentChip.State.ACTIVE
+			_active_chip = chip
 		else:
 			state = PomoSegmentChip.State.PENDING
-		_chips[i].set_state(state)
+		chip.set_state(state)
+		_chips.append(chip)
+
+	if count_after > 0:
+		var count_chip := SEGMENT_CHIP.instantiate() as PomoSegmentChip
+		timeline.add_child(count_chip)
+		count_chip.setup_count(count_after)
+		_chips.append(count_chip)
 	
 func _is_active() -> bool:
 	return pomodoro.is_running()

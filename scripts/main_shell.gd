@@ -2,6 +2,7 @@ extends HBoxContainer
 
 const TODO_SCENE := preload("res://scenes/todo/TodoListView.tscn")
 const HABIT_SCENE := preload("res://scenes/habittracker/HabitTrackerView.tscn")
+const TIMER_SCENE := preload("res://scenes/timer/TimerDashboard.tscn")
 
 @onready var nav_list: VBoxContainer = $Sidebar/Margin/VBox/NavList
 @onready var content_area: PanelContainer = $MainColumn/BodyRow/ContentArea
@@ -9,6 +10,7 @@ const HABIT_SCENE := preload("res://scenes/habittracker/HabitTrackerView.tscn")
 const CONTENT_SCENES := {
 	1: TODO_SCENE,
 	2: HABIT_SCENE,
+	3: TIMER_SCENE,
 }
 
 var _nav := ButtonGroupNav.new()
