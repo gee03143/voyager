@@ -72,6 +72,7 @@ layout_mode = 2
 text = "⚙"
 
 [node name="MiniTimer" type="PanelContainer" parent="Sidebar/Margin/VBox" unique_id=1277431073]
+custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 theme_override_styles/panel = ExtResource("2_rp2pc")
 script = ExtResource("2_i1y7h")

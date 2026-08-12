@@ -10,7 +10,7 @@
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_x1od2")
-tab_labels = Array[String](["CLOCK_TAB_SESSION", "CLOCK_TAB_TIMER", "CLOCK_TAB_ALARM", "CLOCK_TAB_SETTINGS"])
+tab_labels = Array[String](["CLOCK_TAB_POMODORO", "CLOCK_TAB_TIMER", "CLOCK_TAB_ALARM", "CLOCK_TAB_SETTINGS"])
 tab_pages = [NodePath("PomodoroView"), NodePath("TimerView"), NodePath("AlarmView"), NodePath("SettingsView")]
 
 [node name="PomodoroView" parent="." unique_id=2053074751 instance=ExtResource("1_7acyi")]

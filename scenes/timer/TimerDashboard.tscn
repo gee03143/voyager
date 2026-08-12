@@ -25,11 +25,11 @@ theme_override_constants/separation = 6
 
 [node name="Icon" type="Label" parent="PomoCard/VBox/Header" unique_id=1910815048]
 layout_mode = 2
-text = "⏳"
+text = "🍅"
 
 [node name="Title" type="Label" parent="PomoCard/VBox/Header" unique_id=890412256]
 layout_mode = 2
-text = "CLOCK_TAB_SESSION"
+text = "CLOCK_TAB_POMODORO"
 
 [node name="PomodoroView" parent="PomoCard/VBox" unique_id=283874525 instance=ExtResource("2_q6ish")]
 layout_mode = 2
