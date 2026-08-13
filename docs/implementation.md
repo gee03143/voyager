@@ -104,7 +104,7 @@
 ### `MainShell` (`scripts/main_shell.gd`, `scenes/MainShell.tscn`) — 셸 전환 목표 씬
 README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlot 없는 콘텐츠 스왑)의 실제 구현체.
 
-- **구조**: `Sidebar`(로고 + `NavList` + 하단 `SettingsButton`·`MiniTimer`) + `MainColumn`(`Banner`(컴패니언 아바타+말풍선) + `BodyRow/ContentArea`).
+- **구조**: `Sidebar`(로고 + `NavList` + 하단 `SettingsButton`·`MiniTimer`) + `MainColumn`(`Banner`(컴패니언 아바타+말풍선) + `BodyRow/ContentArea`). `MiniTimer`는 `Clock` 상태 따라 제목·아이콘·시간·상태 자동 갱신(`mini_timer.gd`) + 아래 미니 위젯 토글 겸함.
 - **콘텐츠 스왑**: `_nav`(`ButtonGroupNav`)가 `NavList` 버튼을 인덱스로 관리, `_on_nav_selected(index)`가 `CONTENT_SCENES[index]`를 `PanelPool.get_instance()`로 얻어 `content_area`에 reparent. `PopupFrame`의 `NavSlot`(서브탭) 패턴은 의도적으로 안 씀(롤백 이력 있음).
 - **`CONTENT_SCENES`**: `1: TodoListView.tscn`, `2: HabitTrackerView.tscn`, `3: TimerDashboard.tscn`(이번 세션 추가). NavList 순번은 Home(0)/Todo(1)/Habit(2)/Timer(3)/Record(4) — **Home(0)·Record(4)는 아직 매핑 안 됨**(빈 화면).
 - **`SettingsButton`(⚙)**: `NavList` 바깥의 별도 형제 노드라 `_nav`에 안 묶여 있음 — **클릭해도 아직 아무 동작 안 함**(미배선).
@@ -124,15 +124,15 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 - 진행 중인 칩 추적은 배열 인덱스(`_chips[pomodoro.index]`) 대신 `_active_chip` 참조로 변경(윈도우가 더 이상 세그먼트 인덱스와 1:1이 아니므로).
 - `plan_built` 시그널 구독은 제거됨(`build_plan()`이 항상 `segment_changed(0)`를 동반 발신하므로 중복 리빌드 방지 — `pomodoro.gd` 자체는 미수정).
 
-### 컴패니언 모드 (`scripts/companion_mode.gd` + `scripts/display/screen.gd`)
-**이미 구현되어 있음.** `world.gd:_enter_companion()` → `Screen.enter_companion()` 호출 후 `get_tree().change_scene_to_file("res://scenes/CompanionMode.tscn")`로 씬 전체 전환.
+### 미니 위젯 / 컴패니언 모드 (`scripts/main_shell.gd` + `scripts/display/screen.gd`)
+**`MainShell` 자체 기능으로 구현됨** — 씬 전환(`change_scene_to_file`) 없이, `MainShell` 안에서 사이드바 콘텐츠만 숨기고 `MiniTimer`만 남기는 방식(구 `CompanionMode.tscn` 씬 전환 방식과 다름).
 
-- **`Screen.enter_companion()`**: OS 창을 실제로 변형함 — `WINDOWED` 모드로 전환, 크기 280×200(`COMPANION_SIZE`) 고정, `ALWAYS_ON_TOP`/`BORDERLESS`/`TRANSPARENT` 플래그 켬, 배경 클리어 컬러를 알파 0으로. 이전 창 모드·스케일은 복귀용으로 저장.
-- **`CompanionMode`(`companion_mode.gd`)**: 축소된 패럴랙스+배(같은 항해 연출, 링 형태 진행도(`RadialProgress`)로 활성 세션 표시) + 드래그 가능한 타이틀바(`_drag_bar` → `Save.settings.companion_position` 저장) + 복귀 버튼(`_on_return` → `Screen.exit_companion()` + `World.tscn`으로 재전환).
-- **자동 종료**: `Save.settings.auto_exit_companion`이 켜져 있으면 세션 완료 시 자동으로 `World.tscn` 복귀.
-- **왜 `PanelPool`이 오토로드인지의 실제 근거**: 이 씬 전체 전환(`change_scene_to_file`) 때문 — `World.tscn`이 사라지는 순간 그 안의 `PopupFrame`도 함께 파괴되므로, 패널 인스턴스가 살아남으려면 오토로드(씬 트리 최상위)에 있어야 함. `world.gd:_enter_companion()`이 전환 직전 `popup_frame.close()`를 호출해 열려있던 패널을 먼저 pool로 반납.
-
-⚠️ **README.md의 "always-on-top 미니 위젯은 별개 논의로 보류"는 계획 문서 기준 판단이고, 실제로는 이미 동작하는 기능임** — 폐기/유지/재설계 여부를 결정할 때 "새로 만들 것"이 아니라 "이미 있는 것을 어떻게 할지"로 접근해야 함.
+- **트리거**: `MiniTimer` 안 `ToggleButton`(`HoverReveal`로 호버 시에만 노출) 클릭 → `_on_mini_toggle_pressed()`가 `_mini_mode` 보고 `_enter_mini_widget()`/`_exit_mini_widget()` 중 선택 호출.
+- **`_enter_mini_widget()`/`_exit_mini_widget()`**: `MINI_WIDGET_GROUP` 그룹에 없는 `Sidebar` 직계 자식(Logo/NavList/Spacer/SettingsButton)을 일괄 토글(`_set_sidebar_normal_visible`), `MainColumn` 숨김, `Sidebar`를 확장(`size_flags_horizontal`)+가운데 정렬(`alignment`)로 전환. `Sidebar`가 엔진 기본 테마 Panel 스타일에 의존하고 있어서(자체 스타일 없음) 미니 모드일 때만 `StyleBoxEmpty`로 임시 오버라이드(평소 모드 외형은 안 건드림).
+- **`Screen.enter_companion()`/`exit_companion()`**: 기존 컴패니언 모드가 쓰던 OS 창 변형 로직(WINDOWED 전환, 280×200 고정, `ALWAYS_ON_TOP`/`BORDERLESS`)을 그대로 재사용 — 씬 종류와 무관한 순수 창 조작이라 재사용 가능했음. clear color 알파 0 / `TRANSPARENT` 플래그(구 배 비주얼용 트릭)는 미니 위젯엔 안 씀 — MiniTimer는 애초에 불투명 사각 위젯이라 필요 없음.
+- **듀얼 모니터 대응**: `window_get_current_screen()`은 `window_set_min_size()`/`window_set_size()` 등 크기 변경 직후엔 이미 커진(모니터 경계 넘어간) 창 기준으로 답하므로, 반드시 크기 변경 전에 모니터 인덱스를 미리 캡처해서 이후 재사용해야 함(`enter_companion()`/`exit_companion()` 둘 다 이 패턴). `_restore_companion_position()`은 저장된 위치가 현재 모니터 범위 밖이면(`rect.has_point()`) 폐기하고 기본 위치(현재 모니터 우하단) 사용.
+- **위치 저장은 `Screen._save_companion_position()` 한 곳에서만**(퇴장 시점) — `MiniTimer` 자체의 드래그 입력 핸들러에서는 저장 안 함(토글 버튼 클릭이 `HoverReveal`의 `mouse_filter=PASS`로 인해 `MiniTimer.gui_input`에도 같이 전달되는데, 여기서도 저장하면 클릭만 해도 위치가 엉뚱하게 덮어써지는 문제가 있었음).
+- **구 `CompanionMode.tscn`/`companion_mode.gd`/`world.gd`의 `_enter_companion()`은 이제 죽은 코드** — `MainShell`에서 도달하는 경로가 없음. 삭제는 안 함(정리는 별도 작업으로 보류).
 
 ## 5. 공통 유틸/컴포넌트
 

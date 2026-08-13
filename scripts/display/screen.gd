@@ -39,8 +39,8 @@ func apply_window_size() -> void:
 	DisplayServer.window_set_size(sz)
 	_center_window(sz)
 
-func _center_window(sz: Vector2i) -> void:
-	var idx := DisplayServer.window_get_current_screen()
+func _center_window(sz: Vector2i, screen_idx: int = -1) -> void:
+	var idx := screen_idx if screen_idx >= 0 else DisplayServer.window_get_current_screen()
 	var rect := DisplayServer.screen_get_usable_rect(idx)
 	DisplayServer.window_set_position(rect.position + (rect.size - sz) / 2)
 
@@ -53,26 +53,22 @@ func apply_always_on_top() -> void:
 func enter_companion() -> void:
 	_pre_companion_window_mode = Save.settings.window_mode
 	_pre_content_scale_size = get_tree().root.content_scale_size
+	var current_screen := DisplayServer.window_get_current_screen()
 
 	DisplayServer.window_set_min_size(Vector2i(0, 0))
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_ALWAYS_ON_TOP, true)
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
-	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_TRANSPARENT, true)
-	get_window().transparent = true
-	RenderingServer.set_default_clear_color(Color(0, 0, 0, 0))
 	DisplayServer.window_set_size(COMPANION_SIZE)
 	get_tree().root.content_scale_size = COMPANION_SIZE
-	_restore_companion_position()
+	_restore_companion_position(current_screen)
 
 func exit_companion() -> void:
+	var mini_screen := DisplayServer.window_get_current_screen()
 	_save_companion_position()
 	DisplayServer.window_set_min_size(MAIN_MIN_SIZE)
 	apply_always_on_top()
 
-	get_window().transparent = false
-	RenderingServer.set_default_clear_color(Color(0.1, 0.1, 0.1, 1))
-	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_TRANSPARENT, false)
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
 	get_tree().root.content_scale_size = _pre_content_scale_size
 
@@ -84,14 +80,13 @@ func exit_companion() -> void:
 		_:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 			DisplayServer.window_set_size(Save.settings.window_size)
-			_center_window(Save.settings.window_size)
+			_center_window(Save.settings.window_size, mini_screen)
 	apply_always_on_top()
 
-func _restore_companion_position() -> void:
+func _restore_companion_position(screen_idx: int) -> void:
+	var rect := DisplayServer.screen_get_usable_rect(screen_idx)
 	var pos := Save.settings.companion_position
-	if pos == Vector2i(-1, -1):
-		var idx := DisplayServer.window_get_current_screen()
-		var rect := DisplayServer.screen_get_usable_rect(idx)
+	if pos == Vector2i(-1, -1) or not rect.has_point(pos):
 		pos = Vector2i(
 			rect.position.x + rect.size.x - COMPANION_SIZE.x - 20,
 			rect.position.y + rect.size.y - COMPANION_SIZE.y - 60

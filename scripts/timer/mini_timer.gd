@@ -1,6 +1,6 @@
 extends Control
 
-@onready var title_label: Label = $OuterVBox/TitleLabel
+@onready var title_label: Label = $OuterVBox/Header/TitleLabel
 @onready var icon_label: Label = $OuterVBox/HBox/Icon
 @onready var time_label: Label = $OuterVBox/HBox/VBox/TimeLabel
 @onready var status_label: Label = $OuterVBox/HBox/VBox/StatusLabel

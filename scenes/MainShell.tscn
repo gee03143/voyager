@@ -80,10 +80,20 @@ script = ExtResource("2_i1y7h")
 [node name="OuterVBox" type="VBoxContainer" parent="Sidebar/Margin/VBox/MiniTimer" unique_id=46813662]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox" unique_id=1165944317]
+[node name="Header" type="HBoxContainer" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox" unique_id=2016835925]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox/Header" unique_id=1165944317]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "CLOCK_POMO_TITLE"
+
+[node name="Togglebutton" type="Button" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox/Header" unique_id=547565071]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 12
+text = "⇲"
 
 [node name="HBox" type="HBoxContainer" parent="Sidebar/Margin/VBox/MiniTimer/OuterVBox" unique_id=1808172107]
 layout_mode = 2
