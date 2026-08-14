@@ -1,5 +1,7 @@
 extends VBoxContainer
 
+const LOG_ROW := preload("res://scenes/record/RecordLogRow.tscn")
+
 @onready var day_label: Label = $Header/DayLabel
 @onready var play_label: Label = $Header/PlayLabel
 @onready var list: VBoxContainer = $ScrollContainer/List
@@ -11,8 +13,13 @@ const ACCENT := {
 	"habit": Color("27ae60"),              # 초록
 	"journal": Color("9575cd"),            # 보라
 }
-const ICON := {
-	"pomodoro_session": "🍅", "timer": "⏲", "todo": "☑", "habit": "✅", "journal": "📓"
+
+const TYPE_LABEL_KEY := {
+	"pomodoro_session": "RECORD_TYPE_POMO",
+	"timer": "RECORD_TYPE_TIMER",
+	"todo": "RECORD_TYPE_TODO",
+	"habit": "RECORD_TYPE_HABIT",
+	"journal": "RECORD_TYPE_JOURNAL",
 }
 
 var _day: String = ""   # 현재 표시 중인 날짜 iso
@@ -31,28 +38,12 @@ func render_day(date_iso: String) -> void:
 		list.add_child(empty)
 		return
 	for e in entries:
-		list.add_child(_make_row(e))
+		_make_row(e)
 
 func _entries_for(date_iso: String) -> Array:
 	var out := []
-	for e in Save.activity_log.events:                       # 로그 이벤트(스트림 → 날짜 프로젝션)
-		if DateUtil.local_day_iso(int(e.get("ts", 0))) == date_iso:
-			out.append({"ts": int(e.get("ts", 0)), "type": str(e.get("type", "")), "text": _format_event(e)})
-	var titles := {}                                          # 파생 습관 (id→title)
-	for d in Save.habit_defs:
-		titles[int(d["id"])] = str(d.get("title", ""))
-	for wk in Save.habit_weeks:
-		var ws := str(wk.get("week_start", ""))
-		var checks: Dictionary = wk.get("checks", {})
-		for k in checks:
-			var hid := int(k)
-			if not titles.has(hid):
-				continue                                      # 정의 없으면(삭제됨) 미표시
-			var arr = checks[k]
-			for di in 7:
-				if di < arr.size() and bool(arr[di]) and DateUtil.add_days(ws, di) == date_iso:
-					out.append({"ts": 1 << 62, "type": "habit", "text": titles[hid]})   # 시간 없음 → 맨 뒤
-	out.sort_custom(func(a, b): return a["ts"] < b["ts"])     # 시간순, 습관은 끝
+	for e in Save.activity_entries_for(date_iso):
+		out.append({"ts": int(e.get("ts", 0)), "type": str(e.get("type", "")), "text": _format_event(e)})
 	return out
 
 func _format_event(e: Dictionary) -> String:
@@ -68,26 +59,15 @@ func _format_event(e: Dictionary) -> String:
 		"journal":
 			var t := Save.journal.doc_title(int(e.get("doc_id", 0)))
 			return TranslationServer.translate("RECORD_EVENT_JOURNAL").format({"title": t if t != "" else TranslationServer.translate("RECORD_JOURNAL_DELETED")})
+		"habit":
+			return str(e.get("title", ""))
 	return ""
 
-func _make_row(e: Dictionary) -> Control:
+func _make_row(e: Dictionary) -> void:
 	var type := str(e.get("type", ""))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	var bar := ColorRect.new()
-	bar.color = ACCENT.get(type, Color.GRAY)
-	bar.custom_minimum_size = Vector2(4, 0)
-	bar.size_flags_vertical = Control.SIZE_FILL
-	row.add_child(bar)
-	var icon := Label.new()
-	icon.text = ICON.get(type, "•")
-	row.add_child(icon)
-	var label := Label.new()
-	label.text = str(e.get("text", ""))
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(label)
-	return row
+	var row := LOG_ROW.instantiate() as RecordLogRow
+	list.add_child(row)
+	row.setup(TYPE_LABEL_KEY.get(type, ""), ACCENT.get(type, Color.GRAY), str(e.get("text", "")))
 	
 func _subj(e: Dictionary) -> String:
 	var key := str(e.get("subject", ""))

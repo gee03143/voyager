@@ -47,10 +47,7 @@ func _refresh_stats() -> void:
 	var focus_preview := v.total_focus_seconds
 	if Clock.is_focusing():
 		focus_preview += Clock.active_total() - Clock.active_time_left()
-	_focus_label.text = tr("VOYAGE_STAT_FOCUS").format({"time": _fmt_hm(int(focus_preview))})
-	_play_label.text = tr("VOYAGE_STAT_PLAY").format({"time": _fmt_hm(int(Save.current_play_seconds()))})
+	_focus_label.text = tr("VOYAGE_STAT_FOCUS").format({"time": DateUtil.format_hm(focus_preview)})
+	_play_label.text = tr("VOYAGE_STAT_PLAY").format({"time": DateUtil.format_hm(Save.current_play_seconds())})
 	_haeri_label.text = tr("VOYAGE_STAT_DISTANCE").format({"distance": "%.1f" % v.voyage_distance})
 	_count_label.text = tr("VOYAGE_STAT_COUNT").format({"count": Save.activity_log.events.size()})
-
-func _fmt_hm(total: int) -> String:
-	return "%dh %02dm" % [total / 3600, (total % 3600) / 60]

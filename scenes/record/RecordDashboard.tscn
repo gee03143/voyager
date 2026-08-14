@@ -1,0 +1,102 @@
+[gd_scene format=3 uid="uid://d3y231iexp7v6"]
+
+[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="1_o3j4l"]
+[ext_resource type="PackedScene" uid="uid://baouvnhwlly04" path="res://scenes/record/RecordCalendar.tscn" id="2_3vyj2"]
+[ext_resource type="Script" uid="uid://f822jswpwv6u" path="res://scripts/record/record_dashboard.gd" id="2_7wc1k"]
+[ext_resource type="PackedScene" uid="uid://bmq06t54wyo34" path="res://scenes/record/RecordView.tscn" id="3_7wc1k"]
+[ext_resource type="Script" uid="uid://trgf44c8f1u" path="res://scripts/commonui/tab_nav_slot.gd" id="3_me352"]
+[ext_resource type="PackedScene" uid="uid://dxvwumqoq31b7" path="res://scenes/record/graph/GraphView.tscn" id="4_me352"]
+
+[node name="RecordDashboard" type="PanelContainer" unique_id=601049294]
+theme_override_styles/panel = ExtResource("1_o3j4l")
+script = ExtResource("2_7wc1k")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1932406811]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Body" type="HBoxContainer" parent="Margin" unique_id=1616631209]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Main" type="VBoxContainer" parent="Margin/Body" unique_id=1096631152]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="TabRow" type="HBoxContainer" parent="Margin/Body/Main" unique_id=163292993]
+layout_mode = 2
+theme_override_constants/separation = 18
+script = ExtResource("3_me352")
+
+[node name="ActivityPanel" type="HBoxContainer" parent="Margin/Body/Main" unique_id=638238879]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Calendar" parent="Margin/Body/Main/ActivityPanel" unique_id=2011657158 instance=ExtResource("2_3vyj2")]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="LogView" parent="Margin/Body/Main/ActivityPanel" unique_id=1026010099 instance=ExtResource("3_7wc1k")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GraphPanel" parent="Margin/Body/Main" unique_id=1318442920 instance=ExtResource("4_me352")]
+visible = false
+layout_mode = 2
+
+[node name="Summary" type="PanelContainer" parent="Margin/Body" unique_id=366986904]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+
+[node name="SummaryMargin" type="MarginContainer" parent="Margin/Body/Summary" unique_id=1406079994]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="SummaryVBox" type="VBoxContainer" parent="Margin/Body/Summary/SummaryMargin" unique_id=1190934327]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SummaryTitle" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=1859812589]
+layout_mode = 2
+text = "RECORD_SUMMARY_TITLE"
+
+[node name="TodayCountTile" type="VBoxContainer" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=1253001247]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayCountTile" unique_id=744226382]
+layout_mode = 2
+text = "RECORD_TODAY_COUNT"
+
+[node name="Value" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayCountTile" unique_id=986263111]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="TodayTimeTile" type="VBoxContainer" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=1914676043]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayTimeTile" unique_id=419103496]
+layout_mode = 2
+text = "RECORD_TODAY_TIME"
+
+[node name="Value" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayTimeTile" unique_id=1417303977]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="TotalFocusTile" type="VBoxContainer" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=1497665550]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TotalFocusTile" unique_id=183003383]
+layout_mode = 2
+text = "RECORD_TOTAL_FOCUS"
+
+[node name="Value" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TotalFocusTile" unique_id=1953277933]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20

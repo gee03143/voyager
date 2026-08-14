@@ -3,6 +3,7 @@ extends HBoxContainer
 const TODO_SCENE := preload("res://scenes/todo/TodoListView.tscn")
 const HABIT_SCENE := preload("res://scenes/habittracker/HabitTrackerView.tscn")
 const TIMER_SCENE := preload("res://scenes/timer/TimerDashboard.tscn")
+const RECORD_SCENE := preload("res://scenes/record/RecordDashboard.tscn")
 
 const MINI_WIDGET_GROUP := "mini_widget"
 
@@ -19,6 +20,7 @@ const CONTENT_SCENES := {
 	1: TODO_SCENE,
 	2: HABIT_SCENE,
 	3: TIMER_SCENE,
+	4: RECORD_SCENE,
 }
 
 var _nav := ButtonGroupNav.new()

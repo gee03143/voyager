@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://ci2ol0kedyej4"]
+
+[ext_resource type="Script" uid="uid://d2es6i57xm3mb" path="res://scripts/record/record_log_row.gd" id="1_r56hm"]
+
+[node name="RecordLogRow" type="HBoxContainer" unique_id=1610471722]
+theme_override_constants/separation = 10
+script = ExtResource("1_r56hm")
+
+[node name="Badge" type="PanelContainer" parent="." unique_id=882995417]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="BadgeLabel" type="Label" parent="Badge" unique_id=1135717770]
+layout_mode = 2
+
+[node name="TextLabel" type="Label" parent="." unique_id=1636373114]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3

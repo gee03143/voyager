@@ -238,3 +238,25 @@ func quit_game() -> void:
 	save_journal()
 	save_todo()
 	get_tree().quit()
+	
+func activity_entries_for(date_iso: String) -> Array:    # 로그 이벤트 + 습관 파생 완료를 날짜 기준으로 병합(raw, 포맷 없음)
+	var out := []
+	for e in activity_log.events:
+		if DateUtil.local_day_iso(int(e.get("ts", 0))) == date_iso:
+			out.append(e)
+	var titles := {}
+	for d in habit_defs:
+		titles[int(d["id"])] = str(d.get("title", ""))
+	for wk in habit_weeks:
+		var ws := str(wk.get("week_start", ""))
+		var checks: Dictionary = wk.get("checks", {})
+		for k in checks:
+			var hid := int(k)
+			if not titles.has(hid):
+				continue
+			var arr = checks[k]
+			for di in 7:
+				if di < arr.size() and bool(arr[di]) and DateUtil.add_days(ws, di) == date_iso:
+					out.append({"ts": 1 << 62, "type": "habit", "title": titles[hid]})
+	out.sort_custom(func(a, b): return a["ts"] < b["ts"])
+	return out

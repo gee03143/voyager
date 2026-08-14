@@ -88,6 +88,10 @@ static func today_iso() -> String:
 	
 static func format_hours(seconds: float) -> String:
 	return "%dh" % int(round(seconds / 3600.0))
+	
+static func format_hm(seconds: float) -> String:    # "Nh NNm" — 누적/총량 시간 표시용(항해 통계, 기록 요약 등)
+	var total := int(seconds)
+	return "%dh %02dm" % [total / 3600, (total % 3600) / 60]
 
 static func month_start_iso() -> String:
 	var t := Time.get_date_dict_from_system()
