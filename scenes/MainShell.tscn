@@ -58,6 +58,11 @@ layout_mode = 2
 size_flags_vertical = 3
 text = "TIMER_BUTTON"
 
+[node name="JournalButton" type="Button" parent="Sidebar/Margin/VBox/NavList" unique_id=904724568]
+layout_mode = 2
+size_flags_vertical = 3
+text = "JOURNAL_BUTTON"
+
 [node name="RecordButton" type="Button" parent="Sidebar/Margin/VBox/NavList" unique_id=1879060455]
 layout_mode = 2
 size_flags_vertical = 3

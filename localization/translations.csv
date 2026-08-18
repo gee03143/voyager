@@ -5,6 +5,7 @@ CLOCK_BUTTON,시계,Clock
 TIMER_BUTTON,타이머,Timer
 TODO_BUTTON,할일,Todo
 HABIT_BUTTON,습관,Habit
+JOURNAL_BUTTON,일지,Journal
 RECORD_BUTTON,기록,Record
 VOYAGE_TAB_STATS,통계,Stats
 VOYAGE_TAB_LETTER,편지,Letters
@@ -94,3 +95,18 @@ RECORD_TODAY_COUNT,오늘 활동,Today's activity
 RECORD_TODAY_COUNT_VALUE,{n}건,{n}
 RECORD_TODAY_TIME,오늘 활동 시간,Today's active time
 RECORD_TOTAL_FOCUS,누적 집중 시간,Total focus time
+JOURNAL_TAB_FREEFORM,자유 글쓰기,Freeform
+JOURNAL_TAB_GRATITUDE,감사 일지,Gratitude
+JOURNAL_TAB_MOOD,무드 기록,Mood
+GRATITUDE_TODAY_LABEL,오늘의 감사,Today's gratitude
+GRATITUDE_ITEM_PLACEHOLDER,감사한 일,Grateful for
+GRATITUDE_ADD_ITEM_BUTTON,+ 항목 추가,+ Add item
+GRATITUDE_HISTORY_LABEL,지난 기록,Past entries
+GRATITUDE_EMPTY_ENTRY,(빈 기록),(empty entry)
+GRATITUDE_ITEM_COUNT,{n}개,{n} items
+MOOD_PICKER_LABEL,지금 기분은?,How are you feeling?
+MOOD_MEMO_PLACEHOLDER,메모 (선택),Memo (optional)
+MOOD_RECORD_BUTTON,기록하기,Record
+MOOD_UPDATE_BUTTON,수정하기,Update
+MOOD_CANCEL_EDIT_BUTTON,취소,Cancel
+MOOD_HISTORY_LABEL,기록,History

@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://cyxnjwtsdipn8"]
+
+[ext_resource type="Script" uid="uid://dqsdn855sve65" path="res://scripts/record/journal/gratitude_view.gd" id="1_50s7w"]
+
+[node name="GratitudeView" type="HBoxContainer" unique_id=1556157389]
+offset_right = 188.0
+offset_bottom = 93.0
+script = ExtResource("1_50s7w")
+
+[node name="Left" type="VBoxContainer" parent="." unique_id=758068221]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DateLabel" type="Label" parent="Left" unique_id=225345084]
+layout_mode = 2
+text = "GRATITUDE_TODAY_LABEL"
+
+[node name="ItemsScroll" type="ScrollContainer" parent="Left" unique_id=2114775056]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemsBox" type="VBoxContainer" parent="Left/ItemsScroll" unique_id=2137707542]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="AddItemButton" type="Button" parent="Left" unique_id=16997724]
+layout_mode = 2
+text = "GRATITUDE_ADD_ITEM_BUTTON"
+
+[node name="Right" type="VBoxContainer" parent="." unique_id=275707751]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HistoryLabel" type="Label" parent="Right" unique_id=422749681]
+layout_mode = 2
+text = "GRATITUDE_HISTORY_LABEL"
+
+[node name="HistoryScroll" type="ScrollContainer" parent="Right" unique_id=691914131]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HistoryList" type="VBoxContainer" parent="Right/HistoryScroll" unique_id=942660632]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6

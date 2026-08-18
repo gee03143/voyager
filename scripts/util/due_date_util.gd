@@ -92,6 +92,11 @@ static func format_hours(seconds: float) -> String:
 static func format_hm(seconds: float) -> String:    # "Nh NNm" — 누적/총량 시간 표시용(항해 통계, 기록 요약 등)
 	var total := int(seconds)
 	return "%dh %02dm" % [total / 3600, (total % 3600) / 60]
+	
+static func format_time_hm(ts: int) -> String:
+	var bias := int(Time.get_time_zone_from_system().get("bias", 0))
+	var d := Time.get_datetime_dict_from_unix_time(ts + bias * 60)
+	return "%02d:%02d" % [d.hour, d.minute]
 
 static func month_start_iso() -> String:
 	var t := Time.get_date_dict_from_system()

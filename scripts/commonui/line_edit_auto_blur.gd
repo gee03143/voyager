@@ -1,7 +1,7 @@
 class_name LineEditAutoBlur
 extends Node
 
-@export var target: LineEdit
+@export var target: Control
 
 func _ready() -> void:
 	set_process_input(false)

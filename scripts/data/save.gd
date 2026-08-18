@@ -8,12 +8,18 @@ const JOURNAL_PATH := "user://journal.json"
 const JOURNAL_VERSION := 1
 const TODO_PATH := "user://todo.json"
 const TODO_VERSION := 1
+const GRATITUDE_PATH := "user://gratitude.json"
+const GRATITUDE_VERSION := 1
+const MOOD_PATH := "user://mood.json"
+const MOOD_VERSION := 1
 
 var voyage := Voyage.new()
 var letters := LetterArchive.new()
 var lexicon := Lexicon.new()
 var activity_log := ActivityLog.new()
 var journal := Journal.new()
+var gratitude := Gratitude.new()
+var mood := Mood.new()
 var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
 var todo_groups: Array[TodoGroup] = []
@@ -36,6 +42,10 @@ func _ready() -> void:
 		load_journal()
 	if FileAccess.file_exists(TODO_PATH):
 		load_todo()
+	if FileAccess.file_exists(GRATITUDE_PATH):
+		load_gratitude()
+	if FileAccess.file_exists(MOOD_PATH):
+		load_mood()
 	if todo_groups.is_empty():
 		var g := TodoGroup.new()
 		g.is_default = true
@@ -55,12 +65,16 @@ func _ready() -> void:
 	save_records()
 	save_journal()
 	save_todo()
+	save_gratitude()
+	save_mood()
 	settings.changed.connect(save_game)
 	voyage.changed.connect(save_game)
 	activity_log.changed.connect(save_records)
 	journal.changed.connect(save_journal)
 	lexicon.changed.connect(save_game)
 	letters.changed.connect(save_game)
+	gratitude.changed.connect(save_gratitude)
+	mood.changed.connect(save_mood)
 		
 func _accumulate_play_day() -> void:
 	var now_ms := Time.get_ticks_msec()
@@ -237,6 +251,8 @@ func quit_game() -> void:
 	save_records()
 	save_journal()
 	save_todo()
+	save_gratitude()
+	save_mood()
 	get_tree().quit()
 	
 func activity_entries_for(date_iso: String) -> Array:    # 로그 이벤트 + 습관 파생 완료를 날짜 기준으로 병합(raw, 포맷 없음)
@@ -260,3 +276,43 @@ func activity_entries_for(date_iso: String) -> Array:    # 로그 이벤트 + �
 					out.append({"ts": 1 << 62, "type": "habit", "title": titles[hid]})
 	out.sort_custom(func(a, b): return a["ts"] < b["ts"])
 	return out
+
+func save_gratitude() -> void:
+	var data := gratitude.to_dict()
+	data["version"] = GRATITUDE_VERSION
+	var file := FileAccess.open(GRATITUDE_PATH, FileAccess.WRITE)
+	if file == null:
+		push_warning("Fail to Save gratitude: %s" % FileAccess.get_open_error())
+		return
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+
+func load_gratitude() -> void:
+	var file := FileAccess.open(GRATITUDE_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var text := file.get_as_text()
+	file.close()
+	var parsed = JSON.parse_string(text)
+	if typeof(parsed) == TYPE_DICTIONARY:
+		gratitude.from_dict(parsed)
+
+func save_mood() -> void:
+	var data := mood.to_dict()
+	data["version"] = MOOD_VERSION
+	var file := FileAccess.open(MOOD_PATH, FileAccess.WRITE)
+	if file == null:
+		push_warning("Fail to Save mood: %s" % FileAccess.get_open_error())
+		return
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+
+func load_mood() -> void:
+	var file := FileAccess.open(MOOD_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var text := file.get_as_text()
+	file.close()
+	var parsed = JSON.parse_string(text)
+	if typeof(parsed) == TYPE_DICTIONARY:
+		mood.from_dict(parsed)

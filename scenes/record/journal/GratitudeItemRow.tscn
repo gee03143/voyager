@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bip2r3qkwset2"]
+
+[ext_resource type="Script" uid="uid://bdc2hh323elo0" path="res://scripts/record/journal/gratitude_item_row.gd" id="1_6clvj"]
+[ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="2_lksxi"]
+
+[node name="GratitudeItemRow" type="HBoxContainer" unique_id=1658919866]
+script = ExtResource("1_6clvj")
+
+[node name="ItemEdit" type="TextEdit" parent="." unique_id=763630242]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "GRATITUDE_ITEM_PLACEHOLDER"
+
+[node name="DeleteButton" type="Button" parent="." unique_id=907926819]
+layout_mode = 2
+text = "X"
+
+[node name="LineEditAutoBlur" type="Node" parent="." unique_id=1370365017 node_paths=PackedStringArray("target")]
+script = ExtResource("2_lksxi")
+target = NodePath("../ItemEdit")

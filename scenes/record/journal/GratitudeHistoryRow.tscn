@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://53nt56r0n8ym"]
+
+[ext_resource type="Script" uid="uid://deo3r5bro2hte" path="res://scripts/record/journal/gratitude_history_row.gd" id="1_0nxyj"]
+[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="1_a5tqg"]
+[ext_resource type="PackedScene" uid="uid://dg5x6yha4wta5" path="res://scenes/commonui/HoldButton.tscn" id="2_a5tqg"]
+
+[node name="GratitudeHistoryRow" type="PanelContainer" unique_id=1461979749]
+theme_override_styles/panel = ExtResource("1_a5tqg")
+script = ExtResource("1_0nxyj")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=265956309]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=18504671]
+layout_mode = 2
+
+[node name="Head" type="HBoxContainer" parent="Margin/VBox" unique_id=453803723]
+layout_mode = 2
+
+[node name="ClickArea" type="HBoxContainer" parent="Margin/VBox/Head" unique_id=254979204]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 0
+
+[node name="Chevron" type="Label" parent="Margin/VBox/Head/ClickArea" unique_id=1069417304]
+layout_mode = 2
+text = "▸"
+
+[node name="DateLabel" type="Label" parent="Margin/VBox/Head/ClickArea" unique_id=271968527]
+layout_mode = 2
+
+[node name="SummaryLabel" type="Label" parent="Margin/VBox/Head/ClickArea" unique_id=274075511]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CountLabel" type="Label" parent="Margin/VBox/Head/ClickArea" unique_id=888530749]
+layout_mode = 2
+
+[node name="DeleteButton" parent="Margin/VBox/Head" unique_id=16528522 instance=ExtResource("2_a5tqg")]
+layout_mode = 2
+text = "X"
+
+[node name="ExpandBox" type="VBoxContainer" parent="Margin/VBox" unique_id=1933053026]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
