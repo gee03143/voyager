@@ -12,6 +12,8 @@ const ACCENT := {
 	"todo": Color("d9b38c"),               # 베이지
 	"habit": Color("27ae60"),              # 초록
 	"journal": Color("9575cd"),            # 보라
+	"gratitude": Color("f6b93b"),
+	"mood": Color("38ada9"),
 }
 
 const TYPE_LABEL_KEY := {
@@ -20,7 +22,11 @@ const TYPE_LABEL_KEY := {
 	"todo": "RECORD_TYPE_TODO",
 	"habit": "RECORD_TYPE_HABIT",
 	"journal": "RECORD_TYPE_JOURNAL",
+	"gratitude": "RECORD_TYPE_GRATITUDE",
+	"mood": "RECORD_TYPE_MOOD",
 }
+
+const MOOD_LEVEL_KEYS := ["MOOD_LEVEL_1", "MOOD_LEVEL_2", "MOOD_LEVEL_3", "MOOD_LEVEL_4", "MOOD_LEVEL_5"]
 
 var _day: String = ""   # 현재 표시 중인 날짜 iso
 
@@ -61,6 +67,18 @@ func _format_event(e: Dictionary) -> String:
 			return TranslationServer.translate("RECORD_EVENT_JOURNAL").format({"title": t if t != "" else TranslationServer.translate("RECORD_JOURNAL_DELETED")})
 		"habit":
 			return str(e.get("title", ""))
+		"gratitude":
+			return TranslationServer.translate("RECORD_EVENT_GRATITUDE")
+		"mood":
+			var m := Save.mood.entry_by_id(int(e.get("entry_id", 0)))
+			if m.is_empty():
+				return TranslationServer.translate("RECORD_MOOD_DELETED")
+			var lvl := clampi(int(m.get("level", 3)), 1, 5)
+			var label := TranslationServer.translate("RECORD_EVENT_MOOD").format({"level": TranslationServer.translate(MOOD_LEVEL_KEYS[lvl - 1])})
+			var memo := str(m.get("memo", "")).strip_edges()
+			if memo != "":
+				label += " · %s" % memo
+			return label
 	return ""
 
 func _make_row(e: Dictionary) -> void:

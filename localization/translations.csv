@@ -88,6 +88,8 @@ RECORD_TYPE_TIMER,타이머,Timer
 RECORD_TYPE_TODO,할일,Todo
 RECORD_TYPE_HABIT,습관,Habit
 RECORD_TYPE_JOURNAL,일지,Journal
+RECORD_TYPE_GRATITUDE,감사일지,Gratitude
+RECORD_TYPE_MOOD,무드,Mood
 RECORD_TAB_ACTIVITY,활동,Activity
 RECORD_TAB_GRAPH,그래프,Graph
 RECORD_SUMMARY_TITLE,한눈에 보기,At a glance
@@ -95,6 +97,14 @@ RECORD_TODAY_COUNT,오늘 활동,Today's activity
 RECORD_TODAY_COUNT_VALUE,{n}건,{n}
 RECORD_TODAY_TIME,오늘 활동 시간,Today's active time
 RECORD_TOTAL_FOCUS,누적 집중 시간,Total focus time
+RECORD_EVENT_GRATITUDE,감사 일지 작성,Gratitude journal written
+RECORD_EVENT_MOOD,무드 기록 · {level},Mood logged · {level}
+RECORD_MOOD_DELETED,(삭제된 기록),(deleted entry)
+MOOD_LEVEL_1,아주 나쁨,Very bad
+MOOD_LEVEL_2,나쁨,Bad
+MOOD_LEVEL_3,보통,Neutral
+MOOD_LEVEL_4,좋음,Good
+MOOD_LEVEL_5,아주 좋음,Very good
 JOURNAL_TAB_FREEFORM,자유 글쓰기,Freeform
 JOURNAL_TAB_GRATITUDE,감사 일지,Gratitude
 JOURNAL_TAB_MOOD,무드 기록,Mood

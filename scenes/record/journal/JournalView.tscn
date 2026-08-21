@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://425i7ha8epq5"]
 
 [ext_resource type="Script" uid="uid://puhmyprsgfvh" path="res://scripts/record/journal/journal_view.gd" id="1_wwchr"]
+[ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="2_ti1jn"]
 
 [node name="JournalView" type="HBoxContainer" unique_id=730269896]
 custom_minimum_size = Vector2(560, 340)
@@ -45,7 +46,15 @@ text = "+ 그룹"
 layout_mode = 2
 placeholder_text = "제목"
 
+[node name="EditAutoBlur" type="Node" parent="Editor/TitleEdit" unique_id=471547625 node_paths=PackedStringArray("target")]
+script = ExtResource("2_ti1jn")
+target = NodePath("..")
+
 [node name="BodyEdit" type="TextEdit" parent="Editor" unique_id=1938027847]
 layout_mode = 2
 size_flags_vertical = 3
 placeholder_text = "여기에 생각 메모를 시작하세요"
+
+[node name="EditAutoBlur2" type="Node" parent="Editor/BodyEdit" unique_id=1562003452 node_paths=PackedStringArray("target")]
+script = ExtResource("2_ti1jn")
+target = NodePath("..")
