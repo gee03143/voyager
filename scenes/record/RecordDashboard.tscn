@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://f822jswpwv6u" path="res://scripts/record/record_dashboard.gd" id="2_7wc1k"]
 [ext_resource type="Script" uid="uid://trgf44c8f1u" path="res://scripts/commonui/tab_nav_slot.gd" id="3_me352"]
 [ext_resource type="PackedScene" uid="uid://dxvwumqoq31b7" path="res://scenes/record/graph/GraphView.tscn" id="4_me352"]
-[ext_resource type="PackedScene" uid="uid://c1v0hjqeattsl" path="res://scenes/record/DayTimeline.tscn" id="5_7wc1k"]
+[ext_resource type="PackedScene" uid="uid://c1v0hjqeattsl" path="res://scenes/record/Timeline/DayTimeline.tscn" id="5_7wc1k"]
 
 [node name="RecordDashboard" type="PanelContainer" unique_id=601049294]
 theme_override_styles/panel = ExtResource("1_o3j4l")

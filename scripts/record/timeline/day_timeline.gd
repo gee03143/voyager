@@ -20,9 +20,9 @@ const ACCENT := {
 
 const MOOD_LEVEL_KEYS := ["MOOD_LEVEL_1", "MOOD_LEVEL_2", "MOOD_LEVEL_3", "MOOD_LEVEL_4", "MOOD_LEVEL_5"]
 
-const BLOCK_SCENE := preload("res://scenes/record/TimelineBlock.tscn")
-const POINT_ROW_SCENE := preload("res://scenes/record/TimelinePointRow.tscn")
-const HABIT_CHIP_SCENE := preload("res://scenes/record/TimelineHabitChip.tscn")
+const BLOCK_SCENE := preload("res://scenes/record/Timeline/TimelineBlock.tscn")
+const POINT_ROW_SCENE := preload("res://scenes/record/Timeline/TimelinePointRow.tscn")
+const HABIT_CHIP_SCENE := preload("res://scenes/record/Timeline/TimelineHabitChip.tscn")
 
 @onready var day_label: Label = $Header/DayLabel
 @onready var play_label: Label = $Header/PlayLabel

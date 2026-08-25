@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bvwvmpqu4xuf0"]
 
-[ext_resource type="Script" uid="uid://hj8d7jrfy7id" path="res://scripts/record/timeline_point_row.gd" id="1_ug0vc"]
+[ext_resource type="Script" uid="uid://hj8d7jrfy7id" path="res://scripts/record/timeline/timeline_point_row.gd" id="1_u1lme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bwoxv"]
 corner_radius_top_left = 4
@@ -11,7 +11,7 @@ corner_radius_bottom_left = 4
 [node name="TimelinePointRow" type="HBoxContainer" unique_id=1655551189]
 mouse_filter = 2
 theme_override_constants/separation = 7
-script = ExtResource("1_ug0vc")
+script = ExtResource("1_u1lme")
 
 [node name="TimeLabel" type="Label" parent="." unique_id=1147489883]
 modulate = Color(1, 1, 1, 0.6)
