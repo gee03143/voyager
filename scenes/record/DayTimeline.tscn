@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://c1v0hjqeattsl"]
+
+[ext_resource type="Script" uid="uid://cnjnjebu0xq1" path="res://scripts/record/day_timeline.gd" id="1_rqcv8"]
+[ext_resource type="Script" uid="uid://blemfycx0ly3p" path="res://scripts/record/timeline_track.gd" id="2_3660q"]
+
+[node name="DayTimeline" type="VBoxContainer" unique_id=357606297]
+script = ExtResource("1_rqcv8")
+
+[node name="Header" type="HBoxContainer" parent="." unique_id=2011849087]
+layout_mode = 2
+
+[node name="DayLabel" type="Label" parent="Header" unique_id=1891219431]
+layout_mode = 2
+
+[node name="PlayLabel" type="Label" parent="Header" unique_id=1954628485]
+layout_mode = 2
+
+[node name="HabitBand" type="HFlowContainer" parent="." unique_id=255186381]
+layout_mode = 2
+
+[node name="EmptyLabel" type="Label" parent="." unique_id=2109061306]
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=2084306009]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Track" type="Control" parent="Scroll" unique_id=358442141]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_3660q")

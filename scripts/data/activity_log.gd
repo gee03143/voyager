@@ -4,7 +4,8 @@ extends RefCounted
 signal changed
 
 # 자동 수집 완료 활동 스트림 (append, 안정 id + 벽시계 ts)
-# type: "todo"{title} | "pomodoro_session"{focus_count, seconds} | "timer"{seconds}
+# type: "todo"{title} | "pomodoro_session"{focus_count, seconds, start_ts} | "timer"{seconds, start_ts}
+# ts = 완료 시각. start_ts = 시작 시각(세션 계열만) — 없으면 순간 이벤트
 # habit 완료는 여기 저장 X — habit_weeks에서 파생(단일 진실)
 var events: Array = []     # [{id, type, ts, ...payload}]
 var play_days: Dictionary = {}
@@ -37,6 +38,8 @@ func from_dict(d: Dictionary) -> void:
 			if typeof(e) == TYPE_DICTIONARY:
 				e["id"] = int(e.get("id", 0))      # JSON 로드 시 float → int 정규화
 				e["ts"] = int(e.get("ts", 0))
+				if e.has("start_ts"):              # 세션 계열만 보유 — 없는 이벤트는 키를 만들지 않음
+					e["start_ts"] = int(e["start_ts"])
 				events.append(e)
 	var pd = d.get("play_days", {})
 	play_days = pd if typeof(pd) == TYPE_DICTIONARY else {}

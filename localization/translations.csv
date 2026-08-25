@@ -120,3 +120,5 @@ MOOD_RECORD_BUTTON,기록하기,Record
 MOOD_UPDATE_BUTTON,수정하기,Update
 MOOD_CANCEL_EDIT_BUTTON,취소,Cancel
 MOOD_HISTORY_LABEL,기록,History
+RECORD_SPAN_CROSSDAY,{day} {start}–{end},{day} {start}–{end}
+RECORD_SPAN_CROSSDAY_END,{start}–{day} {end},{start}–{day} {end}

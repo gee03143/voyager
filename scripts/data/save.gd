@@ -3,7 +3,7 @@ extends Node
 const SAVE_PATH := "user://save.json"
 const VERSION := 8
 const RECORDS_PATH := "user://records.json"
-const RECORDS_VERSION := 1
+const RECORDS_VERSION := 2
 const JOURNAL_PATH := "user://journal.json"
 const JOURNAL_VERSION := 1
 const TODO_PATH := "user://todo.json"
@@ -258,7 +258,11 @@ func quit_game() -> void:
 func activity_entries_for(date_iso: String) -> Array:    # 로그 이벤트 + 습관 파생 완료를 날짜 기준으로 병합(raw, 포맷 없음)
 	var out := []
 	for e in activity_log.events:
-		if DateUtil.local_day_iso(int(e.get("ts", 0))) == date_iso:
+		var end_day := DateUtil.local_day_iso(int(e.get("ts", 0)))
+		var start_day := end_day
+		if e.has("start_ts"):
+			start_day = DateUtil.local_day_iso(int(e["start_ts"]))
+		if start_day <= date_iso and date_iso <= end_day:    # ISO 문자열 비교 = 날짜순
 			out.append(e)
 	var titles := {}
 	for d in habit_defs:

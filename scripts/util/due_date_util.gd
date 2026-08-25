@@ -72,6 +72,12 @@ static func local_day_iso(ts: int) -> String:
 	var d := Time.get_datetime_dict_from_unix_time(ts + bias * 60)
 	return "%04d-%02d-%02d" % [d.year, d.month, d.day]
 
+# ts → 로컬 자정 기준 경과 분(0.0~1440.0). 타임라인 y좌표 계산용
+static func local_minutes(ts: int) -> float:
+	var bias := int(Time.get_time_zone_from_system().get("bias", 0))
+	var d := Time.get_datetime_dict_from_unix_time(ts + bias * 60)
+	return float(int(d.hour) * 60 + int(d.minute)) + float(int(d.second)) / 60.0
+
 # "YYYY-MM-DD" + N일
 static func add_days(iso: String, days: int) -> String:
 	var p := iso.split("-")

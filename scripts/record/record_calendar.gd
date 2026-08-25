@@ -44,8 +44,17 @@ func set_selected(iso: String) -> void: # 패널이 선택일 동기화(신호 �
 func _recount() -> void:
 	_counts = {}
 	for e in Save.activity_log.events:
-		var iso := DateUtil.local_day_iso(int(e.get("ts", 0)))
-		_counts[iso] = int(_counts.get(iso, 0)) + 1
+		var end_iso := DateUtil.local_day_iso(int(e.get("ts", 0)))
+		var iso := end_iso
+		if e.has("start_ts"):
+			iso = DateUtil.local_day_iso(int(e["start_ts"]))
+		if iso > end_iso:                    # 비정상 데이터 방어
+			iso = end_iso
+		for i in 8:                          # 걸칠 수 있는 날 수 상한
+			_counts[iso] = int(_counts.get(iso, 0)) + 1
+			if iso == end_iso:
+				break
+			iso = DateUtil.add_days(iso, 1)
 	var has := {}
 	for d in Save.habit_defs:
 		has[int(d["id"])] = true
@@ -58,8 +67,8 @@ func _recount() -> void:
 			var arr = checks[k]
 			for di in 7:
 				if di < arr.size() and bool(arr[di]):
-					var iso := DateUtil.add_days(ws, di)
-					_counts[iso] = int(_counts.get(iso, 0)) + 1
+					var hiso := DateUtil.add_days(ws, di)
+					_counts[hiso] = int(_counts.get(hiso, 0)) + 1
 
 func _render_month() -> void:
 	for c in _grid.get_children():

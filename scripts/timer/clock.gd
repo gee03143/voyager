@@ -7,6 +7,8 @@ enum Kind { NONE, POMODORO, TIMER }
 var pomodoro: Pomodoro
 var timer: SimpleTimer
 var current_activity: String = ""   # 현재 집중 대상(Subject key, 휘발성)
+var _pomo_start_ts: int = 0         # 세션 시작 벽시계 시각(휘발성) — 0 = 시작 기록 없음
+var _timer_start_ts: int = 0
 
 func _ready() -> void:
 	pomodoro = Pomodoro.new()
@@ -18,13 +20,21 @@ func _ready() -> void:
 	pomodoro.total_focus_count = Save.settings.total_focus_count
 	pomodoro.build_plan()
 	pomodoro.focus_finished.connect(_on_focus_finished)
+	pomodoro.session_started.connect(_on_session_started)
 	pomodoro.session_completed.connect(_on_session_completed)
 	
 	timer = SimpleTimer.new()
 	timer.name = "Timer"
 	add_child(timer)
 	timer.configure(Save.settings.timer_seconds)
+	timer.timer_started.connect(_on_timer_started)
 	timer.timer_finished.connect(_on_timer_finished)
+
+func _on_session_started() -> void:
+	_pomo_start_ts = int(Time.get_unix_time_from_system())
+
+func _on_timer_started() -> void:
+	_timer_start_ts = int(Time.get_unix_time_from_system())
 
 func _on_focus_finished() -> void:
 	Save.voyage.add_focus(pomodoro.focus_seconds)   # 집중 1구간 = 계획된 집중 길이 적립
@@ -33,13 +43,21 @@ func _on_focus_finished() -> void:
 func _on_timer_finished() -> void:
 	Save.voyage.add_focus(timer.duration)
 	Save.lexicon.unlock_subject(current_activity)
-	Save.activity_log.add("timer", {"seconds": int(timer.duration), "subject": current_activity})
+	var payload := {"seconds": int(timer.duration), "subject": current_activity}
+	if _timer_start_ts > 0:
+		payload["start_ts"] = _timer_start_ts
+	_timer_start_ts = 0
+	Save.activity_log.add("timer", payload)
 	Sound.play_set(Save.settings.sound_set)   # 완료음(컨트롤러가 완료를 앎)
 	timer.reset()                             # 완주 → 자동 대기 복귀 (포모와 일관)
 
 func _on_session_completed() -> void:
 	var secs := int(pomodoro.focus_seconds * pomodoro.total_focus_count)
-	Save.activity_log.add("pomodoro_session", {"focus_count": pomodoro.total_focus_count, "seconds": secs, "subject": current_activity})
+	var payload := {"focus_count": pomodoro.total_focus_count, "seconds": secs, "subject": current_activity}
+	if _pomo_start_ts > 0:
+		payload["start_ts"] = _pomo_start_ts
+	_pomo_start_ts = 0
+	Save.activity_log.add("pomodoro_session", payload)
 	Sound.play_set(Save.settings.sound_set)   # 완료음
 	pomodoro.build_plan()                     # 완료 → 자동 대기 복귀
 	

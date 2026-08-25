@@ -4,7 +4,7 @@ extends PanelContainer
 @onready var activity_panel: HBoxContainer = $Margin/Body/Main/ActivityPanel
 @onready var graph_panel: Control = $Margin/Body/Main/GraphPanel
 @onready var calendar = $Margin/Body/Main/ActivityPanel/Calendar
-@onready var view = $Margin/Body/Main/ActivityPanel/LogView
+@onready var view = $Margin/Body/Main/ActivityPanel/Timeline
 @onready var today_count_value: Label = $Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayCountTile/Value
 @onready var today_time_value: Label = $Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayTimeTile/Value
 @onready var total_focus_value: Label = $Margin/Body/Summary/SummaryMargin/SummaryVBox/TotalFocusTile/Value

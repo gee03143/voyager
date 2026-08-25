@@ -19,7 +19,7 @@
 | 파일 | version | 담당 필드 |
 |---|---|---|
 | `save.json` | 8 | `settings`, `alarms`, `habit_defs`, `habit_weeks`, `voyage`, `letters`, `lexicon` |
-| `records.json` | 1 | `activity_log` |
+| `records.json` | 2 | `activity_log` |
 | `journal.json` | 1 | `journal`(`groups`, `docs`) |
 | `todo.json` | 1 | `todo_groups` |
 
@@ -36,11 +36,20 @@
 - **`AppSettings`**: 포모(`focus_seconds`/`short_break_seconds`/`long_break_seconds`/`total_focus_count`/`timer_seconds`), 화면(`window_mode`/`window_size`/`fps_focused`/`fps_unfocused`/`always_on_top`), 사운드(`master_volume`/`sound_set`), HUD(`hud_position`/`hud_scale`), 컴패니언 모드 관련(`auto_minimize`/`auto_exit_companion`/`companion_position`) 필드 보유. 키 없으면 기본값 유지하도록 `from_dict`가 설계됨(스키마 진화 대응).
 - **`Voyage`**: `total_play_seconds`/`total_focus_seconds`/`voyage_distance`. `add_focus(seconds)`가 `total_focus_seconds` 누적 + `changed` 발신.
 - **`ActivityLog`**: `events`(자동 수집 스트림 — `id`/`type`/`ts` + 타입별 payload, 타입 확인됨: `todo`/`pomodoro_session`/`timer`/`journal`) + `play_days`(일자별 누적 플레이초). **습관 완료는 여기 저장 안 함** — `habit_weeks`에서 파생(단일 진실 원칙 실제 적용 사례).
+  - `ts` = **완료 시각**. 세션 계열(`pomodoro_session`/`timer`)만 `start_ts`(시작 시각)를 추가로 가짐 — **`start_ts` 유무가 "구간이냐 순간이냐"의 판정 기준**이라, 없는 이벤트에 키를 만들면 안 됨(`from_dict`가 `has()` 가드를 두는 이유).
+  - `ts - start_ts` = 일시정지·휴식을 포함한 **실제 벽시계 스팬**. `seconds`는 그와 별개로 **계획된 집중 시간 합계**(`focus_seconds × total_focus_count`)이며 그래프 통계 전용 — 두 값이 다른 게 정상.
+  - `from_dict`가 `id`/`ts`/`start_ts`를 int로 정규화(JSON은 숫자를 float으로 돌려줌).
 - **`Journal`**: `groups`(`id`/`name`, `group_id 0`=미분류) + `docs`(`id`/`title`/`body`/`group_id`/`ts`) 평평 구조. CRUD 메서드(`add_doc`/`update_doc`/`remove_doc`/`add_group`/...) 보유.
 - **`LetterArchive`**: `entries`(`id`/`template_idx`/`subject`/`fact`/`state`/`author`/`ts` — 전보체 형식). `author` 빈 문자열=보낸 것, 아니면 받은 것.
 - **`Lexicon`**: `subjects`(해금된 subject key 배열, 영구·안 줄어듦).
 
 ⚠️ **참고**: `letters`/`lexicon`/`voyage.voyage_distance`는 README.md 기준으론 컨셉상 폐기 대상이지만, 이 데이터 모델·저장 경로는 **코드에 아직 그대로 남아있음**(제거 안 됨) — 스키마 정리·마이그레이션은 의도적으로 안 함(letters/lexicon은 편지 UI 제거 후 방치, `voyage_distance`는 `CompanionMode.gd`가 계속 적립해서 쓰는 값이라 죽은 필드 아님).
+
+### 이벤트의 날짜 소속
+`Save.activity_entries_for(date_iso)`는 **구간 겹침** 기준으로 고름: `start_day <= date_iso <= end_day`(ISO 문자열 비교 = 날짜순). 자정을 넘긴 세션은 시작일·종료일 **양쪽 목록에 모두** 나옴.
+
+- `start_ts`가 없는 구버전 세션은 `start_day = end_day`로 취급 — 근사 역산값(`ts - seconds`)으로 날짜 소속을 바꾸지 않음(부정확한 값이 소속을 결정하면 안 되므로).
+- `record_calendar._recount()`도 같은 기준으로 걸친 날 모두 +1. 다만 **별도 구현**임 — `activity_entries_for`를 안 거치고 `events`를 직접 순회하고, 습관 파생 처리도 두 곳에 중복돼 있음.
 
 ### 공통 유틸리티
 - **`IdGen`**(`scripts/util/id_gen.gd`): `randi()` 기반 안정 ID 생성기. `fresh(used: Dictionary) -> int`가 `used`(사용 중 id 집합)와 충돌 안 나는 새 id를 반환(0도 제외). `ActivityLog`/`Journal`/`LetterArchive`/습관(`Habit._generate_new_id`)이 공통으로 씀.
@@ -65,6 +74,7 @@
 - **`is_focusing()`**: 타이머 작동 중이거나, 포모가 FOCUS 구간을 돌리는 중일 때 true.
 - **HUD 폴링용 읽기**: `active_time_left()`/`active_total()`/`active_paused()`.
 - **HUD 제어용**: `active_toggle()`/`active_skip()`/`active_reset()`.
+- **세션 시작 시각 캡처**: `pomodoro.session_started`/`timer.timer_started`를 구독해 `_pomo_start_ts`/`_timer_start_ts`에 보관(휘발성), 완료 시 payload에 `start_ts`로 실어 보내고 0으로 클리어. 두 시그널 모두 **첫 시작에서만 발신**되고 재개는 다른 분기라 세션당 1회가 보장됨. `Pomodoro`/`SimpleTimer`는 무수정 — 메커니즘이 `Save`를 모르는 원칙 유지.
 - **완료 시 부수효과** (`_on_focus_finished`/`_on_timer_finished`/`_on_session_completed`):
   - `Save.voyage.add_focus(...)` — 집중 통계 적립
   - `Save.lexicon.unlock_subject(current_activity)` — 활동 어휘 해금
@@ -120,8 +130,27 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 `RecordPanel.tscn`(팝업용 3탭: 활동/그래프/일지) 전체를 대체하는 게 아니라 **그중 활동·그래프 둘만** MainShell용으로 새로 구성한 씬(일지는 이번 세션 범위 밖 — 여전히 구 `RecordPanel.tscn` 서브탭으로만 존재, MainShell 최상위 nav엔 없음).
 
 - **구조**: `panel_bg.tres` 카드 하나 안에 `TabNavSlot`(활동/그래프 전환, 외부 주입 없이 직접 소유) + 우측 "한눈에 보기" 요약 레일. 우측 레일은 README 와이어프레임(`docs/app-shell-wireframe.svg`)의 점선 우측 패널 개념을 실제 적용한 첫 사례.
+- 활동 탭은 좌측 `RecordCalendar` + 우측 `DayTimeline`(구 `RecordView` 평평 리스트를 대체 — 아래 항목).
 
-⚠️ **프리팹 인스턴스 `setup()` 호출 순서 주의**: `scene.instantiate()`로 만든 노드는 트리에 들어가기 전엔 `@onready var`가 아직 비어있음(null). `add_child()`로 먼저 트리에 넣은 뒤에 `setup()`을 불러야 함 — 순서를 반대로 하면 `@onready` 참조가 null이라 런타임 에러. `RecordLogRow` 도입 초기에 이 순서를 반대로 해서 크래시가 난 적 있음(`PomoSegmentChip`/`JournalDocRow`는 이미 이 순서를 지키고 있었음).
+⚠️ **프리팹 인스턴스 `setup()` 호출 순서 주의**: `scene.instantiate()`로 만든 노드는 트리에 들어가기 전엔 `@onready var`가 아직 비어있음(null). `add_child()`로 먼저 트리에 넣은 뒤에 `setup()`을 불러야 함 — 순서를 반대로 하면 `@onready` 참조가 null이라 런타임 에러. `RecordLogRow` 도입 초기에 이 순서를 반대로 해서 크래시가 난 적 있음(`PomoSegmentChip`/`JournalDocRow`는 이미 이 순서를 지키고 있었음). `TimelineBlock`/`TimelinePointRow`/`TimelineHabitChip`도 같은 순서를 따름.
+
+### `DayTimeline` (`scenes/record/DayTimeline.tscn`) — 하루 타임라인
+0~24시 세로 축에 그날 활동을 배치. 구 `RecordView`(평평한 리스트)를 대체하며, `render_day(date_iso)` 인터페이스가 같아서 `RecordDashboard` 쪽은 노드 경로만 바뀌었음.
+
+- **구조**: `Header`(날짜·플레이시간) + `HabitBand`(종일 칩) + `EmptyLabel` + `Scroll/Track`. `Track`은 컨테이너가 아닌 순수 `Control`이라 자식을 앵커·오프셋으로 절대 배치할 수 있음 — `_stretch()`가 폭은 앵커로 트랙에 묶고(빌드 시점 `size`가 0이어도 안전) 세로만 절대값으로 줌.
+- **스케일**: `TimelineTrack.HOUR_PX = 60`, 즉 **1분 = 1px**. 24시간 = 1440px. 첫 활동의 정시 눈금으로 스크롤(한 프레임 대기 후 적용).
+- **세 가지 표현**: 세션(구간을 아는 것) = 블록 / 나머지 = 점 행 / 습관 = 상단 고정 칩. 습관을 축에 안 올리는 이유는 `habit_weeks`에 날짜만 있고 시각이 없어서(파생 이벤트의 `ts`는 정렬용 센티널 `1 << 62`).
+- **인셋**: 점 이벤트의 시각이 어떤 블록 구간 안이면 22px 들여쓰기 — "그 세션 중에 완료했다"를 위치로 표현.
+- **밀어내기**: 점 행이 겹치면 아래로 밀어냄(한 행 = `ROW_H` 18px = 18분). 블록 상단 라벨(`LABEL_H`) 구간도 회피 대상.
+- **자정 클램프**: 시작이 전날이면 축 상단(0분), 끝이 다음날이면 축 하단(1440분)으로 자름. 잘린 쪽 모서리를 각지게 해 이어짐을 표시하고, 라벨에는 그쪽 날짜를 붙임.
+- **근사 블록**: `start_ts` 없는 구버전 세션은 `ts - seconds`로 역산해 그리되 배경·테두리를 옅게 하고 `≈`를 붙임. **파일은 안 고침** — 휴식·일시정지가 빠진 부정확한 값을 영구히 굳히지 않기 위해.
+
+**프리팹 3종**(`TimelineBlock`/`TimelinePointRow`/`TimelineHabitChip`): `RecordLogRow` 관용구(씬이 구조를 갖고 `setup()`이 값을 채움)를 따름. 스타일박스는 **씬 리소스를 `duplicate()`한 뒤 색만 덮음** — 복제 없이 쓰면 모든 인스턴스가 한 리소스를 공유해 마지막 색이 전부에 적용됨. 여백·모서리·테두리는 씬(인스펙터)에 남아 코드로 새지 않음.
+
+⚠️ **현재 코드의 알려진 성질**:
+- 블록 최소 높이가 `LABEL_H`(라벨 한 줄, 약 24분)라 **그보다 짧은 세션은 실제보다 길게 보임**. 라벨을 블록 안에 두는 구조의 대가.
+- 점 행 밀어내기에 **상한이 없음** — 짧은 시간에 여러 건이 몰리면 축이 그만큼 늘어남.
+- 구 `RecordView`가 `RecordPanel.tscn`에 **여전히 인스턴스로 남아 있음**. `_format_event`가 두 벌이고, 자정 걸친 세션이 그 평평한 리스트에는 이틀 모두에 나옴.
 
 ### 포모도로 타임라인 — 4칩 슬라이딩 윈도우 (`pomodoro_view.gd`)
 반복 횟수(N, 최대 12)가 늘어나면 세그먼트 수가 `2N`(FOCUS+SHORT_BREAK 교대 반복 + 마지막 LONG_BREAK)이 되어, 칩을 전부 나열하면 카드 폭을 넘어서는 문제가 있었음 — `_build_window()`가 항상 최대 4칩만 그리도록 재설계됨(구 `_rebuild_timeline`+`_update_chip_states` 대체):
@@ -149,7 +178,7 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 - 적용 사례: Todo(태스크·그룹), 알람, 습관 4곳.
 
 ### 날짜/기간 — `DateUtil` + `PeriodNav`
-- **`DateUtil`**(`scripts/util/due_date_util.gd`, static 전용): 요일정렬(`month_grid`, 월요일 시작), 마감일 상대 표기(`format_due`: 오늘/내일/월-일), 기록용 상대 표기(`format_day`: 오늘/어제), 주 시작일(`monday_iso`), UTC→로컬 변환(`local_day_iso`, 타임존 bias 적용) 등. Todo·기록 캘린더·습관 트래커·그래프뷰 4곳이 공유.
+- **`DateUtil`**(`scripts/util/due_date_util.gd`, static 전용): 요일정렬(`month_grid`, 월요일 시작), 마감일 상대 표기(`format_due`: 오늘/내일/월-일), 기록용 상대 표기(`format_day`: 오늘/어제), 주 시작일(`monday_iso`), UTC→로컬 변환(`local_day_iso`, 타임존 bias 적용), 로컬 자정 기준 경과 분(`local_minutes`, 타임라인 y좌표용) 등. Todo·기록 캘린더·습관 트래커·그래프뷰 4곳이 공유.
 - **`PeriodNav`**(`scripts/commonui/period_nav.gd`): 주/월/년 단위 이전·다음·오늘 네비게이션. 두 모드 지원 — 산술 계산(`_step_arithmetic`, `DateUtil`로 날짜 가감) 또는 **유효 시작일 목록 안에서만 이동**(`set_valid_starts`, 예: 습관처럼 실제 데이터가 있는 주만 넘나들 때). 미래로는 "현재" 이상 못 감(`is_current`면 다음 버튼 비활성).
 
 ### 입력 보조 — `LineEditAutoBlur`
@@ -157,6 +186,7 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 
 ### 시각화
 - **`BarChart`**(`scripts/commonui/bar_chart.gd`, `Control`, `_draw()` 기반): 여러 시리즈(`{values, color}`)를 그룹 막대로. `series`/`axis_max` setter가 `queue_redraw()` 트리거. 그래프뷰(플레이시간 vs 집중시간)에서 사용.
+- **`TimelineTrack`**(`scripts/record/timeline_track.gd`, `Control`, `_draw()` 기반): 0~24시 눈금선과 시각 라벨만 그림. `HOUR_PX`/`MIN_PX`/`GUTTER`의 **단일 출처**이고, `_ready()`에서 `custom_minimum_size.y`를 24시간분으로 잡음(스케일을 바꾸면 트랙 높이가 따라옴). `resized`에 `queue_redraw`를 걸어 폭 변화에 대응.
 - **`SegmentTimeline`**(`scripts/commonui/segment_timeline.gd`): 포모도로 구간(FOCUS/SHORT_BREAK/LONG_BREAK)을 폭이 다른 "필"들로 그림, 완료/현재/대기 상태별 색상. `Pomodoro.SegmentType`에 직접 의존(포모 전용이라 완전 범용은 아님).
 
 ### 인터랙션 보조
@@ -173,6 +203,8 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 
 ### 원칙
 원본 문자열을 UPPER_SNAKE_CASE 키로 관리(`localization/translations.csv`, 실제 CSV는 이번 확인 범위 밖 — 경로만 참고). 코드에서 발견되는 키 네이밍 패턴: 도메인 접두사 + 용도. 예: `DATE_MONTH_LABEL`, `RECORD_EVENT_TODO`, `TODO_SORT_MANUAL`, `CLOCK_POMO_FOCUS`, `HABIT_NEW_NAME`, `PERIOD_NAV_THIS_WEEK`. 동적 값은 문장 전체를 키로 갖고 `.format({...})`로 채움(조각을 이어붙이지 않음).
+
+자정을 넘긴 구간 표기는 **다른 날인 쪽에만 날짜를 붙임** — `RECORD_SPAN_CROSSDAY`(`{day} {start}–{end}`, 시작이 다른 날), `RECORD_SPAN_CROSSDAY_END`(`{start}–{day} {end}`, 끝이 다른 날). 같은 날 안에서 끝나는 구간은 키 없이 `%s–%s`로 조립함(대시 하나는 언어 무관, 날짜와 시각의 어순은 언어 의존이라 그쪽만 키로 뺌).
 
 ### `TranslationServer.translate()` vs `tr()` — 실제 사용 분포
 - **`TranslationServer.translate()`**: 15개 파일에서 확인됨. `DateUtil`(static 전용 유틸)·`TodoSort`처럼 **static 함수/`RefCounted`(비-Node) 클래스**에서 특히 이 방식을 씀 — `tr()`은 `Object` 인스턴스 메서드라 이런 컨텍스트에서 쓸 수 없기 때문(호출 주체가 없음).
