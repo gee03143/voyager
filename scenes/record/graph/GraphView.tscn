@@ -11,6 +11,17 @@ offset_bottom = 340.0
 theme_override_constants/separation = 12
 script = ExtResource("1_3n2fn")
 
+[node name="TotalFocusTile" type="VBoxContainer" parent="." unique_id=93652843]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="TotalFocusTile" unique_id=842528350]
+layout_mode = 2
+text = "RECORD_TOTAL_FOCUS"
+
+[node name="Value" type="Label" parent="TotalFocusTile" unique_id=319720938]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
 [node name="ModeNav" type="HBoxContainer" parent="." unique_id=1924756095]
 layout_mode = 2
 

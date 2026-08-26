@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://c3e7ju5nko6c"]
+
+[ext_resource type="Script" uid="uid://c7tdm3av08kb" path="res://scripts/timer/focus_history_row.gd" id="1_yj35k"]
+[ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="2_ue2mm"]
+
+[node name="FocusHistoryRow" type="PanelContainer" unique_id=1742310928]
+script = ExtResource("1_yj35k")
+
+[node name="HBox" type="HBoxContainer" parent="." unique_id=1411867025]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TimeCol" type="VBoxContainer" parent="HBox" unique_id=1451912977]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+
+[node name="SpanLabel" type="Label" parent="HBox/TimeCol" unique_id=638902176]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_override_font_sizes/font_size = 11
+
+[node name="LabelLabel" type="Label" parent="HBox/TimeCol" unique_id=1952903949]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="NoteCol" type="VBoxContainer" parent="HBox" unique_id=2081925344]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NoteLabel" type="Label" parent="HBox/NoteCol" unique_id=1696245083]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+autowrap_mode = 1
+
+[node name="Edit" type="TextEdit" parent="HBox/NoteCol" unique_id=1671984147]
+visible = false
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+wrap_mode = 1
+
+[node name="LineEditAutoBlur" type="Node" parent="." unique_id=1052935657 node_paths=PackedStringArray("target")]
+script = ExtResource("2_ue2mm")
+target = NodePath("../HBox/NoteCol/Edit")

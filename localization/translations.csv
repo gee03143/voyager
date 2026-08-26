@@ -122,3 +122,13 @@ MOOD_CANCEL_EDIT_BUTTON,취소,Cancel
 MOOD_HISTORY_LABEL,기록,History
 RECORD_SPAN_CROSSDAY,{day} {start}–{end},{day} {start}–{end}
 RECORD_SPAN_CROSSDAY_END,{start}–{day} {end},{start}–{day} {end}
+RECORD_NOTE_BACK,닫기,Close
+RECORD_NOTE_CLEAR,노트 지우기,Clear note
+RECORD_NOTE_PLACEHOLDER,짧은 메모 (선택),Short note (optional)
+RECORD_NOTE_STREAM_TITLE,남긴 기록 {n},Notes {n}
+RECORD_NOTE_STREAM_EMPTY,타임라인에서 항목을 골라 메모를 남겨보세요.,Pick an item on the timeline to add a note.
+RECORD_DAY_COUNT,{n}건,{n} entries
+TIMER_HISTORY_TITLE,오늘의 집중,Today's focus
+TIMER_HISTORY_SUMMARY,{n}세션 · {time},{n} sessions · {time}
+TIMER_HISTORY_EMPTY,아직 완료한 세션이 없어요.,No sessions yet today.
+TIMER_HISTORY_ADD_NOTE,메모 없음 — 눌러서 추가,No note — click to add

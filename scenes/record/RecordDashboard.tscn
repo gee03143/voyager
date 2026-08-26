@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://trgf44c8f1u" path="res://scripts/commonui/tab_nav_slot.gd" id="3_me352"]
 [ext_resource type="PackedScene" uid="uid://dxvwumqoq31b7" path="res://scenes/record/graph/GraphView.tscn" id="4_me352"]
 [ext_resource type="PackedScene" uid="uid://c1v0hjqeattsl" path="res://scenes/record/Timeline/DayTimeline.tscn" id="5_7wc1k"]
+[ext_resource type="PackedScene" uid="uid://cp0amj5so5r5e" path="res://scenes/record/Timeline/NoteEditor.tscn" id="7_me352"]
+[ext_resource type="PackedScene" uid="uid://b1kjtke6q5hdf" path="res://scenes/record/Timeline/NoteStream.tscn" id="8_n02kd"]
 
 [node name="RecordDashboard" type="PanelContainer" unique_id=601049294]
 theme_override_styles/panel = ExtResource("1_o3j4l")
@@ -50,7 +52,7 @@ visible = false
 layout_mode = 2
 
 [node name="Summary" type="PanelContainer" parent="Margin/Body" unique_id=366986904]
-custom_minimum_size = Vector2(180, 0)
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 
 [node name="SummaryMargin" type="MarginContainer" parent="Margin/Body/Summary" unique_id=1406079994]
@@ -64,39 +66,8 @@ theme_override_constants/margin_bottom = 14
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SummaryTitle" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=1859812589]
-layout_mode = 2
-text = "RECORD_SUMMARY_TITLE"
-
-[node name="TodayCountTile" type="VBoxContainer" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=1253001247]
+[node name="NoteStream" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=776821205 instance=ExtResource("8_n02kd")]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayCountTile" unique_id=744226382]
+[node name="NoteEditor" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=571126661 instance=ExtResource("7_me352")]
 layout_mode = 2
-text = "RECORD_TODAY_COUNT"
-
-[node name="Value" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayCountTile" unique_id=986263111]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-
-[node name="TodayTimeTile" type="VBoxContainer" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=1914676043]
-layout_mode = 2
-
-[node name="Title" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayTimeTile" unique_id=419103496]
-layout_mode = 2
-text = "RECORD_TODAY_TIME"
-
-[node name="Value" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayTimeTile" unique_id=1417303977]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-
-[node name="TotalFocusTile" type="VBoxContainer" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox" unique_id=1497665550]
-layout_mode = 2
-
-[node name="Title" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TotalFocusTile" unique_id=183003383]
-layout_mode = 2
-text = "RECORD_TOTAL_FOCUS"
-
-[node name="Value" type="Label" parent="Margin/Body/Summary/SummaryMargin/SummaryVBox/TotalFocusTile" unique_id=1953277933]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20

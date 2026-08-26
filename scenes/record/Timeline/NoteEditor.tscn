@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://cp0amj5so5r5e"]
+
+[ext_resource type="Script" uid="uid://p10aydo1bil2" path="res://scripts/record/timeline/note_editor.gd" id="1_xcsm2"]
+[ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="2_s3mjw"]
+
+[node name="NoteEditor" type="VBoxContainer" unique_id=571126661]
+script = ExtResource("1_xcsm2")
+
+[node name="MetaLabel" type="Label" parent="." unique_id=1016682787]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_override_font_sizes/font_size = 11
+
+[node name="TitleLabel" type="Label" parent="." unique_id=2008181324]
+custom_minimum_size = Vector2(212, 0)
+layout_mode = 2
+autowrap_mode = 1
+max_lines_visible = 3
+
+[node name="Edit" type="TextEdit" parent="." unique_id=1276519704]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+placeholder_text = "RECORD_NOTE_PLACEHOLDER"
+wrap_mode = 1
+
+[node name="ClearButton" type="Button" parent="." unique_id=1571952006]
+layout_mode = 2
+text = "RECORD_NOTE_CLEAR"
+
+[node name="BackButton" type="Button" parent="." unique_id=1029769115]
+layout_mode = 2
+text = "RECORD_NOTE_BACK"
+
+[node name="LineEditAutoBlur" type="Node" parent="." unique_id=1449194471 node_paths=PackedStringArray("target")]
+script = ExtResource("2_s3mjw")
+target = NodePath("../Edit")

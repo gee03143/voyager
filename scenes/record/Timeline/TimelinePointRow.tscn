@@ -9,7 +9,7 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [node name="TimelinePointRow" type="HBoxContainer" unique_id=1655551189]
-mouse_filter = 2
+mouse_filter = 0
 theme_override_constants/separation = 7
 script = ExtResource("1_u1lme")
 
@@ -22,6 +22,7 @@ theme_override_font_sizes/font_size = 11
 custom_minimum_size = Vector2(8, 8)
 layout_mode = 2
 size_flags_vertical = 4
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bwoxv")
 
 [node name="TextLabel" type="Label" parent="." unique_id=904798649]

@@ -5,9 +5,8 @@ extends PanelContainer
 @onready var graph_panel: Control = $Margin/Body/Main/GraphPanel
 @onready var calendar = $Margin/Body/Main/ActivityPanel/Calendar
 @onready var view = $Margin/Body/Main/ActivityPanel/Timeline
-@onready var today_count_value: Label = $Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayCountTile/Value
-@onready var today_time_value: Label = $Margin/Body/Summary/SummaryMargin/SummaryVBox/TodayTimeTile/Value
-@onready var total_focus_value: Label = $Margin/Body/Summary/SummaryMargin/SummaryVBox/TotalFocusTile/Value
+@onready var note_editor: NoteEditor = $Margin/Body/Summary/SummaryMargin/SummaryVBox/NoteEditor
+@onready var note_stream: NoteStream = $Margin/Body/Summary/SummaryMargin/SummaryVBox/NoteStream
 
 var _day: String = ""
 
@@ -15,13 +14,22 @@ func _ready() -> void:
 	tab_row.tab_selected.connect(_on_tab_selected)
 	tab_row.set_tabs(["RECORD_TAB_ACTIVITY", "RECORD_TAB_GRAPH"])
 	calendar.day_selected.connect(_on_day_selected)
+	view.entry_selected.connect(_on_entry_selected)
+	note_editor.back_requested.connect(_on_note_back)
+	note_stream.entry_selected.connect(_on_stream_selected)
+	view.rendered.connect(_refresh_stream)
+	_show_editor(false)
 	Save.activity_log.changed.connect(_on_activity_changed)
 	if not has_meta("pooled"):
 		on_shown()
 
 func on_shown() -> void:
 	_select_day(DateUtil.today_iso())
-	_refresh_summary()
+
+func _on_activity_changed() -> void:
+	calendar.refresh()
+	if _day != "":
+		view.render_day(_day)
 
 func _on_tab_selected(index: int) -> void:
 	activity_panel.visible = (index == 0)
@@ -29,21 +37,29 @@ func _on_tab_selected(index: int) -> void:
 
 func _on_day_selected(iso: String) -> void:
 	_day = iso
+	_on_note_back()
 	view.render_day(iso)
-
-func _on_activity_changed() -> void:
-	calendar.refresh()
-	if _day != "":
-		view.render_day(_day)
-	_refresh_summary()
 
 func _select_day(iso: String) -> void:
 	_day = iso
 	calendar.set_selected(iso)
 	view.render_day(iso)
+	
+func _on_entry_selected(event_id: int, meta: String, title: String) -> void:
+	note_editor.open_for(event_id, meta, title)
+	_show_editor(true)
 
-func _refresh_summary() -> void:
-	var today := DateUtil.today_iso()
-	today_count_value.text = TranslationServer.translate("RECORD_TODAY_COUNT_VALUE").format({"n": Save.activity_entries_for(today).size()})
-	today_time_value.text = DateUtil.format_hm(Save.activity_log.play_days.get(today, 0.0))
-	total_focus_value.text = DateUtil.format_hm(Save.voyage.total_focus_seconds)
+func _on_note_back() -> void:
+	view.clear_selection()
+	_show_editor(false)
+	
+func _on_stream_selected(event_id: int, meta: String, title: String) -> void:
+	view.select_entry(event_id)              # 타임라인 하이라이트 동기화
+	_on_entry_selected(event_id, meta, title)
+
+func _refresh_stream() -> void:
+	note_stream.render(view.entries_with_notes())
+
+func _show_editor(on: bool) -> void:
+	note_editor.visible = on
+	note_stream.visible = not on

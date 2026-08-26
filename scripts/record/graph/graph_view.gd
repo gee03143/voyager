@@ -12,6 +12,7 @@ const FOCUS_COLOR := Color("8bc34a")
 @onready var _day_labels: HBoxContainer = $ChartRow/ChartCol/DayLabels
 @onready var _play_swatch: ColorRect = $ChartRow/ChartCol/Legend/PlaySwatch
 @onready var _focus_swatch: ColorRect = $ChartRow/ChartCol/Legend/FocusSwatch
+@onready var _total_focus_value: Label = $TotalFocusTile/Value
 
 var _mode_nav := ButtonGroupNav.new()
 
@@ -25,6 +26,8 @@ func _ready() -> void:
 	_chart.resized.connect(_update_axis_positions)
 	Save.activity_log.changed.connect(func(): _refresh(_period_nav.current_start()))
 	_refresh(_period_nav.current_start())
+	Save.voyage.changed.connect(_refresh_total_focus)
+	_refresh_total_focus()
 
 func _on_mode_selected(index: int) -> void:
 	match index:
@@ -65,6 +68,9 @@ func _refresh_year(start: String) -> void:
 		if int(p[0]) == year:
 			play_values[int(p[1]) - 1] += float(Save.activity_log.play_days[iso])
 	_apply_series(play_values, _focus_seconds_for_months(year))
+
+func _refresh_total_focus() -> void:
+	_total_focus_value.text = DateUtil.format_hm(Save.voyage.total_focus_seconds)
 
 func _apply_series(play_values: Array[float], focus_values: Array[float]) -> void:
 	_chart.series = [
