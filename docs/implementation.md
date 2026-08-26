@@ -42,9 +42,9 @@
   - `ts - start_ts` = 일시정지·휴식을 포함한 **실제 벽시계 스팬**. `seconds`는 그와 별개로 **계획된 집중 시간 합계**(`focus_seconds × total_focus_count`)이며 그래프 통계 전용 — 두 값이 다른 게 정상.
   - `from_dict`가 `id`/`ts`/`start_ts`를 int로 정규화(JSON은 숫자를 float으로 돌려줌).
   - **`note`(선택)** — 사용자가 나중에 붙이는 짧은 회고. 이 스트림에서 **유일한 사용자 편집 대상**이며, 통계·그래프 계산엔 절대 안 씀(README의 "뽀모도로 로그 = reflection의 객관적 근거" 원칙 유지 — 객관 수치와 자기보고를 같은 이벤트에 담되 필드로 분리).
-    - 읽기/쓰기는 `note_of(id)`/`set_note(id, text)`로만. 빈 노트는 `""`로 저장하지 않고 **키째 제거**(`start_ts`와 같은 "키 유무가 의미" 규칙 — 파일에 빈 문자열이 쌓이지 않게).
-    - `set_note`는 값이 이전과 같으면 `changed`를 **안 쏨**. `changed` 한 번이 곧 파일 쓰기인데 노트는 자동 저장이라 호출이 잦기 때문.
-    - 습관 파생 이벤트는 `id` 키 자체가 없으므로(아래 "이벤트의 날짜 소속" 참고) 노트 대상이 아님. `_find()`가 `id == 0`에서 즉시 빠져나옴.
+	- 읽기/쓰기는 `note_of(id)`/`set_note(id, text)`로만. 빈 노트는 `""`로 저장하지 않고 **키째 제거**(`start_ts`와 같은 "키 유무가 의미" 규칙 — 파일에 빈 문자열이 쌓이지 않게).
+	- `set_note`는 값이 이전과 같으면 `changed`를 **안 쏨**. `changed` 한 번이 곧 파일 쓰기인데 노트는 자동 저장이라 호출이 잦기 때문.
+	- 습관 파생 이벤트는 `id` 키 자체가 없으므로(아래 "이벤트의 날짜 소속" 참고) 노트 대상이 아님. `_find()`가 `id == 0`에서 즉시 빠져나옴.
   - `add()`는 만들어진 이벤트의 **id를 반환**함(`Journal.add_doc()`과 같은 형태). 현재 소비자는 없고, 컴패니언이 "방금 끝난 세션"을 지목할 때 쓸 자리.
 - **`Journal`**: `groups`(`id`/`name`, `group_id 0`=미분류) + `docs`(`id`/`title`/`body`/`group_id`/`ts`) 평평 구조. CRUD 메서드(`add_doc`/`update_doc`/`remove_doc`/`add_group`/...) 보유.
 - **`LetterArchive`**: `entries`(`id`/`template_idx`/`subject`/`fact`/`state`/`author`/`ts` — 전보체 형식). `author` 빈 문자열=보낸 것, 아니면 받은 것.
