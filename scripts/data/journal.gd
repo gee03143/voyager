@@ -35,6 +35,12 @@ func remove_doc(id: int) -> void:
 			changed.emit()
 			return
 
+func has_doc(id: int) -> bool:
+	for d in docs:
+		if int(d.get("id", 0)) == id:
+			return true
+	return false
+
 func doc_title(id: int) -> String:
 	for d in docs:
 		if int(d.get("id", 0)) == id:

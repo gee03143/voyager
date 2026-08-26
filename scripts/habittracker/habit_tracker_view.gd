@@ -13,6 +13,7 @@ const SAVE_DEBOUNCE := 0.5
 var _rows: Array[HabitRow] = []
 var _save_timer: Timer
 var _day_circles: Array[RadialProgress] = []
+var _day_labels: Array[Label] = []
 
 func _ready() -> void:
 	_save_timer = Timer.new()
@@ -62,8 +63,10 @@ func _build_header() -> void:
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col.add_child(lbl)
 		var circle := RadialProgress.new()
+		circle.arc_color = HabitGrid.ACCENT
 		circle.custom_minimum_size = Vector2(HabitGrid.DAY_W, 28)
 		col.add_child(circle)
+		_day_labels.append(lbl)
 		header.add_child(col)
 		_day_circles.append(circle)
 
@@ -80,6 +83,7 @@ func _show_week(week_start: String) -> void:
 		var did := int(def["id"])
 		_add_row(Habit.from_parts(did, def, checks.get(str(did), [])))
 	_refresh_progress()
+	_highlight_today(week_start)
 
 func _add_row(habit: Habit) -> HabitRow:
 	var row := HABIT_ROW.instantiate() as HabitRow
@@ -137,7 +141,18 @@ func _refresh_progress() -> void:
 				if r.is_checked(d):
 					done += 1
 		_day_circles[d].value = (float(done) / active) if active > 0 else 0.0
-		
+
+# 이번 주를 볼 때만 오늘 요일 라벨을 강조. 다른 주면 전부 원래 색으로 되돌린다
+func _highlight_today(week_start: String) -> void:
+	var today_col := -1
+	if week_start == DateUtil.monday_iso():
+		today_col = (int(Time.get_date_dict_from_system().weekday) + 6) % 7   # 일0..토6 → 월요일 시작
+	for i in _day_labels.size():
+		if i == today_col:
+			_day_labels[i].add_theme_color_override("font_color", HabitGrid.ACCENT)
+		else:
+			_day_labels[i].remove_theme_color_override("font_color")
+
 func _index_for(week_start: String) -> int:
 	for i in Save.habit_weeks.size():
 		if str(Save.habit_weeks[i]["week_start"]) == week_start:

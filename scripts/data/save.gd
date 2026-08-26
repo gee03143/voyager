@@ -255,9 +255,23 @@ func quit_game() -> void:
 	save_mood()
 	get_tree().quit()
 	
+# 원본이 삭제된 참조형 이벤트(journal/mood/gratitude) 판정.
+# 화면에서 빼는 용도로만 씀 — 파일(records.json)의 이벤트는 그대로 둔다
+func is_orphan_event(e: Dictionary) -> bool:
+	match str(e.get("type", "")):
+		"journal":
+			return not journal.has_doc(int(e.get("doc_id", 0)))
+		"mood":
+			return mood.entry_by_id(int(e.get("entry_id", 0))).is_empty()   # 조회 함수가 이미 있음
+		"gratitude":
+			return not gratitude.has_entry(int(e.get("entry_id", 0)))
+	return false                                                            # 나머지 타입은 참조가 없어 orphan이 될 수 없음
+	
 func activity_entries_for(date_iso: String) -> Array:    # 로그 이벤트 + 습관 파생 완료를 날짜 기준으로 병합(raw, 포맷 없음)
 	var out := []
 	for e in activity_log.events:
+		if is_orphan_event(e):        # 원본 삭제된 참조형 이벤트는 제외
+			continue
 		var end_day := DateUtil.local_day_iso(int(e.get("ts", 0)))
 		var start_day := end_day
 		if e.has("start_ts"):

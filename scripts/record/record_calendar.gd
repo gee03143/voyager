@@ -44,6 +44,8 @@ func set_selected(iso: String) -> void: # 패널이 선택일 동기화(신호 �
 func _recount() -> void:
 	_counts = {}
 	for e in Save.activity_log.events:
+		if Save.is_orphan_event(e):          # 원본 삭제된 참조형 이벤트는 히트맵에서도 제외
+			continue
 		var end_iso := DateUtil.local_day_iso(int(e.get("ts", 0)))
 		var iso := end_iso
 		if e.has("start_ts"):

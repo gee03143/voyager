@@ -40,6 +40,12 @@ func entry_for_date(date_iso: String) -> Dictionary:
 			return e
 	return {}
 
+func has_entry(id: int) -> bool:
+	for e in entries:
+		if int(e.get("id", 0)) == id:
+			return true
+	return false
+
 func to_dict() -> Dictionary:
 	return {"entries": entries}
 
