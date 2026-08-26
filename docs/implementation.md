@@ -8,25 +8,27 @@
 - **저장소**: `C:\Users\NHN\Documents\voyager`
 - **진입점**: `World.tscn`. 좌측 도크(`ButtonGroupNav`)에서 도구 패널을 열고 닫는 구조.
 - **디렉터리 구조**:
-  - `scripts/` — 도메인별 하위 폴더(`data/`, `timer/`, `todo/`, `habittracker/`, `commonui/`, `util/`, `audio/`, `record/`, `letter/`, `discovery/`, `option/`, `display/`)
+  - `scripts/` — 도메인별 하위 폴더(`data/`, `timer/`, `todo/`, `habittracker/`, `commonui/`, `util/`, `audio/`, `record/`, `letter/`, `discovery/`, `option/`, `display/`). 일부는 2단계로 더 나뉨 — `record/timeline/`(하루 타임라인·노트 편집기), `record/journal/`(저널·무드·감사일지), `record/graph/`, `timer/focushistory/`
   - `scenes/` — `.tscn` 씬 파일, `scripts/`와 대응하는 하위 구조
   - `localization/` — `translations.csv`
   - `assets/` — `sounds/`, `placeholder/`
 
 ## 2. 데이터 계층
 
-### 저장 파일 (4개로 분리, `user://` 하위)
+### 저장 파일 (6개로 분리, `user://` 하위)
 | 파일 | version | 담당 필드 |
 |---|---|---|
 | `save.json` | 8 | `settings`, `alarms`, `habit_defs`, `habit_weeks`, `voyage`, `letters`, `lexicon` |
 | `records.json` | 2 | `activity_log` |
 | `journal.json` | 1 | `journal`(`groups`, `docs`) |
 | `todo.json` | 1 | `todo_groups` |
+| `gratitude.json` | 1 | `gratitude`(`entries`) |
+| `mood.json` | 1 | `mood`(`entries`) |
 
-`Save`(autoload, `scripts/data/save.gd`)가 4개 파일을 전부 소유. 파일별로 `save_*()`/`load_*()` 쌍이 독립적으로 존재(`save_game`/`load_game`, `save_records`/`load_records`, `save_journal`/`load_journal`, `save_todo`/`load_todo`).
+`Save`(autoload, `scripts/data/save.gd`)가 6개 파일을 전부 소유. 파일별로 `save_*()`/`load_*()` 쌍이 독립적으로 존재(`save_game`/`load_game`, `save_records`/`load_records`, `save_journal`/`load_journal`, `save_todo`/`load_todo`, `save_gratitude`/`load_gratitude`, `save_mood`/`load_mood`).
 
 ### 저장 트리거
-- **시그널 기반**: `settings.changed`/`voyage.changed`/`lexicon.changed`/`letters.changed` → `save_game()`, `activity_log.changed` → `save_records()`, `journal.changed` → `save_journal()`
+- **시그널 기반**: `settings.changed`/`voyage.changed`/`lexicon.changed`/`letters.changed` → `save_game()`, `activity_log.changed` → `save_records()`, `journal.changed` → `save_journal()`, `gratitude.changed` → `save_gratitude()`, `mood.changed` → `save_mood()`
 - **뷰 디바운스 기반**: `todo_view.gd`/`habit_tracker_view.gd`/`alarm_view.gd`가 각자 `SAVE_DEBOUNCE = 0.5`(초)짜리 `one_shot Timer`를 갖고, 변경마다 타이머를 재시작(`start()`) → 만료 시 `Save.save_todo()`(todo) 또는 `Save.save_game()`(habit·alarm) 직접 호출. `journal_view.gd`도 동일 디바운스 상수(0.5)를 가짐.
 
 ### 구버전 마이그레이션
@@ -35,13 +37,22 @@
 ### 데이터 모델 (`scripts/data/`, 전부 `RefCounted` + `changed` 시그널)
 - **`AppSettings`**: 포모(`focus_seconds`/`short_break_seconds`/`long_break_seconds`/`total_focus_count`/`timer_seconds`), 화면(`window_mode`/`window_size`/`fps_focused`/`fps_unfocused`/`always_on_top`), 사운드(`master_volume`/`sound_set`), HUD(`hud_position`/`hud_scale`), 컴패니언 모드 관련(`auto_minimize`/`auto_exit_companion`/`companion_position`) 필드 보유. 키 없으면 기본값 유지하도록 `from_dict`가 설계됨(스키마 진화 대응).
 - **`Voyage`**: `total_play_seconds`/`total_focus_seconds`/`voyage_distance`. `add_focus(seconds)`가 `total_focus_seconds` 누적 + `changed` 발신.
-- **`ActivityLog`**: `events`(자동 수집 스트림 — `id`/`type`/`ts` + 타입별 payload, 타입 확인됨: `todo`/`pomodoro_session`/`timer`/`journal`) + `play_days`(일자별 누적 플레이초). **습관 완료는 여기 저장 안 함** — `habit_weeks`에서 파생(단일 진실 원칙 실제 적용 사례).
+- **`ActivityLog`**: `events`(자동 수집 스트림 — `id`/`type`/`ts` + 타입별 payload, 타입 확인됨: `todo`/`pomodoro_session`/`timer`/`journal`/`gratitude`/`mood`) + `play_days`(일자별 누적 플레이초). **습관 완료는 여기 저장 안 함** — `habit_weeks`에서 파생(단일 진실 원칙 실제 적용 사례).
   - `ts` = **완료 시각**. 세션 계열(`pomodoro_session`/`timer`)만 `start_ts`(시작 시각)를 추가로 가짐 — **`start_ts` 유무가 "구간이냐 순간이냐"의 판정 기준**이라, 없는 이벤트에 키를 만들면 안 됨(`from_dict`가 `has()` 가드를 두는 이유).
   - `ts - start_ts` = 일시정지·휴식을 포함한 **실제 벽시계 스팬**. `seconds`는 그와 별개로 **계획된 집중 시간 합계**(`focus_seconds × total_focus_count`)이며 그래프 통계 전용 — 두 값이 다른 게 정상.
   - `from_dict`가 `id`/`ts`/`start_ts`를 int로 정규화(JSON은 숫자를 float으로 돌려줌).
+  - **`note`(선택)** — 사용자가 나중에 붙이는 짧은 회고. 이 스트림에서 **유일한 사용자 편집 대상**이며, 통계·그래프 계산엔 절대 안 씀(README의 "뽀모도로 로그 = reflection의 객관적 근거" 원칙 유지 — 객관 수치와 자기보고를 같은 이벤트에 담되 필드로 분리).
+    - 읽기/쓰기는 `note_of(id)`/`set_note(id, text)`로만. 빈 노트는 `""`로 저장하지 않고 **키째 제거**(`start_ts`와 같은 "키 유무가 의미" 규칙 — 파일에 빈 문자열이 쌓이지 않게).
+    - `set_note`는 값이 이전과 같으면 `changed`를 **안 쏨**. `changed` 한 번이 곧 파일 쓰기인데 노트는 자동 저장이라 호출이 잦기 때문.
+    - 습관 파생 이벤트는 `id` 키 자체가 없으므로(아래 "이벤트의 날짜 소속" 참고) 노트 대상이 아님. `_find()`가 `id == 0`에서 즉시 빠져나옴.
+  - `add()`는 만들어진 이벤트의 **id를 반환**함(`Journal.add_doc()`과 같은 형태). 현재 소비자는 없고, 컴패니언이 "방금 끝난 세션"을 지목할 때 쓸 자리.
 - **`Journal`**: `groups`(`id`/`name`, `group_id 0`=미분류) + `docs`(`id`/`title`/`body`/`group_id`/`ts`) 평평 구조. CRUD 메서드(`add_doc`/`update_doc`/`remove_doc`/`add_group`/...) 보유.
 - **`LetterArchive`**: `entries`(`id`/`template_idx`/`subject`/`fact`/`state`/`author`/`ts` — 전보체 형식). `author` 빈 문자열=보낸 것, 아니면 받은 것.
 - **`Lexicon`**: `subjects`(해금된 subject key 배열, 영구·안 줄어듦).
+- **`Gratitude`**: `entries`(`id`/`date_iso`/`items`(문자열 배열)/`ts`). 하루 1건·항목 수 자유. **날짜 유일성은 뷰(`entry_for_date`)가 보장하고 모델은 미강제** — `Journal`이 중복을 모델에서 막지 않는 것과 같은 원칙.
+- **`Mood`**: `entries`(`id`/`ts`/`level`(1~5)/`memo`). 로그형이라 하루 여러 건 허용. `add_entry`/`update_entry`가 `level`을 1~5로 clamp.
+
+⚠️ 이 두 모델과 저널 탭(`scripts/record/journal/` — `JournalDashboard`/`MoodView`/`GratitudeView` 등)의 **뷰 구조는 아직 이 문서에 반영되지 않음**. 데이터 계층 사실(파일·필드·저장 트리거)만 최신화한 상태이고, 탭 구조 서술은 별도 작업으로 남김.
 
 ⚠️ **참고**: `letters`/`lexicon`/`voyage.voyage_distance`는 README.md 기준으론 컨셉상 폐기 대상이지만, 이 데이터 모델·저장 경로는 **코드에 아직 그대로 남아있음**(제거 안 됨) — 스키마 정리·마이그레이션은 의도적으로 안 함(letters/lexicon은 편지 UI 제거 후 방치, `voyage_distance`는 `CompanionMode.gd`가 계속 적립해서 쓰는 값이라 죽은 필드 아님).
 
@@ -51,8 +62,14 @@
 - `start_ts`가 없는 구버전 세션은 `start_day = end_day`로 취급 — 근사 역산값(`ts - seconds`)으로 날짜 소속을 바꾸지 않음(부정확한 값이 소속을 결정하면 안 되므로).
 - `record_calendar._recount()`도 같은 기준으로 걸친 날 모두 +1. 다만 **별도 구현**임 — `activity_entries_for`를 안 거치고 `events`를 직접 순회하고, 습관 파생 처리도 두 곳에 중복돼 있음.
 
+⚠️ **반환값은 `events` 안 dict의 참조**(복사 아님, `out.append(e)`). 뷰에서 `e["note"] = ...`처럼 직접 쓰면 값은 바뀌는데 `changed`가 안 나가서 **저장이 누락됨** — 쓰기는 반드시 `ActivityLog`의 메서드를 경유할 것.
+⚠️ 습관 파생 이벤트는 여기서 즉석 생성되며 `{ts, type, title}`뿐이라 **`id` 키가 없음**. id로 지목하는 기능(노트 등)의 대상이 될 수 없고, 각 뷰가 `id == 0` 가드를 둬야 함.
+
 ### 공통 유틸리티
-- **`IdGen`**(`scripts/util/id_gen.gd`): `randi()` 기반 안정 ID 생성기. `fresh(used: Dictionary) -> int`가 `used`(사용 중 id 집합)와 충돌 안 나는 새 id를 반환(0도 제외). `ActivityLog`/`Journal`/`LetterArchive`/습관(`Habit._generate_new_id`)이 공통으로 씀.
+- **`IdGen`**(`scripts/util/id_gen.gd`): `randi()` 기반 안정 ID 생성기. `fresh(used: Dictionary) -> int`가 `used`(사용 중 id 집합)와 충돌 안 나는 새 id를 반환(0도 제외). `ActivityLog`/`Journal`/`LetterArchive`/`Gratitude`/`Mood`/습관(`Habit._generate_new_id`)이 공통으로 씀.
+- **`ActivityFormat`**(`scripts/util/activity_format.gd`, static 전용): 활동 이벤트의 **표시용 포맷 단일 출처**. `ACCENT`(타입별 색)/`accent_of()`, `start_ts_of()`(구버전은 `ts - seconds` 역산, 불가하면 0)/`is_approx()`, `span_text(start_ts, end_ts, day_iso)`(자정 걸침 표기 포함), `session_label()`(포모/타이머 요약), `mmss()`.
+  - **`Save`를 봐야 하는 타입(`journal`/`mood`/`gratitude`)은 일부러 안 넣음** — 각 뷰가 자기 문맥에서 처리. 덕분에 이 유틸은 `DateUtil`/`ActivityVocab`에만 의존하는 순수 static으로 유지됨.
+  - `DayTimeline`과 `FocusHistory`가 공유. 타이머 히스토리를 만들면서 세션 포맷이 세 벌째가 될 상황이라 그 시점에 추출함.
 
 ## 3. 타이밍 인프라
 
@@ -116,28 +133,51 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 
 - **구조**: `Sidebar`(로고 + `NavList` + 하단 `SettingsButton`·`MiniTimer`) + `MainColumn`(`Banner`(컴패니언 아바타+말풍선) + `BodyRow/ContentArea`). `MiniTimer`는 `Clock` 상태 따라 제목·아이콘·시간·상태 자동 갱신(`mini_timer.gd`) + 아래 미니 위젯 토글 겸함.
 - **콘텐츠 스왑**: `_nav`(`ButtonGroupNav`)가 `NavList` 버튼을 인덱스로 관리, `_on_nav_selected(index)`가 `CONTENT_SCENES[index]`를 `PanelPool.get_instance()`로 얻어 `content_area`에 reparent. `PopupFrame`의 `NavSlot`(서브탭) 패턴은 의도적으로 안 씀(롤백 이력 있음).
-- **`CONTENT_SCENES`**: `1: TodoListView.tscn`, `2: HabitTrackerView.tscn`, `3: TimerDashboard.tscn`, `4: RecordDashboard.tscn`(이번 세션 추가). NavList 순번은 Home(0)/Todo(1)/Habit(2)/Timer(3)/Record(4) — **Home(0)만 아직 매핑 안 됨**(빈 화면).
+- **`CONTENT_SCENES`**: `1: Todo`, `2: Habit`, `3: Timer`, `4: Journal`, `5: Record`. NavList 순번은 Home(0)/Todo(1)/Habit(2)/Timer(3)/Journal(4)/Record(5) — **Home(0)만 아직 매핑 안 됨**(빈 화면). 저널이 최상위 nav로 올라오면서 Record의 인덱스가 4→5로 밀렸음.
 - **`SettingsButton`(⚙)**: `NavList` 바깥의 별도 형제 노드라 `_nav`에 안 묶여 있음 — **클릭해도 아직 아무 동작 안 함**(미배선).
 
 ### `TimerDashboard` (`scenes/timer/TimerDashboard.tscn`) — 카드형 타이머 페이지
-`ClockTab.tscn`(팝업용 4탭: 세션/타이머/알람/설정) 전체를 대체하는 게 아니라 **그중 세션·타이머 둘만** 카드 형태로 MainShell용으로 새로 구성한 씬. 스크립트 없음(정적 배치).
+`ClockTab.tscn`(팝업용 4탭: 세션/타이머/알람/설정) 전체를 대체하는 게 아니라 **그중 세션·타이머 둘만** 카드 형태로 MainShell용으로 새로 구성한 씬. 루트 자체엔 스크립트 없음(정적 배치).
 
-- 루트 `HBoxContainer`(가로 배치, 카드 폭은 콘텐츠 기준 자연 크기 — 강제 50/50 아님), 카드 2장(`PomoCard`/`TimerCard`, `PanelContainer` + `panel_bg.tres` 스타일) 각각 헤더(아이콘+제목) + 기존 `PromoTimer.tscn`/`NormalTimer.tscn` 인스턴스를 그대로 재사용(뷰 스크립트 변경 없이 씬 구성만으로 이식됨).
+- 루트 `VBoxContainer` → `Cards`(HBoxContainer, 카드 2장) + `FocusHistory`(아래 항목, 세로 Expand로 남는 공간 전부). 히스토리를 아래에 붙이면서 구 루트(`HBoxContainer`)에서 바뀐 구조.
+- 카드 2장(`PomoCard`/`TimerCard`, `PanelContainer` + `panel_bg.tres` 스타일) 각각 헤더(아이콘+제목) + 기존 `PromoTimer.tscn`/`NormalTimer.tscn` 인스턴스를 그대로 재사용(뷰 스크립트 변경 없이 씬 구성만으로 이식됨). 카드 폭은 콘텐츠 기준 자연 크기 — 강제 50/50 아님.
+- **카드 높이는 세로 Fill로 통일** — 뽀모 카드가 스피너가 하나 더 많아 원래 더 길었는데, 아래 히스토리와 맞닿는 하단 라인이 어긋나 보여서 높은 쪽에 맞춤. 짧은 타이머 카드엔 그만큼 빈 공간이 생김(향후 프리셋 등이 들어갈 자리).
 - **알람·설정(옵션 3종: 자동 최소화/컴패니언 자동 복귀/카운트다운 숨김)은 의도적으로 카드화 안 함** — 기존 `AlarmView`/`SettingsView`·`Save.settings` 필드는 그대로 살아있고 기능도 안 끊김(설정 3종은 향후 폐기 후보로 판단돼 옮길 위치 미정, 보류).
 - `card_bg.tres`(화이트+테두리 스타일, `assets/`)는 초안으로 만들었으나 최종적으로 `panel_bg.tres`(사이드바 MiniTimer와 동일 스타일)로 교체되어 **현재 미사용 상태**로 남아있음.
 
-### `RecordDashboard` (`scenes/record/RecordDashboard.tscn`) — 카드형 기록 페이지
-`RecordPanel.tscn`(팝업용 3탭: 활동/그래프/일지) 전체를 대체하는 게 아니라 **그중 활동·그래프 둘만** MainShell용으로 새로 구성한 씬(일지는 이번 세션 범위 밖 — 여전히 구 `RecordPanel.tscn` 서브탭으로만 존재, MainShell 최상위 nav엔 없음).
+### `FocusHistory` (`scenes/timer/FocusHistory.tscn`, `scripts/timer/focushistory/focus_history.gd`) — 오늘의 집중 목록
+`TimerDashboard` 하단에서 **오늘 완료한 세션만** 최근 순으로 나열하고, 각 행에서 노트를 바로 달 수 있는 카드. `Save.activity_entries_for(today)`를 `pomodoro_session`/`timer`로 걸러 쓰므로 신규 데이터는 없음.
 
-- **구조**: `panel_bg.tres` 카드 하나 안에 `TabNavSlot`(활동/그래프 전환, 외부 주입 없이 직접 소유) + 우측 "한눈에 보기" 요약 레일. 우측 레일은 README 와이어프레임(`docs/app-shell-wireframe.svg`)의 점선 우측 패널 개념을 실제 적용한 첫 사례.
+- **세션만 올라옴** — Todo·저널·무드는 안 보임. "노트 유도는 세션에만"이라는 정책이 필터 하나로 구조에 박혀 있는 셈(Todo 완료는 하루 수십 번이라 프롬프트 대상이 아님).
+- 정렬은 `activity_entries_for`가 시각 오름차순으로 주는 것을 `reverse()` — 최근 것이 위.
+- 헤더 우측에 `{n}세션 · {총 집중시간}`. 합계는 `seconds`(계획된 집중 시간) 누계.
+- 행 프리팹 `FocusHistoryRow`: 좌측 고정폭 시각열(`span`/`label`) + 우측 노트열. 노트가 없으면 "눌러서 추가" 안내가 흐리게 뜨고, 행 아무 곳이나 클릭하면 `TextEdit`이 열림. 스타일박스는 `note_stream_row.tres`를 공유(코드가 `duplicate()` 후 `border_color`만 accent로 덮음).
+- **저장은 `focus_exited` → `note_committed` → `ActivityLog.set_note()`**. Enter=커밋 / Shift+Enter=줄바꿈은 `mood_view.gd`의 관용구를 그대로 따름(`set_input_as_handled()` 후 `insert_text_at_caret("\n")` 또는 `release_focus()`).
+
+⚠️ **편집 중 재빌드 보류**: `activity_log.changed`를 구독해 목록을 다시 그리는데, 노트 저장 자체가 `changed`를 유발하므로 입력 중인 노드가 파괴될 수 있음. `_editing`(행의 `edit.focus_entered`로 세움)이 참이면 `_dirty`만 남기고 재빌드를 미뤘다가, 커밋 후 한 번에 갱신함.
+
+**세션 완료 직후 "메모 남길래?" 유도는 의도적으로 구현하지 않음** — 여기까지가 노트를 *달 수 있는* 기능이고, *유도*는 README의 컴패니언 3축 중 **함께 있음**(세션 방금 종료 → 말 걸기)에 속한다. 카드 안 프롬프트를 만들었다가 컴패니언이 붙으면 같은 일을 하는 UI가 둘이 되므로, 배너가 생길 때 그 자리에서 열도록 남겨둠. 접합점은 `ActivityLog.add()`의 반환 id — `Clock`의 두 완료 콜백에서 그 값을 시그널로 흘리면 됨(구현 중 실제로 넣었다가, 유도를 컴패니언 몫으로 되돌리면서 걷어냄).
+
+### `RecordDashboard` (`scenes/record/RecordDashboard.tscn`) — 카드형 기록 페이지
+`RecordPanel.tscn`(팝업용 3탭: 활동/그래프/일지) 전체를 대체하는 게 아니라 **그중 활동·그래프 둘만** MainShell용으로 새로 구성한 씬. 일지는 그 뒤 별도 최상위 탭(`JournalDashboard`)으로 독립했고, 구 `RecordPanel.tscn`의 서브탭도 그대로 남아 있음.
+
+- **구조**: `panel_bg.tres` 카드 하나 안에 `TabNavSlot`(활동/그래프 전환, 외부 주입 없이 직접 소유) + 우측 레일. 우측 레일은 README 와이어프레임(`docs/app-shell-wireframe.svg`)의 점선 우측 패널 개념을 실제 적용한 첫 사례.
 - 활동 탭은 좌측 `RecordCalendar` + 우측 `DayTimeline`(구 `RecordView` 평평 리스트를 대체 — 아래 항목).
 
-⚠️ **프리팹 인스턴스 `setup()` 호출 순서 주의**: `scene.instantiate()`로 만든 노드는 트리에 들어가기 전엔 `@onready var`가 아직 비어있음(null). `add_child()`로 먼저 트리에 넣은 뒤에 `setup()`을 불러야 함 — 순서를 반대로 하면 `@onready` 참조가 null이라 런타임 에러. `RecordLogRow` 도입 초기에 이 순서를 반대로 해서 크래시가 난 적 있음(`PomoSegmentChip`/`JournalDocRow`는 이미 이 순서를 지키고 있었음). `TimelineBlock`/`TimelinePointRow`/`TimelineHabitChip`도 같은 순서를 따름.
+**우측 레일 = 노트 스트림 ↔ 편집기 두 상태** (구 "한눈에 보기" 요약 타일 3종을 대체):
+- 고른 항목이 없으면 `NoteStream`(그날 노트가 달린 활동만 시각순 나열), 타임라인 행을 고르면 `NoteEditor`(그 이벤트 하나의 노트 편집)로 전환. `record_dashboard.gd`의 `_show_editor()`가 둘의 표시를 맞바꿈.
+- 구 타일이 하던 일의 행선지: **오늘 활동 건수 → `DayTimeline` 헤더로 흡수**(`render_day` 안에서 계산되므로 선택 날짜와 자동 일치 — 구 타일은 `today_iso()` 고정이라 다른 날을 봐도 안 바뀌는 불일치가 있었음), **오늘 활동 시간 → 타임라인 헤더에 이미 있던 값이라 폐기**, **누적 집중시간 → Graph 탭 상단 타일로 이사**(`graph_view.gd`가 `Save.voyage.changed` 구독).
+- `NoteStream`은 `DayTimeline.entries_with_notes()`로 데이터를 받음 — 타임라인이 이미 만들어둔 라벨·색·시각을 재사용해 포맷을 두 번 짜지 않음. 갱신은 `DayTimeline.rendered` 시그널 구독(`render_day` 호출부가 세 곳이라 하나를 빠뜨리지 않도록 시그널로 묶음).
+- 스트림 행 클릭 → `view.select_entry(id)`로 타임라인 하이라이트만 동기화하고 `entry_selected`를 재발신하지 않음(되돌아오는 루프 방지).
 
-### `DayTimeline` (`scenes/record/DayTimeline.tscn`) — 하루 타임라인
+⚠️ **레일 폭은 라벨의 `custom_minimum_size.x`가 결정함**: Godot Label의 autowrap은 최소 폭이 지정돼야 동작하므로, `Summary`(240)에서 마진·행 여백·스크롤바를 뺀 값을 각 라벨에 직접 박아둠(`TitleLabel` 212 / 스트림 행 라벨 184 / `EmptyLabel` 212). 폭을 바꾸면 **이 값들을 같이 고쳐야 하고**, 하나라도 `Summary`를 넘으면 그 라벨이 레일을 밀어내 타임라인이 좁아짐. autowrap은 반드시 **Arbitrary** — Word는 최소 폭이 "가장 긴 단어"라 공백 없는 긴 한글 제목이 오면 다시 밀려남.
+
+⚠️ **프리팹 인스턴스 `setup()` 호출 순서 주의**: `scene.instantiate()`로 만든 노드는 트리에 들어가기 전엔 `@onready var`가 아직 비어있음(null). `add_child()`로 먼저 트리에 넣은 뒤에 `setup()`을 불러야 함 — 순서를 반대로 하면 `@onready` 참조가 null이라 런타임 에러. `RecordLogRow` 도입 초기에 이 순서를 반대로 해서 크래시가 난 적 있음(`PomoSegmentChip`/`JournalDocRow`는 이미 이 순서를 지키고 있었음). `TimelineBlock`/`TimelinePointRow`/`TimelineHabitChip`/`NoteStreamRow`/`FocusHistoryRow`도 같은 순서를 따름.
+
+### `DayTimeline` (`scenes/record/Timeline/DayTimeline.tscn`) — 하루 타임라인
 0~24시 세로 축에 그날 활동을 배치. 구 `RecordView`(평평한 리스트)를 대체하며, `render_day(date_iso)` 인터페이스가 같아서 `RecordDashboard` 쪽은 노드 경로만 바뀌었음.
 
-- **구조**: `Header`(날짜·플레이시간) + `HabitBand`(종일 칩) + `EmptyLabel` + `Scroll/Track`. `Track`은 컨테이너가 아닌 순수 `Control`이라 자식을 앵커·오프셋으로 절대 배치할 수 있음 — `_stretch()`가 폭은 앵커로 트랙에 묶고(빌드 시점 `size`가 0이어도 안전) 세로만 절대값으로 줌.
+- **구조**: `Header`(날짜·플레이시간·활동 건수) + `HabitBand`(종일 칩) + `EmptyLabel` + `Scroll/Track`. `Track`은 컨테이너가 아닌 순수 `Control`이라 자식을 앵커·오프셋으로 절대 배치할 수 있음 — `_stretch()`가 폭은 앵커로 트랙에 묶고(빌드 시점 `size`가 0이어도 안전) 세로만 절대값으로 줌.
 - **스케일**: `TimelineTrack.HOUR_PX = 60`, 즉 **1분 = 1px**. 24시간 = 1440px. 첫 활동의 정시 눈금으로 스크롤(한 프레임 대기 후 적용).
 - **세 가지 표현**: 세션(구간을 아는 것) = 블록 / 나머지 = 점 행 / 습관 = 상단 고정 칩. 습관을 축에 안 올리는 이유는 `habit_weeks`에 날짜만 있고 시각이 없어서(파생 이벤트의 `ts`는 정렬용 센티널 `1 << 62`).
 - **인셋**: 점 이벤트의 시각이 어떤 블록 구간 안이면 22px 들여쓰기 — "그 세션 중에 완료했다"를 위치로 표현.
@@ -145,12 +185,22 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 - **자정 클램프**: 시작이 전날이면 축 상단(0분), 끝이 다음날이면 축 하단(1440분)으로 자름. 잘린 쪽 모서리를 각지게 해 이어짐을 표시하고, 라벨에는 그쪽 날짜를 붙임.
 - **근사 블록**: `start_ts` 없는 구버전 세션은 `ts - seconds`로 역산해 그리되 배경·테두리를 옅게 하고 `≈`를 붙임. **파일은 안 고침** — 휴식·일시정지가 빠진 부정확한 값을 영구히 굳히지 않기 위해.
 
-**프리팹 3종**(`TimelineBlock`/`TimelinePointRow`/`TimelineHabitChip`): `RecordLogRow` 관용구(씬이 구조를 갖고 `setup()`이 값을 채움)를 따름. 스타일박스는 **씬 리소스를 `duplicate()`한 뒤 색만 덮음** — 복제 없이 쓰면 모든 인스턴스가 한 리소스를 공유해 마지막 색이 전부에 적용됨. 여백·모서리·테두리는 씬(인스펙터)에 남아 코드로 새지 않음.
+**노트 연동** (활동 노트의 주 진입점):
+- 블록·점 행을 클릭하면 `entry_selected(event_id, meta, title)` 발신 → `RecordDashboard`가 레일을 편집기로 전환. 라벨 텍스트(`meta`/`title`)를 시그널에 실어 보내므로 **대시보드가 포맷을 다시 만들지 않음**.
+- 노트가 있는 항목은 라벨 앞에 `NOTE_MARK`(`✎`) 접두사. 행에 아이콘 노드를 새로 넣는 대신 텍스트로 처리한 이유는, 점 행이 `text_overrun_behavior`로 끝을 자르고 블록은 라벨이 하나뿐이라 구조를 바꿔야 했기 때문.
+- `_entries`(event_id → 노드·라벨·색·ts)를 들고 `_apply_selection()`으로 하이라이트 관리. `entries_with_notes()`가 레일 스트림용 데이터를 만들고, `select_entry(id)`는 외부(스트림)에서 부르는 하이라이트 전용 경로.
+- `render_day` 끝에 **`rendered` 시그널** — 레일 스트림 갱신을 여기에 물려둠.
+- **같은 날 재빌드면 스크롤 위치 보존**(`keep_scroll`). 노트를 저장할 때마다 `changed` → `render_day`가 돌기 때문에, 없으면 매번 그날 첫 활동으로 튐. 날짜가 바뀔 때만 `_scroll_to_first()`.
+
+**프리팹 3종**(`TimelineBlock`/`TimelinePointRow`/`TimelineHabitChip`, `scenes/record/Timeline/`): `RecordLogRow` 관용구(씬이 구조를 갖고 `setup()`이 값을 채움)를 따름. 스타일박스는 **씬 리소스를 `duplicate()`한 뒤 색만 덮음** — 복제 없이 쓰면 모든 인스턴스가 한 리소스를 공유해 마지막 색이 전부에 적용됨. 여백·모서리·테두리는 씬(인스펙터)에 남아 코드로 새지 않음.
+
+⚠️ **클릭을 받으려면 Mouse Filter를 손봐야 함**: 두 프리팹 모두 원래 루트가 입력을 무시하도록 되어 있어서 Stop으로 바꿨고, `TimelinePointRow`의 자식 `Dot`(Panel)은 기본값이 클릭을 먹는 쪽이라 Ignore로 내려야 함(안 그러면 도트를 정확히 누를 때만 선택이 안 됨). `TimeLabel`/`TextLabel`은 Label 기본값이 무시라 그대로 둠.
 
 ⚠️ **현재 코드의 알려진 성질**:
 - 블록 최소 높이가 `LABEL_H`(라벨 한 줄, 약 24분)라 **그보다 짧은 세션은 실제보다 길게 보임**. 라벨을 블록 안에 두는 구조의 대가.
 - 점 행 밀어내기에 **상한이 없음** — 짧은 시간에 여러 건이 몰리면 축이 그만큼 늘어남.
-- 구 `RecordView`가 `RecordPanel.tscn`에 **여전히 인스턴스로 남아 있음**. `_format_event`가 두 벌이고, 자정 걸친 세션이 그 평평한 리스트에는 이틀 모두에 나옴.
+- 구 `RecordView`가 `RecordPanel.tscn`에 **여전히 인스턴스로 남아 있음**. 자정 걸친 세션이 그 평평한 리스트에는 이틀 모두에 나옴. `_format_event`는 **세션 부분만** `ActivityFormat`으로 합쳐졌고 나머지 타입(todo/journal/mood/gratitude)은 여전히 두 벌 — 구 뷰가 죽은 경로라 의도적으로 안 건드림.
+- 블록끼리 시간대가 겹칠 때 **나란히 배치하는 처리가 없음**. 점 행에는 밀어내기가 있지만 블록은 항상 트랙 전체 폭을 쓰므로, 뽀모와 타이머를 겹쳐 돌리면 뒤에 그려진 블록이 앞 블록 위에 올라가 라벨이 뭉개짐.
 
 ### 포모도로 타임라인 — 4칩 슬라이딩 윈도우 (`pomodoro_view.gd`)
 반복 횟수(N, 최대 12)가 늘어나면 세그먼트 수가 `2N`(FOCUS+SHORT_BREAK 교대 반복 + 마지막 LONG_BREAK)이 되어, 칩을 전부 나열하면 카드 폭을 넘어서는 문제가 있었음 — `_build_window()`가 항상 최대 4칩만 그리도록 재설계됨(구 `_rebuild_timeline`+`_update_chip_states` 대체):
@@ -202,7 +252,9 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 ## 6. 다국어(i18n) 구현
 
 ### 원칙
-원본 문자열을 UPPER_SNAKE_CASE 키로 관리(`localization/translations.csv`, 실제 CSV는 이번 확인 범위 밖 — 경로만 참고). 코드에서 발견되는 키 네이밍 패턴: 도메인 접두사 + 용도. 예: `DATE_MONTH_LABEL`, `RECORD_EVENT_TODO`, `TODO_SORT_MANUAL`, `CLOCK_POMO_FOCUS`, `HABIT_NEW_NAME`, `PERIOD_NAV_THIS_WEEK`. 동적 값은 문장 전체를 키로 갖고 `.format({...})`로 채움(조각을 이어붙이지 않음).
+원본 문자열을 UPPER_SNAKE_CASE 키로 관리. `localization/translations.csv`는 `keys,ko,en` 3열이며, Godot이 이를 임포트해 `translations.ko/en.translation`을 생성한다 — **CSV만 고치고 리임포트를 안 하면 화면에 키가 그대로 노출됨**(증상으로 바로 알 수 있음). 코드에서 발견되는 키 네이밍 패턴: 도메인 접두사 + 용도. 예: `DATE_MONTH_LABEL`, `RECORD_EVENT_TODO`, `TODO_SORT_MANUAL`, `CLOCK_POMO_FOCUS`, `HABIT_NEW_NAME`, `PERIOD_NAV_THIS_WEEK`. 동적 값은 문장 전체를 키로 갖고 `.format({...})`로 채움(조각을 이어붙이지 않음).
+
+활동 노트 관련 키군: `RECORD_NOTE_BACK`/`RECORD_NOTE_CLEAR`/`RECORD_NOTE_PLACEHOLDER`(레일 편집기), `RECORD_NOTE_STREAM_TITLE`/`RECORD_NOTE_STREAM_EMPTY`(레일 스트림), `RECORD_DAY_COUNT`(타임라인 헤더 건수), `TIMER_HISTORY_*`(오늘의 집중 목록). `At a glance` 해체로 `RECORD_SUMMARY_TITLE`/`RECORD_TODAY_COUNT`/`RECORD_TODAY_COUNT_VALUE`/`RECORD_TODAY_TIME`은 **미사용**이 됨(`RECORD_TOTAL_FOCUS`는 Graph 탭 타일에서 계속 씀).
 
 자정을 넘긴 구간 표기는 **다른 날인 쪽에만 날짜를 붙임** — `RECORD_SPAN_CROSSDAY`(`{day} {start}–{end}`, 시작이 다른 날), `RECORD_SPAN_CROSSDAY_END`(`{start}–{day} {end}`, 끝이 다른 날). 같은 날 안에서 끝나는 구간은 키 없이 `%s–%s`로 조립함(대시 하나는 언어 무관, 날짜와 시각의 어순은 언어 의존이라 그쪽만 키로 뺌).
 
