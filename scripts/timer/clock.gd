@@ -2,6 +2,8 @@ extends Node
 
 enum Kind { NONE, POMODORO, TIMER }
 
+signal session_logged(event_id: int)   # 세션 완료 → 방금 적재된 이벤트 id (컴패니언 배선용)
+
 # 세션 컨트롤러 — 진행 중 포모/타이머 인스턴스를 상주 소유(뷰와 분리).
 # 휘발성(종료 시 소멸, Save 직렬화 X). Save는 앎(컨트롤러 계층).
 var pomodoro: Pomodoro
@@ -47,7 +49,8 @@ func _on_timer_finished() -> void:
 	if _timer_start_ts > 0:
 		payload["start_ts"] = _timer_start_ts
 	_timer_start_ts = 0
-	Save.activity_log.add("timer", payload)
+	var id := Save.activity_log.add("timer", payload)
+	session_logged.emit(id)
 	Sound.play_set(Save.settings.sound_set)   # 완료음(컨트롤러가 완료를 앎)
 	timer.reset()                             # 완주 → 자동 대기 복귀 (포모와 일관)
 
@@ -57,7 +60,8 @@ func _on_session_completed() -> void:
 	if _pomo_start_ts > 0:
 		payload["start_ts"] = _pomo_start_ts
 	_pomo_start_ts = 0
-	Save.activity_log.add("pomodoro_session", payload)
+	var id := Save.activity_log.add("pomodoro_session", payload)
+	session_logged.emit(id)
 	Sound.play_set(Save.settings.sound_set)   # 완료음
 	pomodoro.build_plan()                     # 완료 → 자동 대기 복귀
 	

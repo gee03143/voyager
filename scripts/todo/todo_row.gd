@@ -19,6 +19,7 @@ signal due_edit_requested(row: TodoRow)
 var _text: String = ""
 var _done: bool = false
 var _due: String = ""
+var _created_ts: int = 0
 
 func _ready() -> void:
 	done_check.toggled.connect(_on_done_toggled)
@@ -44,6 +45,7 @@ func setup(todo: Todo) -> void:
 	_done = todo.done
 	done_check.set_pressed_no_signal(todo.done)
 	_due = todo.due_date
+	_created_ts = todo.created_ts
 	_render()
 	_render_due()
 	
@@ -53,6 +55,7 @@ func get_data() -> Todo:
 	t.done = _done
 	t.text = _text
 	t.due_date = _due
+	t.created_ts = _created_ts
 	return t
 	
 func start_edit() -> void:

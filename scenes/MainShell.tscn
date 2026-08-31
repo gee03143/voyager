@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://da6f63m8ecp3e" path="res://scripts/timer/mini_timer.gd" id="2_i1y7h"]
 [ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="2_rp2pc"]
 [ext_resource type="Texture2D" uid="uid://b8aqhfvxna5b2" path="res://assets/placeholder/companion.svg" id="4_6572n"]
+[ext_resource type="Script" uid="uid://caq3k8gxcdugg" path="res://scripts/companion/companion_banner.gd" id="4_ccli4"]
+[ext_resource type="Texture2D" uid="uid://ccivhvg12r28i" path="res://assets/placeholder/stamp_good.svg" id="5_mxd28"]
 
 [node name="MainShell" type="HBoxContainer" unique_id=1558229445]
 anchors_preset = 15
@@ -125,6 +127,7 @@ size_flags_horizontal = 3
 [node name="Banner" type="PanelContainer" parent="MainColumn" unique_id=2069580132]
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
+script = ExtResource("4_ccli4")
 
 [node name="Margin" type="MarginContainer" parent="MainColumn/Banner" unique_id=1726159006]
 layout_mode = 2
@@ -140,6 +143,7 @@ theme_override_constants/separation = 12
 [node name="AvatarSlot" type="PanelContainer" parent="MainColumn/Banner/Margin/HBox" unique_id=1017584856]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
+size_flags_vertical = 0
 
 [node name="TextureRect" type="TextureRect" parent="MainColumn/Banner/Margin/HBox/AvatarSlot" unique_id=1662206769]
 layout_mode = 2
@@ -149,6 +153,8 @@ stretch_mode = 5
 
 [node name="Bubble" type="PanelContainer" parent="MainColumn/Banner/Margin/HBox" unique_id=1203916371]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
 
 [node name="BubbleMargin" type="MarginContainer" parent="MainColumn/Banner/Margin/HBox/Bubble" unique_id=77722992]
 layout_mode = 2
@@ -157,9 +163,44 @@ theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="MessageLabel" type="Label" parent="MainColumn/Banner/Margin/HBox/Bubble/BubbleMargin" unique_id=2047877076]
+[node name="VBox" type="VBoxContainer" parent="MainColumn/Banner/Margin/HBox/Bubble/BubbleMargin" unique_id=380854892]
+layout_mode = 2
+
+[node name="MessageLabel" type="Label" parent="MainColumn/Banner/Margin/HBox/Bubble/BubbleMargin/VBox" unique_id=2047877076]
+custom_minimum_size = Vector2(0, 33)
 layout_mode = 2
 text = "BANNER_PLACEHOLDER_MESSAGE"
+autowrap_mode = 1
+
+[node name="MetaLabel" type="Label" parent="MainColumn/Banner/Margin/HBox/Bubble/BubbleMargin/VBox" unique_id=698180363]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_override_font_sizes/font_size = 12
+
+[node name="NoteEdit" type="TextEdit" parent="MainColumn/Banner/Margin/HBox/Bubble/BubbleMargin/VBox" unique_id=149807979]
+custom_minimum_size = Vector2(0, 66)
+layout_mode = 2
+
+[node name="OptionsBox" type="HBoxContainer" parent="MainColumn/Banner/Margin/HBox/Bubble/BubbleMargin/VBox" unique_id=1460330494]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StampSlot" type="Control" parent="MainColumn/Banner/Margin/HBox" unique_id=918094170]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+
+[node name="StampImage" type="TextureRect" parent="MainColumn/Banner/Margin/HBox/StampSlot" unique_id=1780901113]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("5_mxd28")
 
 [node name="BodyRow" type="HBoxContainer" parent="MainColumn" unique_id=686737686]
 layout_mode = 2

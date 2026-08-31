@@ -6,6 +6,8 @@ const TIMER_SCENE := preload("res://scenes/timer/TimerDashboard.tscn")
 const RECORD_SCENE := preload("res://scenes/record/RecordDashboard.tscn")
 const JOURNAL_SCENE := preload("res://scenes/record/journal/JournalDashboard.tscn")
 
+const NAV_TARGETS := {&"todo": 1, &"habit": 2, &"timer": 3, &"record": 5, &"journal": 4}
+
 const MINI_WIDGET_GROUP := "mini_widget"
 
 @onready var nav_list: VBoxContainer = $Sidebar/Margin/VBox/NavList
@@ -16,6 +18,7 @@ const MINI_WIDGET_GROUP := "mini_widget"
 @onready var main_column: VBoxContainer = $MainColumn
 @onready var mini_timer: PanelContainer = $Sidebar/Margin/VBox/MiniTimer
 @onready var mini_toggle_button: Button = $Sidebar/Margin/VBox/MiniTimer/OuterVBox/Header/Togglebutton
+@onready var banner: PanelContainer = $MainColumn/Banner
 
 const CONTENT_SCENES := {
 	1: TODO_SCENE,
@@ -38,6 +41,11 @@ func _ready() -> void:
 	_nav.selected.connect(_on_nav_selected)
 	_nav.select(0)
 	_init_mini_widget()
+	banner.navigate_requested.connect(_on_banner_navigate)
+
+func _on_banner_navigate(target: StringName) -> void:
+	if NAV_TARGETS.has(target):
+		_nav.select(NAV_TARGETS[target])   # 눌림 표시 + selected 발신 → 콘텐츠 전환까지 한 번에
 
 func _on_nav_selected(index: int) -> void:
 	if _content != null:

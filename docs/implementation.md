@@ -8,10 +8,10 @@
 - **저장소**: `C:\Users\NHN\Documents\voyager`
 - **진입점**: `World.tscn`. 좌측 도크(`ButtonGroupNav`)에서 도구 패널을 열고 닫는 구조.
 - **디렉터리 구조**:
-  - `scripts/` — 도메인별 하위 폴더(`data/`, `timer/`, `todo/`, `habittracker/`, `commonui/`, `util/`, `audio/`, `record/`, `letter/`, `discovery/`, `option/`, `display/`). 일부는 2단계로 더 나뉨 — `record/timeline/`(하루 타임라인·노트 편집기), `record/journal/`(저널·무드·감사일지), `record/graph/`, `timer/focushistory/`
+  - `scripts/` — 도메인별 하위 폴더(`data/`, `timer/`, `todo/`, `habittracker/`, `companion/`, `commonui/`, `util/`, `audio/`, `record/`, `letter/`, `discovery/`, `option/`, `display/`). 일부는 2단계로 더 나뉨 — `record/timeline/`(하루 타임라인·노트 편집기), `record/journal/`(저널·무드·감사일지), `record/graph/`, `timer/focushistory/`
   - `scenes/` — `.tscn` 씬 파일, `scripts/`와 대응하는 하위 구조
   - `localization/` — `translations.csv`
-  - `assets/` — `sounds/`, `placeholder/`
+  - `assets/` — `sounds/`, `placeholder/`(컴패니언 아바타 `companion.svg`, 보상 도장 `stamp_good.svg` 포함), `styles/`
 
 ## 2. 데이터 계층
 
@@ -45,7 +45,11 @@
 	- 읽기/쓰기는 `note_of(id)`/`set_note(id, text)`로만. 빈 노트는 `""`로 저장하지 않고 **키째 제거**(`start_ts`와 같은 "키 유무가 의미" 규칙 — 파일에 빈 문자열이 쌓이지 않게).
 	- `set_note`는 값이 이전과 같으면 `changed`를 **안 쏨**. `changed` 한 번이 곧 파일 쓰기인데 노트는 자동 저장이라 호출이 잦기 때문.
 	- 습관 파생 이벤트는 `id` 키 자체가 없으므로(아래 "이벤트의 날짜 소속" 참고) 노트 대상이 아님. `_find()`가 `id == 0`에서 즉시 빠져나옴.
-  - `add()`는 만들어진 이벤트의 **id를 반환**함(`Journal.add_doc()`과 같은 형태). 현재 소비자는 없고, 컴패니언이 "방금 끝난 세션"을 지목할 때 쓸 자리.
+  - `add()`는 만들어진 이벤트의 **id를 반환**함(`Journal.add_doc()`과 같은 형태). 소비자는 `Clock`(세션 완료 → `session_logged`)과 `todo_list_view`(할 일 완료 → `Companion.notify_todo_completed`) — 컴패니언이 "방금 끝난 것"을 지목해 노트를 달 수 있게 하는 통로다.
+  - `event_by_id(id)`는 `_find()`의 공개 창구(`Mood.entry_by_id`와 같은 형태). **참조를 그대로 반환**하므로 쓰기는 반드시 `set_note()` 경유.
+- **`Todo` / `TodoGroup`**(`scripts/todo/`): `Todo`는 `{text, done, due_date, created_ts}`, `TodoGroup`은 `{name, is_default, sort_key, sort_desc, tasks}`. **둘 다 ID 없는 스냅샷**(`CLAUDE.md`의 안정 ID 도입 기준 참고).
+  - **`created_ts`**(unix, 0=모름)는 `_init()`에서 현재 시각으로 채워진다. 새 `Todo`를 만드는 곳이 여러 군데라 각자 넣으면 빠뜨리기 쉬워서 생성자에 뒀고, `from_dict`가 항상 덮어쓰므로 구버전 데이터가 "방금 만든 것"으로 둔갑하지 않는다(키 없으면 0).
+  - ⚠️ **`TodoRow.get_data()`가 `created_ts`를 실어 나른다**. 구 `todo_view.gd`가 행에서 만든 `Todo`로 그룹 전체를 갈아끼우는 구조라(`_on_list_changed`), 행이 이 값을 보관·반환하지 않으면 편집 한 번에 전부 0으로 날아간다.
 - **`Journal`**: `groups`(`id`/`name`, `group_id 0`=미분류) + `docs`(`id`/`title`/`body`/`group_id`/`ts`) 평평 구조. CRUD 메서드(`add_doc`/`update_doc`/`remove_doc`/`add_group`/...) 보유.
 - **`LetterArchive`**: `entries`(`id`/`template_idx`/`subject`/`fact`/`state`/`author`/`ts` — 전보체 형식). `author` 빈 문자열=보낸 것, 아니면 받은 것.
 - **`Lexicon`**: `subjects`(해금된 subject key 배열, 영구·안 줄어듦).
@@ -131,7 +135,8 @@
 ### `MainShell` (`scripts/main_shell.gd`, `scenes/MainShell.tscn`) — 셸 전환 목표 씬
 README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlot 없는 콘텐츠 스왑)의 실제 구현체.
 
-- **구조**: `Sidebar`(로고 + `NavList` + 하단 `SettingsButton`·`MiniTimer`) + `MainColumn`(`Banner`(컴패니언 아바타+말풍선) + `BodyRow/ContentArea`). `MiniTimer`는 `Clock` 상태 따라 제목·아이콘·시간·상태 자동 갱신(`mini_timer.gd`) + 아래 미니 위젯 토글 겸함.
+- **구조**: `Sidebar`(로고 + `NavList` + 하단 `SettingsButton`·`MiniTimer`) + `MainColumn`(`Banner` + `BodyRow/ContentArea`). `MiniTimer`는 `Clock` 상태 따라 제목·아이콘·시간·상태 자동 갱신(`mini_timer.gd`) + 아래 미니 위젯 토글 겸함.
+- **`Banner`**(높이 160 고정): 아바타 + 말풍선(문구·보조 줄·노트 입력·선택지) + 도장. `companion_banner.gd`가 붙어 실제로 동작함 — 상세는 §5. `MainShell`은 `NAV_TARGETS`(의미 이름 → NavList 인덱스)로 배너의 `navigate_requested`만 받아 `_nav.select()`를 부른다.
 - **콘텐츠 스왑**: `_nav`(`ButtonGroupNav`)가 `NavList` 버튼을 인덱스로 관리, `_on_nav_selected(index)`가 `CONTENT_SCENES[index]`를 `PanelPool.get_instance()`로 얻어 `content_area`에 reparent. `PopupFrame`의 `NavSlot`(서브탭) 패턴은 의도적으로 안 씀(롤백 이력 있음).
 - **`CONTENT_SCENES`**: `1: Todo`, `2: Habit`, `3: Timer`, `4: Journal`, `5: Record`. NavList 순번은 Home(0)/Todo(1)/Habit(2)/Timer(3)/Journal(4)/Record(5) — **Home(0)만 아직 매핑 안 됨**(빈 화면). 저널이 최상위 nav로 올라오면서 Record의 인덱스가 4→5로 밀렸음.
 - **`SettingsButton`(⚙)**: `NavList` 바깥의 별도 형제 노드라 `_nav`에 안 묶여 있음 — **클릭해도 아직 아무 동작 안 함**(미배선).
@@ -156,7 +161,7 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 
 ⚠️ **편집 중 재빌드 보류**: `activity_log.changed`를 구독해 목록을 다시 그리는데, 노트 저장 자체가 `changed`를 유발하므로 입력 중인 노드가 파괴될 수 있음. `_editing`(행의 `edit.focus_entered`로 세움)이 참이면 `_dirty`만 남기고 재빌드를 미뤘다가, 커밋 후 한 번에 갱신함.
 
-**세션 완료 직후 "메모 남길래?" 유도는 의도적으로 구현하지 않음** — 여기까지가 노트를 *달 수 있는* 기능이고, *유도*는 README의 컴패니언 3축 중 **함께 있음**(세션 방금 종료 → 말 걸기)에 속한다. 카드 안 프롬프트를 만들었다가 컴패니언이 붙으면 같은 일을 하는 UI가 둘이 되므로, 배너가 생길 때 그 자리에서 열도록 남겨둠. 접합점은 `ActivityLog.add()`의 반환 id — `Clock`의 두 완료 콜백에서 그 값을 시그널로 흘리면 됨(구현 중 실제로 넣었다가, 유도를 컴패니언 몫으로 되돌리면서 걷어냄).
+**세션 완료 직후 "메모 남길래?" 유도는 여기 없다 — 컴패니언 몫이다.** 이 카드는 노트를 *달 수 있는* 곳이고, *유도*는 3축 중 함께 있음(세션 방금 종료 → 말 걸기)에 속한다. 카드 안에 프롬프트를 두면 같은 일을 하는 UI가 둘이 되므로 배너로 미뤄뒀고, 지금은 `Clock.session_logged` → 배너가 그 자리에서 노트 입력을 연다(§5). 접합점으로 남겨둔 `ActivityLog.add()`의 반환 id가 실제로 그렇게 쓰인다.
 
 ### `RecordDashboard` (`scenes/record/RecordDashboard.tscn`) — 카드형 기록 페이지
 `RecordPanel.tscn`(팝업용 3탭: 활동/그래프/일지) 전체를 대체하는 게 아니라 **그중 활동·그래프 둘만** MainShell용으로 새로 구성한 씬. 일지는 그 뒤 별도 최상위 탭(`JournalDashboard`)으로 독립했고, 구 `RecordPanel.tscn`의 서브탭도 그대로 남아 있음.
@@ -220,7 +225,64 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 - **위치 저장은 `Screen._save_companion_position()` 한 곳에서만**(퇴장 시점) — `MiniTimer` 자체의 드래그 입력 핸들러에서는 저장 안 함(토글 버튼 클릭이 `HoverReveal`의 `mouse_filter=PASS`로 인해 `MiniTimer.gui_input`에도 같이 전달되는데, 여기서도 저장하면 클릭만 해도 위치가 엉뚱하게 덮어써지는 문제가 있었음).
 - **구 `CompanionMode.tscn`/`companion_mode.gd`/`world.gd`의 `_enter_companion()`은 이제 죽은 코드** — `MainShell`에서 도달하는 경로가 없음. 삭제는 안 함(정리는 별도 작업으로 보류).
 
-## 5. 공통 유틸/컴포넌트
+## 5. 컴패니언
+
+README의 3축 중 **활력·함께 있음**, 할 일/습관 완료 반응, 대화 라우팅이 구현됨. **기억 축은 미구현** — 과거 기록 중 무엇을 꺼낼지 선택 기준을 안 정해서 의도적으로 보류.
+
+### 3층 구조
+
+| 층 | 파일 | 아는 것 |
+|---|---|---|
+| 접점 | `scripts/companion/companion.gd` (autoload `Companion`) | `Save`. 씬·문구는 모름 |
+| 판단 | `scripts/companion/companion_engine.gd` (`class_name`, 전부 static) | 번역 키만. `Save`·씬·autoload 모름 |
+| 표시 | `scripts/companion/companion_banner.gd` (`MainShell`의 `Banner` 노드) | 전부 — 배선 담당 |
+
+- **`Companion`** — 뷰는 "이런 일이 있었다"만 알리고 맥락 계산은 여기서 한다. 할 일 완료는 콘텐츠 영역에서 스왑되는 뷰에서 일어나 배너가 그 뷰를 모르므로, `Clock`이 세션에서 맡는 것과 같은 만남의 자리가 필요했다. 시그널 `todo_completed`/`habit_completed`, 조회 `today_done_count()`/`last_activity()`/`habit_today()`/`is_first_time()`.
+  - ⚠️ `notify_*`는 **모델을 갱신한 뒤에** 부를 것 — `first_today`·`remaining`이 방금 것까지 반영해 계산된다. 호출부가 이 순서를 지킨다.
+- **`CompanionEngine`** — 반환값은 `{message_key, message_args, reward, options}` 네 필드로 **항상 고정**(`_reaction()`이 강제)이라 뷰가 `has()`로 확인할 일이 없다. 이벤트 표기(구간·요약 라벨)는 여기가 아니라 `ActivityFormat` 담당.
+- **`CompanionBanner`** — `_held`가 참이면 화면이 붙잡힌 상태라 대기 갱신이 갈아엎지 않는다. `_event_id`는 **노트 대상만** 가리킨다(습관 반응은 로그 이벤트가 없어 0).
+
+### 반응
+
+**대기**(`idle`) 우선순위: 세션 진행 중 → 조용히 / 활동 0일 때만 습관 기준선 / 그 외엔 활동 수 밴드(1~2 / `MANY_THRESHOLD`(3) 이상).
+
+- ⚠️ **습관은 활력 카운트에 안 들어간다**(`VITALITY_TYPES`에서 제외). 성과 하나가 아니라 "채워야 할 기준선"이라 개수가 아닌 완료율로 따로 본다.
+- ⚠️ **흐름 중엔 습관을 안 꺼낸다.** 할 일을 하는 중에 습관 얘기를 꺼내면 화제가 끊기므로, 기준선은 활동 0일 때와 이탈 시점(아래)에서만 등장한다.
+
+**완료 반응** — 세션(`session_done`) / 할 일(`todo_done`) / 습관(`habit_done`). 뒤의 둘은 **사다리**(먼저 걸리는 조건이 이김)다. 변수 3~4개를 조합하면 경우의 수가 폭발해서 우선순위 목록으로 뒀다.
+
+- 할 일: 그룹 잔여 0 → 오늘 첫 완료 → `LONG_AGO_DAYS`(7) 이상 묵음 → 잔여 `ALMOST_REMAINING`(2) 이하 → 기본
+- 습관: 오늘 다 채움 → 첫 기록 → 재개 → 남은 수
+- **도장(`reward`)은 드문 순간에만** — 그룹 완주·오래 묵은 것·습관 완주·습관 재개. 매번 찍으면 보상 가치가 닳는다.
+
+⚠️ **"재개" 판정에 고정 임계값을 쓰지 않는다.** 습관마다 주기가 달라(월·수·금은 정상 간격이 이미 3일, 주 1회는 7일) 고정값이면 주기가 긴 습관이 매번 재개로 뜬다. `Companion._expected_gap()`이 `active_days`에서 정상 간격을 뽑고, 엔진이 `gap > expected and gap >= HABIT_BACK_MIN_DAYS`(3)로 판정한다.
+
+### 대화 라우팅
+
+"얘기 좀 하자"를 누르면 시작. **트리거를 묻지 않고 상황을 짐작한다** — 첫 사용 / 활동 0 / 1~2 / 3+ 로 오프닝이 갈리고(`TALK_OPEN`), 감정은 데이터로 알 수 없으니 "사실 좀 그래" 옵션 하나로 남겼다. 말을 건다는 것 자체가 "다음을 못 정하고 있다"는 뜻이라, 되묻지 않고 먼저 짚는 쪽으로 설계됨.
+
+노드는 `TALK_OPEN`/`TALK_NODES` **const 표** — 갈래를 늘릴 때 코드가 아니라 표와 CSV만 손대면 된다. 선택지의 `arg`가 다음 노드 id이고, 후속 노드에 `goto`만 적으면 `talk_node()`가 안내 버튼과 "그냥 넘어가기"를 붙인다.
+
+- **"그냥 쉴래"의 행선지가 상황마다 다른 게 페르소나의 구현체다** — `before`면 시작 권유(`reask_start`), `during`/`enough`면 마무리 권유(`reask_wrap`), 감정 경로면 부드러운 권유(`reask_low`). 되묻기는 **한 번만**이고, 또 거절하면 `stand_*`로 물러난다(동의는 안 하고 문만 열어둠).
+- **이탈 시 습관 환기**: `talk_node()`가 `reask_start`/`reask_wrap`에서 습관이 남았으면 습관 되묻기로 갈아끼운다. 하루를 닫으려는 순간이라 기준선을 짚어도 흐름을 안 끊는다. `reask_low`는 제외 — 힘들다는 사람에게 들이밀면 무신경.
+
+### 배선 접점
+
+- **세션 완료**: `Clock.session_logged(event_id)` — 두 완료 콜백이 `activity_log.add()`의 반환 id를 실어 발신.
+- **할 일 완료**: `todo_list_view._on_row_changed`가 **모델의 `done` 전이(false→true)** 를 감지 → 로그 적재 → `Companion.notify_todo_completed`.
+  - ⚠️ `TodoRow.completed` 시그널은 안 쓴다. 그건 "체크박스가 켜졌다"는 뷰 이벤트라 `changed` 핸들러가 모델을 갱신하기 **전에** 오고, 그 시점엔 `todo.done`이 아직 false여서 잔여가 1 많게 나온다. 완료를 모델 전이로 판정하면 `done`을 쓰는 곳도 하나로 유지된다.
+- **습관 체크**: `habit_tracker_view._on_list_changed`가 덮어쓰기 직전 `checks`를 잡아두고 `_notify_checked()`가 오늘 칸의 전이를 찾는다. **이번 주를 볼 때만** 울리므로(`_today_column()`이 아니면 -1) 과거 주 소급 체크·요일 토글·추가/삭제/재정렬로는 안 울린다.
+- **화면 이동**: `Banner.navigate_requested(target)` → `MainShell._on_banner_navigate` → `NAV_TARGETS`(의미 이름 → NavList 인덱스) → `_nav.select()`. 엔진은 nav 인덱스를 모르고 의미(`GOTO_TODO` 등)만 돌려준다.
+
+### 도장 (`assets/placeholder/stamp_good.svg`)
+
+"Good!!"를 폰트가 아니라 **획(패스)으로 그린** SVG — 번역도 폰트 의존도 없다. `MainShell.tscn`의 `StampSlot`(Control) 안 `StampImage`(TextureRect)에 붙고, `_pop_stamp()`가 `create_tween()`으로 스케일+알파를 준다(코드베이스 첫 애니메이션).
+
+⚠️ **컨테이너 직계 자식에 scale 애니메이션을 걸면 안 된다.** `Container`는 자식을 배치할 때 위치·크기뿐 아니라 **rotation·scale까지 초기화**한다. 그래서 레이아웃이 다시 정렬되는 순간(문구 교체·버튼 생성 등) 트윈이 세운 scale이 1.0으로 되돌아가 애니메이션이 통째로 사라진다. 크기 고정된 순수 `Control`을 사이에 끼우고 그 안쪽(앵커 Full Rect)에 애니메이션을 거는 것으로 피했다 — `DayTimeline`의 `Track`이 앵커 배치를 쓰는 것과 같은 이유.
+
+⚠️ **숨김은 `visible`이 아니라 알파로.** 컨테이너는 숨겨진 자식을 배치에서 빼므로 `visible = true`가 되는 순간 행 전체가 리플로우된다(말풍선이 도장 폭만큼 줄며 텍스트가 튄다). 자리는 항상 차지하게 두고 `modulate.a`로 감춘다.
+
+## 6. 공통 유틸/컴포넌트
 
 ### 드래그 재정렬 — `DragHandle` + `ReorderList` (`scripts/commonui/`)
 - **`DragHandle`**(`Label`): 행 좌측에 두는 "⋮⋮" 핸들. `_get_drag_data`가 이 노드에만 있어 **핸들에서 시작한 드래그만 허용**(행 전체가 아님). `token`(StringName)으로 어떤 리스트용인지 식별. `enabled=false`면 드래그 비활성 + 숨김(수동 정렬 모드가 아닐 때).
@@ -249,12 +311,16 @@ README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlo
 ### 위젯 이동/리사이즈 — `WidgetMover` (`scripts/commonui/widget_mover.gd`)
 지정한 `target` Control을 `drag_handle`로 드래그 이동, `resize_grip`으로 스케일 조정(`min_scale`~`max_scale`). 화면 밖으로 안 나가게 매 프레임 클램프. `moved`/`resized` 시그널로 최종 값만 알림(저장은 호출부 책임 — 예: HUD 위치/크기를 `AppSettings.hud_position`/`hud_scale`에 반영).
 
-## 6. 다국어(i18n) 구현
+## 7. 다국어(i18n) 구현
 
 ### 원칙
 원본 문자열을 UPPER_SNAKE_CASE 키로 관리. `localization/translations.csv`는 `keys,ko,en` 3열이며, Godot이 이를 임포트해 `translations.ko/en.translation`을 생성한다 — **CSV만 고치고 리임포트를 안 하면 화면에 키가 그대로 노출됨**(증상으로 바로 알 수 있음). 코드에서 발견되는 키 네이밍 패턴: 도메인 접두사 + 용도. 예: `DATE_MONTH_LABEL`, `RECORD_EVENT_TODO`, `TODO_SORT_MANUAL`, `CLOCK_POMO_FOCUS`, `HABIT_NEW_NAME`, `PERIOD_NAV_THIS_WEEK`. 동적 값은 문장 전체를 키로 갖고 `.format({...})`로 채움(조각을 이어붙이지 않음).
 
-활동 노트 관련 키군: `RECORD_NOTE_BACK`/`RECORD_NOTE_CLEAR`/`RECORD_NOTE_PLACEHOLDER`(레일 편집기), `RECORD_NOTE_STREAM_TITLE`/`RECORD_NOTE_STREAM_EMPTY`(레일 스트림), `RECORD_DAY_COUNT`(타임라인 헤더 건수), `TIMER_HISTORY_*`(오늘의 집중 목록). `At a glance` 해체로 `RECORD_SUMMARY_TITLE`/`RECORD_TODAY_COUNT`/`RECORD_TODAY_COUNT_VALUE`/`RECORD_TODAY_TIME`은 **미사용**이 됨(`RECORD_TOTAL_FOCUS`는 Graph 탭 타일에서 계속 씀).
+활동 노트 관련 키군: `RECORD_NOTE_BACK`/`RECORD_NOTE_CLEAR`/`RECORD_NOTE_PLACEHOLDER`(레일 편집기), `RECORD_NOTE_STREAM_TITLE`/`RECORD_NOTE_STREAM_EMPTY`(레일 스트림), `RECORD_DAY_COUNT`(타임라인 헤더 건수), `TIMER_HISTORY_*`(오늘의 집중 목록).
+
+컴패니언 키군 `COMPANION_*` — 접두사가 곧 역할이다: `IDLE_*`(대기) / `FOCUSING`·`SESSION_DONE`(함께 있음) / `TODO_*`·`HABIT_*`(완료 사다리) / `TALK_*`(대화 오프닝) / `EMPATHY`·`FOLLOW_*`(감정 경로·후속) / `REASK_*`(되묻기) / `STAND_*`(물러섬) / `OPT_*`(사용자가 고르는 선택지) / `GOTO_*`(화면 이동 버튼). **엔진 코드에는 키 문자열만 있고 문장은 전부 CSV에 있다** — 갈래를 늘릴 때 표(`TALK_OPEN`/`TALK_NODES`)와 CSV만 손대면 되는 구조.
+
+⚠️ 컴패니언 문구는 값에 **쉼표가 들어가면 CSV가 깨진다**(3열 구조). 안내문의 구분자로 `·`를 쓰고, 영문에서는 쉼표 대신 마침표나 em dash로 끊는 관례를 따르고 있다. `At a glance` 해체로 `RECORD_SUMMARY_TITLE`/`RECORD_TODAY_COUNT`/`RECORD_TODAY_COUNT_VALUE`/`RECORD_TODAY_TIME`은 **미사용**이 됨(`RECORD_TOTAL_FOCUS`는 Graph 탭 타일에서 계속 씀).
 
 자정을 넘긴 구간 표기는 **다른 날인 쪽에만 날짜를 붙임** — `RECORD_SPAN_CROSSDAY`(`{day} {start}–{end}`, 시작이 다른 날), `RECORD_SPAN_CROSSDAY_END`(`{start}–{day} {end}`, 끝이 다른 날). 같은 날 안에서 끝나는 구간은 키 없이 `%s–%s`로 조립함(대시 하나는 언어 무관, 날짜와 시각의 어순은 언어 의존이라 그쪽만 키로 뺌).
 

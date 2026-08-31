@@ -128,3 +128,67 @@ TIMER_HISTORY_TITLE,오늘의 집중,Today's focus
 TIMER_HISTORY_SUMMARY,{n}세션 · {time},{n} sessions · {time}
 TIMER_HISTORY_EMPTY,아직 완료한 세션이 없어요.,No sessions yet today.
 TIMER_HISTORY_ADD_NOTE,메모 없음 — 눌러서 추가,No note — click to add
+
+# --- 대기 (활력 축) ---
+COMPANION_IDLE_NONE_DAY,오늘은 뭐부터 해볼까?,What should we start with today?
+COMPANION_IDLE_SOME_ITEM,오늘 {n}개 했네. 하나 더 해볼까?,{n} done today. One more?
+COMPANION_IDLE_SOME_FOCUS,{min}분 집중했었네. 한 번 더 해볼까?,{min} min of focus earlier. Another round?
+COMPANION_IDLE_MANY,오늘 {n}개째네. 쌓인 거 한번 볼래?,That's {n} today. Want to see what's piled up?
+
+# --- 함께 있음 ---
+COMPANION_FOCUSING,조용히 옆에 있을게.,I'll be right here.
+COMPANION_SESSION_DONE,수고했어. 방금 {min}분 집중했네.,Nice work. That was {min} min of focus.
+
+# --- 할 일 완료 (사다리: 위에서부터 먼저 걸리는 것) ---
+COMPANION_TODO_GROUP_CLEAR,{group} 이제 하나도 안 남았네.,Nothing left in {group}.
+COMPANION_TODO_FIRST_TODAY,오늘 첫 번째네. 이제 하나씩 가자.,First one today. Let's keep them coming.
+COMPANION_TODO_LONG_AGO,{days}일 만이네. 결국 해냈구나.,{days} days later. You got there.
+COMPANION_TODO_ALMOST,{n}개 남았네. 거의 다 왔어.,{n} left. Almost there.
+COMPANION_TODO_DONE,하나 끝냈네.,One down.
+
+# --- 버튼 · 입력 ---
+COMPANION_OPT_NOTE,노트 남기기,Leave a note
+COMPANION_OPT_SKIP,그냥 넘어가기,Skip for now
+COMPANION_NOTE_SAVE,저장,Save
+COMPANION_NOTE_PLACEHOLDER,한 줄이면 충분해 · Enter로 저장,One line is plenty · Enter to save
+COMPANION_GOTO_TODO,할 일 보기,See your tasks
+COMPANION_GOTO_TIMER,타이머 열기,Open the timer
+COMPANION_GOTO_RECORD,오늘 기록 보기,See today's record
+
+
+COMPANION_OPT_TALK,얘기 좀 하자,Let's talk
+COMPANION_TALK_FIRST,처음이구나. 할 일 하나 적는 것부터 시작하자.,New here? Let's start by writing one task.
+COMPANION_TALK_BEFORE,오늘은 아직 조용하네. 가벼운 걸로 하나 시작해볼까?,Quiet so far today. Want to start with something light?
+COMPANION_TALK_DURING,하나 했네. 이어서 뭐 해볼까?,One done. What's next?
+COMPANION_TALK_ENOUGH,오늘 꽤 했어. 정리해두면 내일이 편해.,You've done a fair bit. Tidying up now makes tomorrow easier.
+COMPANION_OPT_SEE_TODO,할 일 볼래,Show me my tasks
+COMPANION_OPT_SHORT_FOCUS,짧게 집중할래,Short focus session
+COMPANION_OPT_SEE_RECORD,오늘 기록 볼래,Show today's record
+COMPANION_OPT_WRITE_JOURNAL,일지에 남길래,Write it down
+COMPANION_OPT_PLAN_TOMORROW,내일 할 일 적을래,Jot down tomorrow's tasks
+COMPANION_OPT_NOT_GREAT,사실 좀 그래,Honestly — not great
+COMPANION_OPT_REST,그냥 쉴래,Just rest
+COMPANION_EMPATHY,그런 날 있지. 그래도 하나만 해보자.,Some days are like that. Let's do just one anyway.
+COMPANION_FOLLOW_TODO,가벼운 것부터 보자.,Let's start light.
+COMPANION_FOLLOW_FOCUS,짧게라도 좋아. 타이머 열어둘게.,Short is fine. I'll get the timer.
+COMPANION_FOLLOW_RECORD,오늘 어땠는지는 여기가 제일 정확해.,This is the most honest look at your day.
+COMPANION_FOLLOW_JOURNAL_VENT,천천히 적어봐.,Take your time with it.
+COMPANION_FOLLOW_JOURNAL_WRAP,오늘 뭘 했는지는 적어둬야 남아.,It only sticks if you write it down.
+COMPANION_FOLLOW_PLAN,내일 뭘 할지 적어두면 아침이 수월해.,Writing tomorrow down makes the morning easier.
+COMPANION_REASK_START,그래. 근데 5분만 해보고 쉬는 건 어때?,Sure. But how about five minutes first?
+COMPANION_REASK_WRAP,그래. 쉬기 전에 오늘 정리해둘까?,Sure. Want to close out the day first?
+COMPANION_REASK_LOW,그래. 그래도 딱 하나만 하고 쉬자.,Sure. One small thing first though. Then rest.
+COMPANION_STAND_START,알겠어. 마음 바뀌면 말해줘. 하나면 충분하니까.,Alright. Tell me if that changes. One is enough.
+COMPANION_STAND_WRAP,알겠어. 기록은 남아 있으니까 내일이라도 봐.,Alright. It'll keep. Look it over tomorrow.
+COMPANION_GOTO_JOURNAL,일지 열기,Open the journal
+COMPANION_GOTO_HABIT,습관 보기,See your habits
+
+COMPANION_IDLE_HABIT_LEFT,습관 {n}개 남았어. 이것만큼은 채우고 가자.,{n} habits left. Let's not skip these.
+COMPANION_IDLE_HABIT_CLEAR,습관은 다 채웠네. 하나 더 해볼까?,Habits are all in. Something more?
+COMPANION_HABIT_ALL_DONE,오늘 습관은 다 채웠네.,All your habits are checked for today.
+COMPANION_HABIT_FIRST_EVER,새로 만든 거구나. 첫 칸 채웠네.,A new one. First box filled.
+COMPANION_HABIT_BACK,{days}일 만이네. 잘 돌아왔어.,{days} days since the last one. Good to have you back.
+COMPANION_HABIT_LEFT,좋아. 이제 {n}개 남았어.,Good. {n} to go.
+COMPANION_REASK_WRAP_HABIT,그래. 근데 습관 {m}개는 채우고 가자.,Sure. But let's not leave {m} habits open.
+COMPANION_OPT_SEE_HABIT,습관 채울래,Fill them in
+COMPANION_FOLLOW_HABIT,금방 끝나. 하나씩 체크하자.,Won't take long. Check them off.

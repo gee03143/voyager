@@ -119,9 +119,34 @@ func _on_list_changed() -> void:
 			checks[str(h.id)] = h.checks.duplicate()
 	Save.habit_defs = defs                            # 멤버십·순서·title·active 전역 갱신
 	var idx := _index_for(_period_nav.current_start())
+	var before = Save.habit_weeks[idx].get("checks", {})   # 덮어쓰기 전 — 전이 판정용
 	Save.habit_weeks[idx]["checks"] = checks        # 그 주 체크만
 	_refresh_progress()
 	_save_timer.start()
+	_notify_checked(before)                           # 모델 반영 뒤에 알린다
+
+# 오늘 칸이 새로 켜진 습관을 컴패니언에 알린다(이번 주를 보고 있을 때만)
+func _notify_checked(before) -> void:
+	var col := _today_column()
+	if col < 0 or typeof(before) != TYPE_DICTIONARY:
+		return
+	for r in _rows:
+		if not (r.is_active(col) and r.is_checked(col)):
+			continue
+		var h := r.get_data()
+		var prev = before.get(str(h.id), [])
+		var was := false
+		if typeof(prev) == TYPE_ARRAY:
+			var pa: Array = prev
+			was = col < pa.size() and bool(pa[col])
+		if not was:
+			Companion.notify_habit_completed(h)
+			return                                       # 클릭 한 번에 하나만 켜지므로 첫 건에서 끝
+
+func _today_column() -> int:                          # 이번 주를 안 보고 있으면 -1
+	if _period_nav.current_start() != DateUtil.monday_iso():
+		return -1
+	return (int(Time.get_date_dict_from_system().weekday) + 6) % 7
 
 func _on_reordered(from: int, to: int) -> void:
 	var r := _rows[from]

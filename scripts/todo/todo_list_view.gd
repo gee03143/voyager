@@ -282,8 +282,7 @@ func _add_task_row(parent: Node, todo: Todo, group: TodoGroup) -> TodoRow:
 	row.set_drag_enabled(_current_spec["mode"] == "group")
 	row.setup(todo)
 	_row_todo_map[row] = todo
-	row.changed.connect(_on_row_changed.bind(row, todo))
-	row.completed.connect(_on_row_completed)
+	row.changed.connect(_on_row_changed.bind(row, todo, group))
 	row.delete_requested.connect(_on_row_delete.bind(todo, group))
 	row.due_edit_requested.connect(_on_row_due_edit.bind(todo))
 	if todo == _pending_focus_todo:
@@ -311,16 +310,17 @@ func _on_reordered(from: int, to: int) -> void:
 	_save_timer.start()
 	_rebuild_rail()
 
-func _on_row_changed(row: TodoRow, todo: Todo) -> void:
+func _on_row_changed(row: TodoRow, todo: Todo, group: TodoGroup) -> void:
+	var was_done := todo.done
 	todo.text = row.get_text()
 	todo.done = row.is_done()
 	todo.due_date = row.get_due()
+	if todo.done and not was_done and not todo.text.strip_edges().is_empty():
+		var id := Save.activity_log.add("todo", {"title": todo.text})
+		Companion.notify_todo_completed(id, todo, group)   # 모델이 갱신된 뒤라 잔여 계산이 맞음
 	_save_timer.start()
 	_rebuild_rail()
-
-func _on_row_completed(title: String) -> void:
-	Save.activity_log.add("todo", {"title": title})
-
+	
 func _on_row_delete(_row: TodoRow, todo: Todo, group: TodoGroup) -> void:
 	group.tasks.erase(todo)
 	_save_timer.start()

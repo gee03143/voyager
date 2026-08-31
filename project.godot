@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Save="*uid://b46e2jhwgai18"
+Companion="*uid://b47v6v5w8pbua"
 Screen="*uid://bvhbiaj17oroj"
 ImeFocusGuard="*uid://xwip88whevwe"
 PanelPool="*uid://qa85qxohnwlx"
@@ -36,7 +37,7 @@ window/vsync/vsync_mode=0
 [internationalization]
 
 locale/translations=PackedStringArray("res://localization/translations.ko.translation", "res://localization/translations.en.translation")
-locale/test="kr"
+locale/test="ko"
 
 [physics]
 

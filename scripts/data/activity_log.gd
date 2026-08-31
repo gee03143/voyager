@@ -73,3 +73,6 @@ func from_dict(d: Dictionary) -> void:
 				events.append(e)
 	var pd = d.get("play_days", {})
 	play_days = pd if typeof(pd) == TYPE_DICTIONARY else {}
+
+func event_by_id(id: int) -> Dictionary:
+	return _find(id)             # 참조 반환 — 쓰기는 set_note()로만(직접 쓰면 changed가 안 나감)

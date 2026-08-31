@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- 보상 도장 — 언어 중립 문구를 패스로 그림(폰트 의존 없음) -->
+  <g transform="rotate(-10 60 60)" fill="none" stroke="#F0B8AE" stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- 바깥 링 -->
+    <circle cx="60" cy="60" r="52" stroke-width="4"/>
+    <!-- 안쪽 링 -->
+    <circle cx="60" cy="60" r="44" stroke-width="1.5" opacity="0.65"/>
+
+    <!-- "Good!!" — 획으로 조립한 레터폼 -->
+    <g transform="translate(2.75 0)" stroke-width="4.5">
+      <!-- G -->
+      <path d="M 34.18 55.02 A 6.5 6.5 0 1 0 36.5 60 L 30.5 60"/>
+      <!-- o -->
+      <circle cx="45" cy="60" r="5.5"/>
+      <!-- o -->
+      <circle cx="58" cy="60" r="5.5"/>
+      <!-- d -->
+      <circle cx="71" cy="60" r="5.5"/>
+      <path d="M 76.5 48 L 76.5 65.5"/>
+      <!-- ! -->
+      <path d="M 84 52 L 84 63"/>
+      <circle cx="84" cy="67.5" r="1" stroke-width="2.6"/>
+      <!-- ! -->
+      <path d="M 91 52 L 91 63"/>
+      <circle cx="91" cy="67.5" r="1" stroke-width="2.6"/>
+    </g>
+  </g>
+</svg>
