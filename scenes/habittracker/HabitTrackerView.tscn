@@ -27,6 +27,7 @@ text = "▶"
 
 [node name="TodayButton" type="Button" parent="WeekNav" unique_id=1579506445]
 layout_mode = 2
+theme_type_variation = &"VgActionButton"
 text = "오늘"
 
 [node name="Header" type="HBoxContainer" parent="." unique_id=113572953]
@@ -46,11 +47,12 @@ metadata/_custom_type_script = "uid://d4nofmpdi3kkj"
 
 [node name="AddButton" type="Button" parent="." unique_id=451622607]
 layout_mode = 2
+theme_type_variation = &"VgActionButton"
 text = "+ 습관 추가"
 
 [node name="HintLabel" type="Label" parent="." unique_id=1211233454]
-modulate = Color(1, 1, 1, 0.49803922)
 layout_mode = 2
+theme_type_variation = &"VgMutedLabel"
 text = "셀 우클릭으로 요일 켜기/끄기"
 horizontal_alignment = 1
 

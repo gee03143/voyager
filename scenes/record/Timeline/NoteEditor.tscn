@@ -8,7 +8,7 @@ script = ExtResource("1_xcsm2")
 
 [node name="MetaLabel" type="Label" parent="." unique_id=1016682787]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_type_variation = &"VgMutedLabel"
 theme_override_font_sizes/font_size = 11
 
 [node name="TitleLabel" type="Label" parent="." unique_id=2008181324]

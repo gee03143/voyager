@@ -101,6 +101,7 @@ func _build_options(options: Array) -> void:
 		c.queue_free()
 	for o in options:
 		var b := Button.new()
+		b.theme_type_variation = &"VgActionButton"
 		b.text = TranslationServer.translate(str(o["key"]))
 		var action := int(o["action"])
 		var arg: StringName = o.get("arg", &"")    # 대화 노드 id (없으면 빈 값)

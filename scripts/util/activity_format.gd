@@ -5,13 +5,13 @@ extends RefCounted
 # Save를 봐야 하는 타입(journal/mood/gratitude)은 여기 없음 — 각 뷰가 자기 문맥에서 처리
 
 const ACCENT := {
-	"pomodoro_session": Color("c0392b"),
-	"timer": Color("2e86de"),
-	"todo": Color("d9b38c"),
-	"habit": Color("27ae60"),
-	"journal": Color("9575cd"),
-	"gratitude": Color("f6b93b"),
-	"mood": Color("38ada9"),
+	"pomodoro_session": Color("a63d2e"),   # 벽돌
+	"timer": Color("2a6491"),              # 잉크 블루
+	"todo": Color("7a5c34"),               # 세피아
+	"habit": Color("3d7a3f"),              # 수풀
+	"journal": Color("6a4e96"),            # 자주
+	"gratitude": Color("9a6b12"),          # 황토
+	"mood": Color("2a7a72"),               # 청록
 }
 
 static func accent_of(type: String) -> Color:

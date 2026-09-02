@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://53nt56r0n8ym"]
 
 [ext_resource type="Script" uid="uid://deo3r5bro2hte" path="res://scripts/record/journal/gratitude_history_row.gd" id="1_0nxyj"]
-[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="1_a5tqg"]
 [ext_resource type="PackedScene" uid="uid://dg5x6yha4wta5" path="res://scenes/commonui/HoldButton.tscn" id="2_a5tqg"]
 
 [node name="GratitudeHistoryRow" type="PanelContainer" unique_id=1461979749]
-theme_override_styles/panel = ExtResource("1_a5tqg")
+theme_type_variation = &"VgRowPanel"
 script = ExtResource("1_0nxyj")
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=265956309]

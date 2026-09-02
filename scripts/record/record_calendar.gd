@@ -2,8 +2,8 @@ extends VBoxContainer
 
 signal day_selected(iso: String)
 
-const HEAT_LOW := Color("4caf50")    # 활동 적음 = 연한 초록
-const HEAT_HIGH := Color("114415ff")   # 활동 많음 = 진한 초록
+const HEAT_LOW := Color("cfe0c4")    # 활동 적음 = 옅은 세이지
+const HEAT_HIGH := Color("3d7a3f")   # 활동 많음 = 습관 초록
 
 @onready var _month_label: Label = $Nav/MonthLabel
 @onready var _header: GridContainer = $Header
@@ -76,28 +76,33 @@ func _render_month() -> void:
 	for c in _grid.get_children():
 		c.queue_free()
 	_month_label.text = DateUtil.month_label("%04d-%02d-01" % [_year, _month])
+	var today := DateUtil.today_iso()
 	for slot in DateUtil.month_grid("%04d-%02d-01" % [_year, _month]):
 		if slot.is_empty():
 			_grid.add_child(_blank())
 		else:
-			_grid.add_child(_day_cell(slot, int(slot.split("-")[2])))
+			_grid.add_child(_day_cell(slot, int(slot.split("-")[2]), slot == today))
 
-func _day_cell(iso: String, day: int) -> Control:
+func _day_cell(iso: String, day: int, is_today: bool) -> Control:
 	var b := Button.new()
 	b.text = str(day)
 	b.custom_minimum_size = Vector2(32, 32)
 	var sb := StyleBoxFlat.new()
 	var cnt := int(_counts.get(iso, 0))  # TODO: 집중 시간, 플레이 시간으로도 판단 가능하게 수정
+	var heat := 0.0
 	if cnt > 0:
-		var t := clampf((cnt - 1) / 5.0, 0.0, 1.0)  # 6건 이상이면 최대한 진하게
-		sb.bg_color = HEAT_LOW.lerp(HEAT_HIGH, t)
+		heat = clampf((cnt - 1) / 5.0, 0.0, 1.0)  # 6건 이상이면 최대한 진하게
+		sb.bg_color = HEAT_LOW.lerp(HEAT_HIGH, heat)
 	else:
-		sb.bg_color = Color(1, 1, 1, 0.05)        # 빈 날 옅은 셀
+		sb.bg_color = Color("f0e9db")              # 빈 날 옅은 셀
+	sb.set_corner_radius_all(4)
 	if iso == _selected:
 		sb.set_border_width_all(2)
-		sb.border_color = Color("ffd54a")          # 선택 강조(노란 테두리) — 배경색은 유지
+		sb.border_color = Color("2a261f")          # 선택 = 사방 잉크 테두리
 	for st in ["normal", "hover", "pressed", "focus"]:
 		b.add_theme_stylebox_override(st, sb)
+	if is_today:
+		b.add_child(_today_mark(Color("fbf7ef") if heat > 0.5 else Color("2a261f")))
 	b.pressed.connect(func():
 		_selected = iso
 		_render_month()
@@ -123,3 +128,17 @@ func _go_today() -> void:
 	var t := Time.get_date_dict_from_system()
 	_year = t.year; _month = t.month
 	_render_month()
+	
+func _today_mark(c: Color) -> ColorRect:
+	var bar := ColorRect.new()
+	bar.color = c
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.anchor_left = 0.5
+	bar.anchor_right = 0.5
+	bar.anchor_top = 1.0
+	bar.anchor_bottom = 1.0
+	bar.offset_left = -6.0      # 폭 12 — 두 자리 숫자 아래에 깔리는 길이
+	bar.offset_right = 6.0
+	bar.offset_top = -7.0       # 높이 2, 셀 바닥에서 5px 띄움
+	bar.offset_bottom = -5.0
+	return bar

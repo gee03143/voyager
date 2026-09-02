@@ -1,12 +1,11 @@
 [gd_scene format=3 uid="uid://kc5gdtvnmkok"]
 
-[ext_resource type="StyleBox" uid="uid://brwsd4nkjx3ch" path="res://assets/styles/timeline_block/timeline_habit_chip.tres" id="1_fksqe"]
 [ext_resource type="Script" uid="uid://d0jjy3ovbnsnt" path="res://scripts/record/timeline/timeline_habit_chip.gd" id="2_s6g86"]
 
 [node name="TimelineHabitChip" type="PanelContainer" unique_id=425280265]
 offset_right = 19.0
 offset_bottom = 20.0
-theme_override_styles/panel = ExtResource("1_fksqe")
+theme_type_variation = &"VgHabitChip"
 script = ExtResource("2_s6g86")
 
 [node name="Label" type="Label" parent="." unique_id=389135772]

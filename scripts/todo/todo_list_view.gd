@@ -57,7 +57,7 @@ func _ready() -> void:
 	sort_dir_button.pressed.connect(_on_sort_dir_toggled)
 
 	_hover_indicator = ColorRect.new()
-	_hover_indicator.color = Color(0.3, 0.5, 0.9, 0.4)
+	_hover_indicator.color = Color(0.16470589, 0.14901961, 0.12156863, 0.12)
 	_hover_indicator.top_level = true
 	_hover_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hover_indicator.visible = false

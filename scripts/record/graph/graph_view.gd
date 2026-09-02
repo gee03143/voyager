@@ -1,8 +1,8 @@
 extends VBoxContainer
 
 const AXIS_STEP := 2.0 * 3600.0
-const PLAY_COLOR := Color("e8dcc4")
-const FOCUS_COLOR := Color("8bc34a")
+const PLAY_COLOR := Color("bfb49d")    # 플레이 시간 = 중립 모래
+const FOCUS_COLOR := Color("a63d2e")   # 집중 시간 = 팔레트의 집중색
 
 @onready var _mode_nav_container: HBoxContainer = $ModeNav
 @onready var _period_nav: PeriodNav = $PeriodNav

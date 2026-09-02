@@ -23,8 +23,10 @@ func setup(doc: Dictionary, is_selected: bool) -> void:
 	var t := str(doc.get("title", "")).strip_edges()
 	title_label.text = t if t != "" else "(제목 없음)"
 	date_label.text = "생성됨 %s" % DateUtil.format_created(int(doc.get("ts", 0)))
-	date_label.modulate.a = 0.6
 	if is_selected:
 		var sel := StyleBoxFlat.new()
-		sel.bg_color = Color(1, 1, 1, 0.10)
+		sel.bg_color = Color(0.16470589, 0.14901961, 0.12156863, 0.08)   # 선택 = 잉크 워시
+		sel.set_corner_radius_all(8)
 		add_theme_stylebox_override("panel", sel)
+	else:
+		remove_theme_stylebox_override("panel")

@@ -58,6 +58,7 @@ text = "▶"
 
 [node name="TodayButton" type="Button" parent="WeekNav" unique_id=409699522]
 layout_mode = 2
+theme_type_variation = &"VgActionButton"
 text = "오늘"
 
 [node name="ChartRow" type="HBoxContainer" parent="." unique_id=1502062569]

@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dg5x6yha4wta5" path="res://scenes/commonui/HoldButton.tscn" id="2_88dv2"]
 
 [node name="JournalDocRow" type="PanelContainer" unique_id=1236425911]
+theme_type_variation = &"VgRowPanel"
 script = ExtResource("1_w2hi8")
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=1149091678]
@@ -16,6 +17,7 @@ mouse_filter = 0
 
 [node name="TitleLabel" type="Label" parent="HBox/Body" unique_id=1567459731]
 layout_mode = 2
+theme_type_variation = &"VgMutedLabel"
 
 [node name="DateLabel" type="Label" parent="HBox/Body" unique_id=1181326123]
 layout_mode = 2

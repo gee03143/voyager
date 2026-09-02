@@ -1,10 +1,9 @@
 [gd_scene format=3 uid="uid://duetjmpmgveap"]
 
-[ext_resource type="StyleBox" uid="uid://b6vpqiafqwcl1" path="res://assets/styles/timeline_block/note_stream_row.tres" id="1_fvkov"]
 [ext_resource type="Script" uid="uid://y6lvymgufi1k" path="res://scripts/record/timeline/note_stream_row.gd" id="2_0w7v5"]
 
 [node name="NoteStreamRow" type="PanelContainer" unique_id=908416430]
-theme_override_styles/panel = ExtResource("1_fvkov")
+theme_type_variation = &"VgNoteRow"
 script = ExtResource("2_0w7v5")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=1938565482]
@@ -13,7 +12,7 @@ layout_mode = 2
 [node name="MetaLabel" type="Label" parent="VBox" unique_id=1122955301]
 custom_minimum_size = Vector2(184, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_type_variation = &"VgMutedLabel"
 theme_override_font_sizes/font_size = 11
 autowrap_mode = 1
 

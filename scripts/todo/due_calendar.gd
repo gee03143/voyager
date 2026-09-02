@@ -54,20 +54,16 @@ func _day_cell(iso: String, day: int, is_today: bool) -> Control:
 	var b := Button.new()
 	b.text = str(day)
 	b.custom_minimum_size = Vector2(32, 32)
-	var sb: StyleBoxFlat
 	if iso == _selected:
-		sb = StyleBoxFlat.new()
-		sb.bg_color = Color(1, 1, 1, 0.12)
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color("fbf7ef")
+		sb.set_corner_radius_all(4)
 		sb.set_border_width_all(2)
-		sb.border_color = Color("ffd54a")     # 선택됨 = 노란 테두리(기존)
-	elif is_today:
-		sb = StyleBoxFlat.new()
-		sb.bg_color = Color(1, 1, 1, 0.05)
-		sb.set_border_width_all(1)
-		sb.border_color = Color("7ec8ff")     # 오늘 = 옅은 파란 테두리(신규)
-	if sb:
+		sb.border_color = Color("2a261f")          # 선택 = 사방 잉크 테두리
 		for st in ["normal", "hover", "pressed", "focus"]:
 			b.add_theme_stylebox_override(st, sb)
+	if is_today:
+		b.add_child(_today_mark(Color("2a261f")))   # 오늘 = 잉크 점
 	b.pressed.connect(func():
 		_selected = iso
 		_render_month()
@@ -98,3 +94,17 @@ func _update_separation() -> void:
 	var sep := maxi(int((size.x - 7 * 32) / 6.0), 2)
 	_header.add_theme_constant_override("h_separation", sep)
 	_grid.add_theme_constant_override("h_separation", sep)
+
+func _today_mark(c: Color) -> ColorRect:
+	var bar := ColorRect.new()
+	bar.color = c
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.anchor_left = 0.5
+	bar.anchor_right = 0.5
+	bar.anchor_top = 1.0
+	bar.anchor_bottom = 1.0
+	bar.offset_left = -6.0      # 폭 12 — 두 자리 숫자 아래에 깔리는 길이
+	bar.offset_right = 6.0
+	bar.offset_top = -7.0       # 높이 2, 셀 바닥에서 5px 띄움
+	bar.offset_bottom = -5.0
+	return bar

@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://bv0kkmavlcenv"]
 
-[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="1_qf4bl"]
 [ext_resource type="Script" uid="uid://rb0i2qwj4hpk" path="res://scripts/record/journal/journal_dashboard.gd" id="2_w1olf"]
 [ext_resource type="Script" uid="uid://trgf44c8f1u" path="res://scripts/commonui/tab_nav_slot.gd" id="3_33j2y"]
 [ext_resource type="PackedScene" uid="uid://425i7ha8epq5" path="res://scenes/record/journal/JournalView.tscn" id="4_w1olf"]
@@ -8,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://2yknrlttfsdb" path="res://scenes/record/journal/MoodView.tscn" id="6_avahc"]
 
 [node name="JournalDashboard" type="PanelContainer" unique_id=2135047390]
-theme_override_styles/panel = ExtResource("1_qf4bl")
+theme_type_variation = &"VgCard"
 script = ExtResource("2_w1olf")
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=32460013]

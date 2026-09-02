@@ -6,16 +6,6 @@ const LOG_ROW := preload("res://scenes/record/RecordLogRow.tscn")
 @onready var play_label: Label = $Header/PlayLabel
 @onready var list: VBoxContainer = $ScrollContainer/List
 
-const ACCENT := {
-	"pomodoro_session": Color("c0392b"),   # 빨강
-	"timer": Color("2e86de"),              # 파랑
-	"todo": Color("d9b38c"),               # 베이지
-	"habit": Color("27ae60"),              # 초록
-	"journal": Color("9575cd"),            # 보라
-	"gratitude": Color("f6b93b"),
-	"mood": Color("38ada9"),
-}
-
 const TYPE_LABEL_KEY := {
 	"pomodoro_session": "RECORD_TYPE_POMO",
 	"timer": "RECORD_TYPE_TIMER",
@@ -85,7 +75,7 @@ func _make_row(e: Dictionary) -> void:
 	var type := str(e.get("type", ""))
 	var row := LOG_ROW.instantiate() as RecordLogRow
 	list.add_child(row)
-	row.setup(TYPE_LABEL_KEY.get(type, ""), ACCENT.get(type, Color.GRAY), str(e.get("text", "")))
+	row.setup(TYPE_LABEL_KEY.get(type, ""), ActivityFormat.accent_of(type), str(e.get("text", "")))
 	
 func _subj(e: Dictionary) -> String:
 	var key := str(e.get("subject", ""))

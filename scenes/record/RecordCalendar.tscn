@@ -23,6 +23,7 @@ text = "▶"
 
 [node name="TodayButton" type="Button" parent="Nav" unique_id=177888695]
 layout_mode = 2
+theme_type_variation = &"VgActionButton"
 
 [node name="Header" type="GridContainer" parent="." unique_id=830454414]
 layout_mode = 2

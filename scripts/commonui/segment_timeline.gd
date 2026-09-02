@@ -7,12 +7,12 @@ const BREAK_W := 10.0
 const LONG_W := 14.0
 const PIP_H := 12.0
 
-const C_FOCUS_DONE := Color(0.54, 0.435, 0.227)
-const C_FOCUS_CUR := Color(0.953, 0.788, 0.42)
-const C_FOCUS_PEND := Color(0.5, 0.42, 0.27)
-const C_BREAK_DONE := Color(0.27, 0.376, 0.435)
-const C_BREAK_PEND := Color(0.247, 0.322, 0.373)
-const C_CUR_OUTLINE := Color(0.984, 0.914, 0.74)
+const C_FOCUS_DONE := Color("a63d2e")     # 지난 집중 구간
+const C_FOCUS_CUR := Color("a63d2e")      # 현재 구간 — 윤곽으로 구분
+const C_FOCUS_PEND := Color("e0c6c0")     # 아직 안 온 집중 구간
+const C_BREAK_DONE := Color("9a9080")     # 지난 휴식
+const C_BREAK_PEND := Color("d6ccb8")     # 아직 안 온 휴식
+const C_CUR_OUTLINE := Color("2a261f")    # 현재 구간 잉크 윤곽
 
 var _types: Array = []
 var _index: int = 0

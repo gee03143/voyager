@@ -61,9 +61,11 @@ func _build_header() -> void:
 		lbl.text = TranslationServer.translate(d)
 		lbl.custom_minimum_size.x = HabitGrid.DAY_W
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.theme_type_variation = &"VgDayLabel"
 		col.add_child(lbl)
 		var circle := RadialProgress.new()
-		circle.arc_color = HabitGrid.ACCENT
+		circle.arc_color = HabitGrid.IDLE
+		circle.track_color = Color("e0d6c0")
 		circle.custom_minimum_size = Vector2(HabitGrid.DAY_W, 28)
 		col.add_child(circle)
 		_day_labels.append(lbl)
@@ -173,10 +175,9 @@ func _highlight_today(week_start: String) -> void:
 	if week_start == DateUtil.monday_iso():
 		today_col = (int(Time.get_date_dict_from_system().weekday) + 6) % 7   # 일0..토6 → 월요일 시작
 	for i in _day_labels.size():
-		if i == today_col:
-			_day_labels[i].add_theme_color_override("font_color", HabitGrid.ACCENT)
-		else:
-			_day_labels[i].remove_theme_color_override("font_color")
+		var is_today := i == today_col
+		_day_labels[i].theme_type_variation = &"VgTodayLabel" if is_today else &"VgDayLabel"
+		_day_circles[i].arc_color = HabitGrid.ACCENT if is_today else HabitGrid.IDLE
 
 func _index_for(week_start: String) -> int:
 	for i in Save.habit_weeks.size():

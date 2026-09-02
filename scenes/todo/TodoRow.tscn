@@ -8,6 +8,7 @@
 [node name="TodoRow" type="PanelContainer" unique_id=1444403424]
 offset_right = 40.0
 offset_bottom = 40.0
+theme_type_variation = &"VgRowPanel"
 script = ExtResource("1_rnimk")
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=1559890846]

@@ -12,7 +12,7 @@ signal delete_requested(row: HabitRow)
 var _id: int = 0
 var _active: Array[bool] = [true, true, true, true, true, true, true]
 var _checks: Array[bool] = [false, false, false, false, false, false, false]
-var _cells: Array[CheckBox] = []
+var _cells: Array[Panel] = []
 
 func _ready() -> void:
 	drag_handle.custom_minimum_size.x = HabitGrid.HANDLE_W
@@ -29,8 +29,9 @@ func _build_cells() -> void:
 		wrap.custom_minimum_size.x = HabitGrid.DAY_W
 		wrap.mouse_filter = Control.MOUSE_FILTER_STOP
 		wrap.gui_input.connect(func(e): _on_cell_input(i, e)) # 입력은 cell이 처리
-		var cb := CheckBox.new()
-		cb.mouse_filter = Control.MOUSE_FILTER_IGNORE    # Checkbbox는 표시만
+		var cb := Panel.new()
+		cb.custom_minimum_size = Vector2(20, 20)
+		cb.mouse_filter = Control.MOUSE_FILTER_IGNORE    # 표시 전용, 입력은 wrap이 받음
 		wrap.add_child(cb)
 		cells_box.add_child(wrap)
 		_cells.append(cb)
@@ -71,8 +72,11 @@ func _on_cell_input(i: int, event: InputEvent) -> void:
 
 func _render_cell(i: int) -> void:
 	var cb := _cells[i]
-	cb.set_pressed_no_signal(_checks[i] and _active[i])
-	cb.disabled = not _active[i]             # 비활성 = 회색 비활성 모양
-	cb.modulate.a = 1.0 if _active[i] else 0.4
+	if not _active[i]:
+		cb.theme_type_variation = &"VgHabitCellOff"
+	elif _checks[i]:
+		cb.theme_type_variation = &"VgHabitCellDone"
+	else:
+		cb.theme_type_variation = &"VgHabitCell"
 	var wrap := cb.get_parent() as Control
 	wrap.tooltip_text = TranslationServer.translate("HABIT_DAY_TOGGLE_OFF" if _active[i] else "HABIT_DAY_TOGGLE_ON")

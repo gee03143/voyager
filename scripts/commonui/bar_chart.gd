@@ -1,7 +1,7 @@
 class_name BarChart
 extends Control
 
-const GRID_COLOR := Color(1.0, 1.0, 1.0, 0.15)
+const GRID_COLOR := Color(0.16470589, 0.14901961, 0.12156863, 0.10)   # 잉크 10%
 const BAR_GAP := 0.2    # 막대 사이 여백 비율(칸 너비 대비)
 
 var series: Array[Dictionary] = []:   # [{values: Array[float], color: Color}, ...]

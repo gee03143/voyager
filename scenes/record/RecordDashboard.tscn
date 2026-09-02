@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://d3y231iexp7v6"]
 
-[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="1_o3j4l"]
 [ext_resource type="PackedScene" uid="uid://baouvnhwlly04" path="res://scenes/record/RecordCalendar.tscn" id="2_3vyj2"]
 [ext_resource type="Script" uid="uid://f822jswpwv6u" path="res://scripts/record/record_dashboard.gd" id="2_7wc1k"]
 [ext_resource type="Script" uid="uid://trgf44c8f1u" path="res://scripts/commonui/tab_nav_slot.gd" id="3_me352"]
@@ -10,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://b1kjtke6q5hdf" path="res://scenes/record/Timeline/NoteStream.tscn" id="8_n02kd"]
 
 [node name="RecordDashboard" type="PanelContainer" unique_id=601049294]
-theme_override_styles/panel = ExtResource("1_o3j4l")
+theme_type_variation = &"VgCard"
 script = ExtResource("2_7wc1k")
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=1932406811]
@@ -54,6 +53,7 @@ layout_mode = 2
 [node name="Summary" type="PanelContainer" parent="Margin/Body" unique_id=366986904]
 custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
+theme_type_variation = &"VgCard"
 
 [node name="SummaryMargin" type="MarginContainer" parent="Margin/Body/Summary" unique_id=1406079994]
 layout_mode = 2

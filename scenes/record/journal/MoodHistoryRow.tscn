@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://c7q462ewoyiut"]
 
-[ext_resource type="StyleBox" uid="uid://b4nex8wrr6ji2" path="res://assets/panel_bg.tres" id="1_clh1k"]
 [ext_resource type="Script" uid="uid://bvqvk01400mhf" path="res://scripts/record/journal/mood_history_row.gd" id="2_ax5vm"]
 [ext_resource type="PackedScene" uid="uid://dg5x6yha4wta5" path="res://scenes/commonui/HoldButton.tscn" id="2_tc0jb"]
 
 [node name="MoodHistoryRow" type="PanelContainer" unique_id=1294028683]
-theme_override_styles/panel = ExtResource("1_clh1k")
+theme_type_variation = &"VgRowPanel"
 script = ExtResource("2_ax5vm")
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=642458556]

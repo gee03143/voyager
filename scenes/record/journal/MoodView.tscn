@@ -1,31 +1,7 @@
 [gd_scene format=3 uid="uid://2yknrlttfsdb"]
 
 [ext_resource type="Script" uid="uid://b5mrt6bmp4non" path="res://scripts/record/journal/mood_view.gd" id="1_k45k5"]
-[ext_resource type="StyleBox" uid="uid://doqy4v5ocm6xm" path="res://assets/styles/mood_button/mood_normal.tres" id="2_a4ame"]
-[ext_resource type="StyleBox" uid="uid://dglejog3rntp1" path="res://assets/styles/mood_button/mood_activate.tres" id="3_frq1q"]
 [ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="4_frq1q"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a4ame"]
-content_margin_left = 1.0
-content_margin_top = 1.0
-content_margin_right = 1.0
-content_margin_bottom = 1.0
-bg_color = Color(0.08627451, 0.14117648, 0.18431373, 0.92156863)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frq1q"]
-content_margin_left = 1.0
-content_margin_top = 1.0
-content_margin_right = 1.0
-content_margin_bottom = 1.0
-bg_color = Color(0.08627451, 0.14117648, 0.18431373, 0.92156863)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
 
 [node name="MoodView" type="HBoxContainer" unique_id=118539587]
 offset_right = 587.0
@@ -46,32 +22,27 @@ layout_mode = 2
 
 [node name="Level1Button" type="Button" parent="Left/LevelRow" unique_id=320016978]
 layout_mode = 2
-theme_override_styles/normal = ExtResource("2_a4ame")
-theme_override_styles/pressed = ExtResource("3_frq1q")
+theme_type_variation = &"VgMoodButton"
 text = "😞"
 
 [node name="Level2Button" type="Button" parent="Left/LevelRow" unique_id=1356562982]
 layout_mode = 2
-theme_override_styles/normal = ExtResource("2_a4ame")
-theme_override_styles/pressed = ExtResource("3_frq1q")
+theme_type_variation = &"VgMoodButton"
 text = "😕"
 
 [node name="Level3Button" type="Button" parent="Left/LevelRow" unique_id=2009138287]
 layout_mode = 2
-theme_override_styles/normal = ExtResource("2_a4ame")
-theme_override_styles/pressed = ExtResource("3_frq1q")
+theme_type_variation = &"VgMoodButton"
 text = "😐"
 
 [node name="Level4Button" type="Button" parent="Left/LevelRow" unique_id=1487750778]
 layout_mode = 2
-theme_override_styles/normal = ExtResource("2_a4ame")
-theme_override_styles/pressed = ExtResource("3_frq1q")
+theme_type_variation = &"VgMoodButton"
 text = "🙂"
 
 [node name="Level5Button" type="Button" parent="Left/LevelRow" unique_id=1116039205]
 layout_mode = 2
-theme_override_styles/normal = ExtResource("2_a4ame")
-theme_override_styles/pressed = ExtResource("3_frq1q")
+theme_type_variation = &"VgMoodButton"
 text = "😄"
 
 [node name="MemoEdit" type="TextEdit" parent="Left" unique_id=695856862]
@@ -85,12 +56,12 @@ layout_mode = 2
 
 [node name="RecordButton" type="Button" parent="Left/ButtonRow" unique_id=960489933]
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_a4ame")
+theme_type_variation = &"VgActionButton"
 text = "MOOD_RECORD_BUTTON"
 
 [node name="CancelEditButton" type="Button" parent="Left/ButtonRow" unique_id=1343165997]
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_frq1q")
+theme_type_variation = &"VgActionButton"
 text = "MOOD_CANCEL_EDIT_BUTTON"
 
 [node name="VSeparator" type="VSeparator" parent="." unique_id=985429282]

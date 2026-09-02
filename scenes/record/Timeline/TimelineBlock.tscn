@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://beeh8odjvy5l4"]
 
-[ext_resource type="StyleBox" uid="uid://lfe41hkxija7" path="res://assets/styles/timeline_block/timeline_block.tres" id="1_lpklh"]
 [ext_resource type="Script" uid="uid://cqj2cxrc26acx" path="res://scripts/record/timeline/timeline_block.gd" id="2_2idua"]
 
 [node name="TimelineBlock" type="PanelContainer" unique_id=723705945]
 clip_contents = true
-theme_override_styles/panel = ExtResource("1_lpklh")
+theme_type_variation = &"VgTimelineBlock"
 script = ExtResource("2_2idua")
 
 [node name="Label" type="Label" parent="." unique_id=635113215]

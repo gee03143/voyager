@@ -12,8 +12,8 @@ func _ready() -> void:
 func _draw() -> void:
 	var font := get_theme_default_font()
 	var fs := 11
-	var line_color := Color(1, 1, 1, 0.08)
-	var text_color := Color(1, 1, 1, 0.35)
+	var line_color := Color(0.16470589, 0.14901961, 0.12156863, 0.10)   # 잉크 10% — 24시간 눈금선
+	var text_color := Color("9a9080")                                   # ink 3 — 시각 라벨
 	for h in 25:
 		var y := h * HOUR_PX
 		draw_line(Vector2(GUTTER, y), Vector2(size.x, y), line_color, 1.0)

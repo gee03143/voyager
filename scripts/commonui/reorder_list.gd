@@ -16,9 +16,9 @@ func _ready() -> void:
 	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_overlay)
 	_overlay.set_drag_forwarding(Callable(), _can_drop_data, _drop_data)
-	
+
 	_indicator = ColorRect.new()
-	_indicator.color = Color(0.4, 0.7, 1.0)
+	_indicator.color = Color("2a261f")              # 드롭 위치 = 잉크 선
 	_indicator.custom_minimum_size = Vector2(0, 2)
 	_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_indicator.top_level = true                # 컨테이너 레이아웃에서 제외

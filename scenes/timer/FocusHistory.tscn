@@ -29,11 +29,11 @@ size_flags_horizontal = 3
 
 [node name="Summary" type="Label" parent="Margin/VBox/Header" unique_id=1105163295]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_type_variation = &"VgMutedLabel"
 
 [node name="EmptyLabel" type="Label" parent="Margin/VBox" unique_id=701126189]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_type_variation = &"VgMutedLabel"
 text = "TIMER_HISTORY_EMPTY"
 
 [node name="Scroll" type="ScrollContainer" parent="Margin/VBox" unique_id=1257326708]

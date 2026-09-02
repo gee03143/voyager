@@ -12,7 +12,7 @@ layout_mode = 2
 [node name="EmptyLabel" type="Label" parent="." unique_id=2096453420]
 custom_minimum_size = Vector2(212, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_type_variation = &"VgMutedLabel"
 text = "RECORD_NOTE_STREAM_EMPTY"
 autowrap_mode = 1
 

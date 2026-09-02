@@ -2,20 +2,14 @@
 
 [ext_resource type="Script" uid="uid://hj8d7jrfy7id" path="res://scripts/record/timeline/timeline_point_row.gd" id="1_u1lme"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bwoxv"]
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
 [node name="TimelinePointRow" type="HBoxContainer" unique_id=1655551189]
 mouse_filter = 0
 theme_override_constants/separation = 7
 script = ExtResource("1_u1lme")
 
 [node name="TimeLabel" type="Label" parent="." unique_id=1147489883]
-modulate = Color(1, 1, 1, 0.6)
 layout_mode = 2
+theme_type_variation = &"VgMutedLabel"
 theme_override_font_sizes/font_size = 11
 
 [node name="Dot" type="Panel" parent="." unique_id=1176599690]
@@ -23,7 +17,7 @@ custom_minimum_size = Vector2(8, 8)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_bwoxv")
+theme_type_variation = &"VgTimelineDot"
 
 [node name="TextLabel" type="Label" parent="." unique_id=904798649]
 layout_mode = 2

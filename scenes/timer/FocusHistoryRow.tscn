@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://ci6x0r824dwdb" path="res://scripts/commonui/line_edit_auto_blur.gd" id="2_ue2mm"]
 
 [node name="FocusHistoryRow" type="PanelContainer" unique_id=1742310928]
+theme_type_variation = &"VgRowPanel"
 script = ExtResource("1_yj35k")
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=1411867025]
@@ -16,7 +17,7 @@ layout_mode = 2
 
 [node name="SpanLabel" type="Label" parent="HBox/TimeCol" unique_id=638902176]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_type_variation = &"VgMutedLabel"
 theme_override_font_sizes/font_size = 11
 
 [node name="LabelLabel" type="Label" parent="HBox/TimeCol" unique_id=1952903949]
