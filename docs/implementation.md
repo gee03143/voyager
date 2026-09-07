@@ -1,12 +1,12 @@
 # Voyage — Implementation
 
-> 인수인계/컨텍스트 파악용 기술 문서. **상태**를 기록한다(지금 코드에 실제로 있는 것). 계획·백로그는 사용자가 별도 관리(repo 문서 없음), 의도·방향성은 `README.md` 참고.
+> 인수인계/컨텍스트 파악용 기술 문서. **상태**를 기록한다(지금 코드에 실제로 있는 것). 계획·백로그는 사용자가 별도 관리(repo 문서 없음), 의도·방향성은 `docs/README.md` 참고.
 
 ## 1. 개요
 
 - **엔진**: Godot 4.6 (GDScript)
-- **저장소**: `C:\Users\NHN\Documents\voyager`
-- **진입점**: `World.tscn`. 좌측 도크(`ButtonGroupNav`)에서 도구 패널을 열고 닫는 구조.
+- **경로 표기**: 이 문서의 모든 경로는 **워크스페이스 루트(저장소 루트) 기준 상대 경로**. 로컬 절대 경로는 적지 않는다(환경마다 다름).
+- **진입점**: `scenes/World.tscn`(`project.godot`의 `run/main_scene`). 좌측 도크(`ButtonGroupNav`)에서 도구 패널을 열고 닫는 구조.
 - **디렉터리 구조**:
   - `scripts/` — 도메인별 하위 폴더(`data/`, `timer/`, `todo/`, `habittracker/`, `companion/`, `commonui/`, `util/`, `audio/`, `record/`, `letter/`, `discovery/`, `option/`, `display/`). 일부는 2단계로 더 나뉨 — `record/timeline/`(하루 타임라인·노트 편집기), `record/journal/`(저널·무드·감사일지), `record/graph/`, `timer/focushistory/`
   - `scenes/` — `.tscn` 씬 파일, `scripts/`와 대응하는 하위 구조
