@@ -4,3 +4,6 @@
 
 # Claude Code 로컬 설정 (환경 의존 경로 포함)
 .claude/settings.local.json
+
+# Claude 작업용 휘발성 파일 (티켓 초안 등)
+.scratch/
