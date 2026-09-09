@@ -1,12 +1,17 @@
 # Voyage — Implementation
 
-> 인수인계/컨텍스트 파악용 기술 문서. **상태**를 기록한다(지금 코드에 실제로 있는 것). 계획·백로그는 사용자가 별도 관리(repo 문서 없음), 의도·방향성은 `docs/README.md` 참고.
+> ⚠️ **이 문서는 동결됐다(2026-09-09).** 새 내용을 추가하지 않는다. 읽기 전용 참조용.
+> 갱신이 필요해진 절은 **갱신하지 말고** `docs/specs/`(기능) 또는 `docs/architecture/`(구조)로 이관한 뒤 여기서 삭제한다.
+> 정본 관할은 `CLAUDE.md`의 "문서 체계" 표 참고.
+>
+> (원래 성격) 인수인계/컨텍스트 파악용 기술 문서. **상태**를 기록한다(지금 코드에 실제로 있는 것).
 
 ## 1. 개요
 
 - **엔진**: Godot 4.6 (GDScript)
 - **경로 표기**: 이 문서의 모든 경로는 **워크스페이스 루트(저장소 루트) 기준 상대 경로**. 로컬 절대 경로는 적지 않는다(환경마다 다름).
-- **진입점**: `scenes/World.tscn`(`project.godot`의 `run/main_scene`). 좌측 도크(`ButtonGroupNav`)에서 도구 패널을 열고 닫는 구조.
+- **진입점**: `scenes/MainShell.tscn`(`project.godot`의 `run/main_scene`, uid `drbksltg435d4`). 사이드바 `NavList`로 콘텐츠 영역을 스왑하는 구조.
+  - 구 진입점 `scenes/World.tscn`(좌측 도크 + 팝업)은 파일로 남아 있으나 더 이상 실행되지 않음.
 - **디렉터리 구조**:
   - `scripts/` — 도메인별 하위 폴더(`data/`, `timer/`, `todo/`, `habittracker/`, `companion/`, `commonui/`, `util/`, `audio/`, `record/`, `letter/`, `discovery/`, `option/`, `display/`). 일부는 2단계로 더 나뉨 — `record/timeline/`(하루 타임라인·노트 편집기), `record/journal/`(저널·무드·감사일지), `record/graph/`, `timer/focushistory/`
   - `scenes/` — `.tscn` 씬 파일, `scripts/`와 대응하는 하위 구조
@@ -124,13 +129,13 @@
 ### `TabNavSlot` / `ButtonGroupNav` (`scripts/commonui/`)
 `TabNavSlot.set_tabs(labels)`가 매번 버튼을 새로 만들고 `ButtonGroupNav`(새 인스턴스)로 묶음. `clear()`가 시그널 연결 해제 + 버튼 파괴 + `ButtonGroupNav` 재생성까지 함께 처리(연결 중복 방지). `ButtonGroupNav`는 Godot `ButtonGroup` 기반, `allow_close`(=`allow_unpress`)로 "재클릭 시 전부 해제" 지원.
 
-### `world.gd` — 현재 루트 씬
-`World.tscn`의 루트 스크립트. **현재 코드 기준으로 패럴랙스·배·`voyage_distance` 구동 로직이 그대로 살아있음**:
+### `world.gd` — 구 루트 씬 (더 이상 진입점 아님)
+`World.tscn`의 루트 스크립트. 진입점이 `MainShell.tscn`로 바뀐 뒤로는 실행되지 않는다. 아래 로직은 코드에 남아 있을 뿐 동작하지 않음:
 - `_process`에서 `Clock.is_focusing()`이면 배 속도를 가속, `Save.voyage.voyage_distance`를 매 프레임 적분, 그 값으로 패럴랙스 레이어 `motion_offset` 계산 + 배 bob/rock 애니메이션 + "N leagues" 라벨 갱신.
 - 도크 버튼(`dock` 자식 + `voyage_button`/`gear_button`)을 `ButtonGroupNav`로 묶어 `_on_nav_selected`에서 `DYNAMIC_SCENES` 딕셔너리(인덱스→씬, 하드코딩)로 `popup_frame.show_scene()` 호출.
 - `companion_button` 클릭 또는 `Save.settings.auto_minimize`가 켜진 상태에서 포커스 세션 시작 시 `_enter_companion()` 자동 호출.
 
-⚠️ **README.md 기준 컴패니언 셸(고정 배너, 배경 없음)과 지금 코드는 다름** — `World.tscn`(현재 `run/main_scene`)엔 패럴랙스·배·항해 거리가 여전히 살아있음. 다만 셸 전환 자체는 착수됨 — 아래 `MainShell` 항목에 Todo/Habit/Timer/Record가 이미 이전됐고, World.tscn의 구 팝업 경로(`ClockTab` 등)도 병행 존재. 아직 `MainShell`이 실제 진입점으로 전환되진 않음(에디터에서 `MainShell.tscn`을 직접 "현재 씬 실행"해서 확인하는 단계).
+⚠️ **셸 전환은 완료됨(2026-09-09 확인)** — `run/main_scene`이 `MainShell.tscn`로 바뀌었다. 패럴랙스·배·항해 거리 코드는 `World.tscn`/`world.gd`에 남아 있지만 실행 경로가 없다. `World.tscn`의 구 팝업 경로(`ClockTab` 등)도 마찬가지로 파일만 존재. 삭제·정리는 별도 작업으로 보류.
 
 ### `MainShell` (`scripts/main_shell.gd`, `scenes/MainShell.tscn`) — 셸 전환 목표 씬
 README.md 기준 새 셸(고정 배너 + 사이드바 + 콘텐츠 영역, NavSlot 없는 콘텐츠 스왑)의 실제 구현체.
