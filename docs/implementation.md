@@ -281,14 +281,6 @@ README의 3축 중 **활력·함께 있음**, 할 일/습관 완료 반응, 대�
 - **습관 체크**: `habit_tracker_view._on_list_changed`가 덮어쓰기 직전 `checks`를 잡아두고 `_notify_checked()`가 오늘 칸의 전이를 찾는다. **이번 주를 볼 때만** 울리므로(`_today_column()`이 아니면 -1) 과거 주 소급 체크·요일 토글·추가/삭제/재정렬로는 안 울린다.
 - **화면 이동**: `Banner.navigate_requested(target)` → `MainShell._on_banner_navigate` → `NAV_TARGETS`(의미 이름 → NavList 인덱스) → `_nav.select()`. 엔진은 nav 인덱스를 모르고 의미(`GOTO_TODO` 등)만 돌려준다.
 
-### 도장 (`assets/placeholder/stamp_good.svg`)
-
-"Good!!"를 폰트가 아니라 **획(패스)으로 그린** SVG — 번역도 폰트 의존도 없다. `MainShell.tscn`의 `StampSlot`(Control) 안 `StampImage`(TextureRect)에 붙고, `_pop_stamp()`가 `create_tween()`으로 스케일+알파를 준다(코드베이스 첫 애니메이션).
-
-⚠️ **컨테이너 직계 자식에 scale 애니메이션을 걸면 안 된다.** `Container`는 자식을 배치할 때 위치·크기뿐 아니라 **rotation·scale까지 초기화**한다. 그래서 레이아웃이 다시 정렬되는 순간(문구 교체·버튼 생성 등) 트윈이 세운 scale이 1.0으로 되돌아가 애니메이션이 통째로 사라진다. 크기 고정된 순수 `Control`을 사이에 끼우고 그 안쪽(앵커 Full Rect)에 애니메이션을 거는 것으로 피했다 — `DayTimeline`의 `Track`이 앵커 배치를 쓰는 것과 같은 이유.
-
-⚠️ **숨김은 `visible`이 아니라 알파로.** 컨테이너는 숨겨진 자식을 배치에서 빼므로 `visible = true`가 되는 순간 행 전체가 리플로우된다(말풍선이 도장 폭만큼 줄며 텍스트가 튄다). 자리는 항상 차지하게 두고 `modulate.a`로 감춘다.
-
 ## 6. 공통 유틸/컴포넌트
 
 ### 드래그 재정렬 — `DragHandle` + `ReorderList` (`scripts/commonui/`)

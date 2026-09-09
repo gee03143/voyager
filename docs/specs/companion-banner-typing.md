@@ -1,5 +1,5 @@
 ---
-status: planned
+status: implemented
 ---
 # 컴패니언 배너 발화 연출
 
@@ -95,4 +95,5 @@ status: planned
 - `scripts/audio/sound.gd` — 전용 플레이어와 발화음 재생
 - `scripts/data/app_settings.gd` — 컴패니언 음성 볼륨 필드
 - `assets/sounds/` — 발화음 에셋이 놓일 자리
+- `assets/placeholder/stamp_good.svg` — 도장 이미지. "Good!!"을 폰트가 아니라 획으로 그려 번역·폰트에 의존하지 않는다
 - `scenes/MainShell.tscn` — 편집하지 않는다. 노드 추가 없이 코드에서만 처리한다

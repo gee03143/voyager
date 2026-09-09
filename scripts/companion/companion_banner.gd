@@ -12,6 +12,8 @@ const MAX_TYPE_SEC := 0.8       # 문장 전체 상한 — 영어 긴 문장이 
 const FADE_OUT_SEC := 0.3       # 완성된 문장을 거두는 시간
 const FADE_OUT_SHORT_SEC := 0.08  # 아직 안 끝난 말을 거두는 시간
 const OPTIONS_FADE_SEC := 0.15  # 말이 끝난 뒤 선택지가 스며드는 시간
+const VOICE_EVERY := 3          # 글자마다 울리면 시끄럽다
+const VOICE_MIN_GAP_MS := 60    # 상한에 걸려 빨라져도 소리가 몰리지 않게
 
 @onready var message_label: Label = $Margin/HBox/Bubble/BubbleMargin/VBox/MessageLabel
 @onready var meta_label: Label = $Margin/HBox/Bubble/BubbleMargin/VBox/MetaLabel
@@ -30,6 +32,9 @@ var _fade_tween: Tween
 var _options_tween: Tween
 var _pending_reward := false    # 이번 반응에 도장이 있는가 — 말이 끝난 뒤에 찍는다
 var _pending_options: Array = []  # 퇴장 중에 스킵이 들어오면 교체를 앞당겨야 해서 들고 있는다
+var _total_chars := 0           # 지금 찍는 문장의 글자 수 — 마지막 글자 판정용
+var _voice_next := 0            # 다음으로 발화음을 낼 글자 인덱스
+var _voice_last_ms := 0
 var _said := ""                 # 지금 떠 있는 문구 줄
 var _said_meta := ""            # 지금 떠 있는 보조 줄 — 둘 다 같을 때만 다시 안 찍는다
 
@@ -237,12 +242,13 @@ func _swap(text: String, meta: String, options: Array) -> void:
 
 func _start_typing(text: String) -> void:
 	# get_total_character_count()는 공백·줄바꿈을 뺀 수라 visible_characters의 단위와 다르다.
-	var total := text.length()
-	if total <= 0:
+	_total_chars = text.length()
+	if _total_chars <= 0:
 		_finish_typing()
 		return
+	_voice_next = 1                                # 첫 글자가 보이는 순간부터 울린다
 	_type_tween = create_tween()
-	_type_tween.tween_method(_set_typed, 0.0, float(total), minf(total * CHAR_SEC, MAX_TYPE_SEC))
+	_type_tween.tween_method(_set_typed, 0.0, float(_total_chars), minf(_total_chars * CHAR_SEC, MAX_TYPE_SEC))
 	_type_tween.tween_callback(_finish_typing)
 
 # --- 스킵 ---
@@ -290,8 +296,19 @@ func _kill_fade_tween() -> void:
 		_fade_tween.kill()
 	_fade_tween = null
 
+# 발화음은 글자에 붙지만 글자마다 울리지는 않는다.
+# 총시간 상한에 걸려 빨라진 문장에서는 최소 간격이 자동으로 솎아낸다.
 func _set_typed(v: float) -> void:
-	message_label.visible_characters = int(v)
+	var n := int(v)
+	message_label.visible_characters = n
+	if n < _voice_next or n >= _total_chars:
+		return                                     # 마지막 글자엔 안 울린다 — 끝나는 순간과 겹치지 않게
+	_voice_next = n + VOICE_EVERY
+	var now := Time.get_ticks_msec()
+	if now - _voice_last_ms < VOICE_MIN_GAP_MS:
+		return
+	_voice_last_ms = now
+	Sound.play_voice()
 
 # 완성 상태 = 문장이 다 보이고 + 선택지가 떠 있고 + 도장이 찍힌 상태.
 # 타이핑이 끝나서 오든 스킵으로 오든 같은 자리를 통과한다.

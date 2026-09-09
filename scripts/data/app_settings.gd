@@ -30,6 +30,7 @@ var always_on_top: bool = false
 
 # 사운드 세팅
 var master_volume: float = 1.0
+var companion_voice_volume: float = 1.0   # 헤이즐 발화음 — 알람과 용도가 달라 따로 둔다
 
 # 컴패니언 모드
 var companion_position: Vector2i = Vector2i(-1, -1)  # (-1,-1) = 미설정 → 화면 우하단
@@ -53,6 +54,7 @@ func to_dict() -> Dictionary:
 		"fps_unfocused": fps_unfocused,
 		"always_on_top": always_on_top,
 		"master_volume": master_volume,
+		"companion_voice_volume": companion_voice_volume,
 		"companion_position": [companion_position.x, companion_position.y],
 	}
 
@@ -82,6 +84,7 @@ func from_dict(d: Dictionary) -> void:
 	fps_unfocused = int(d.get("fps_unfocused", fps_unfocused))
 	always_on_top = bool(d.get("always_on_top", always_on_top))
 	master_volume = clampf(float(d.get("master_volume", master_volume)), 0.0, 1.0)
+	companion_voice_volume = clampf(float(d.get("companion_voice_volume", companion_voice_volume)), 0.0, 1.0)
 	
 	var cp = d.get("companion_position", null)
 	if typeof(cp) == TYPE_ARRAY and cp.size() == 2:
