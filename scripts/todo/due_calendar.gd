@@ -40,7 +40,9 @@ func set_selected(iso: String) -> void:
 	_render_month()
 
 func _render_month() -> void:
+	# queue_free만 하면 프레임 끝까지 자식으로 남아, 새 셀과 겹친 상태로 격자 크기가 재진다.
 	for c in _grid.get_children():
+		_grid.remove_child(c)
 		c.queue_free()
 	_month_label.text = DateUtil.month_label("%04d-%02d-01" % [_year, _month])
 	var today := DateUtil.today_iso()
@@ -90,8 +92,12 @@ func _go_today() -> void:
 	_year = t.year; _month = t.month
 	_render_month()
 
+# ⚠️ 간격이 곧 격자의 최소 폭이 되므로 현재 폭에서 그대로 뽑으면 안 된다.
+# "지금 폭 = 새 최소 폭"이 되어 한 번 넓어진 창이 영영 안 줄어든다. 상한으로 그 되먹임을 끊는다.
+const MAX_SEPARATION := 12
+
 func _update_separation() -> void:
-	var sep := maxi(int((size.x - 7 * 32) / 6.0), 2)
+	var sep := clampi(int((size.x - 7 * 32) / 6.0), 2, MAX_SEPARATION)
 	_header.add_theme_constant_override("h_separation", sep)
 	_grid.add_theme_constant_override("h_separation", sep)
 

@@ -3,6 +3,9 @@ extends PopupPanel
 
 signal groups_changed                       # 추가/이름변경/삭제 → 뷰가 동기화·저장
 
+const ENTER_SEC := 0.14        # 작은 오버레이라 짧다. F6에서 눈으로 조정할 값
+
+@onready var vbox: VBoxContainer = $VBox
 @onready var add_group_button: Button = $VBox/AddGroupButton
 @onready var close_button: Button = $VBox/CloseButton
 @onready var group_list: ReorderList = $VBox/GroupList
@@ -18,6 +21,8 @@ func _ready() -> void:
 func open() -> void:
 	_rebuild()
 	popup_centered()
+	# 창은 즉시 뜬다. Window엔 투명도가 없어 연출을 걸 자리가 안쪽뿐이다.
+	PanelEnter.pop_in(self, vbox, ENTER_SEC)
 
 func _rebuild() -> void:
 	group_list.clear_items()

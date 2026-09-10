@@ -42,6 +42,22 @@ static func settle(panel: Control) -> void:
 	panel.position = Vector2.ZERO
 	panel.modulate.a = 1.0
 
+# 팝업용 변형. PopupPanel은 자식의 position과 size를 매 배치마다 덮어쓰므로(popup.cpp)
+# 이동은 쓸 수 없다. scale과 modulate는 안 건드리니 그 둘로 자리를 잡는 느낌을 낸다.
+const POP_FROM_SCALE := 0.96
+
+static func pop_in(host: Node, content: Control, sec: float) -> Tween:
+	# 처음 열 때는 아직 배치 전이라 size가 0이다. 그때는 최소 크기로 대신한다.
+	var box := content.size if content.size.y > 0.0 else content.get_combined_minimum_size()
+	content.pivot_offset = box * 0.5               # 가운데를 기준으로 커진다
+	content.scale = Vector2.ONE * POP_FROM_SCALE
+	content.modulate.a = 0.0
+	var t := host.create_tween().set_parallel()
+	t.tween_property(content, "scale", Vector2.ONE, sec) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_property(content, "modulate:a", 1.0, sec * 0.7)
+	return t
+
 static func kill(t: Tween) -> void:
 	if t != null and t.is_valid():
 		t.kill()

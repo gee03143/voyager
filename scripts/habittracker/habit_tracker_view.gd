@@ -13,6 +13,7 @@ const SAVE_DEBOUNCE := 0.5
 var _rows: Array[HabitRow] = []
 var _save_timer: Timer
 var _day_circles: Array[RadialProgress] = []
+var _ring_tween: Tween
 var _day_labels: Array[Label] = []
 
 func _ready() -> void:
@@ -123,7 +124,7 @@ func _on_list_changed() -> void:
 	var idx := _index_for(_period_nav.current_start())
 	var before = Save.habit_weeks[idx].get("checks", {})   # 덮어쓰기 전 — 전이 판정용
 	Save.habit_weeks[idx]["checks"] = checks        # 그 주 체크만
-	_refresh_progress()
+	_refresh_progress(is_visible_in_tree())         # 화면에 없으면 연출을 낭비하지 않는다
 	_save_timer.start()
 	_notify_checked(before)                           # 모델 반영 뒤에 알린다
 
@@ -158,7 +159,14 @@ func _on_reordered(from: int, to: int) -> void:
 		list.move_child(_rows[i], i)   # 화면 순서도 _rows에 맞춤
 	_on_list_changed()                 # _rows → Save.habits 스냅샷 + 저장
 	
-func _refresh_progress() -> void:
+# 누른 칸에서 끝나지 않고 그 주 전체에 어떻게 기여했는지까지 이어 보여준다.
+# 칸의 팝보다 길게 잡아 결과가 뒤따라오는 인상을 준다. F6에서 눈으로 조정할 값.
+const RING_FILL_SEC := 0.3
+
+func _refresh_progress(animate: bool = false) -> void:
+	if _ring_tween != null and _ring_tween.is_valid():
+		_ring_tween.kill()
+	_ring_tween = create_tween().set_parallel() if animate else null
 	for d in 7:
 		var active := 0
 		var done := 0
@@ -167,7 +175,12 @@ func _refresh_progress() -> void:
 				active += 1
 				if r.is_checked(d):
 					done += 1
-		_day_circles[d].value = (float(done) / active) if active > 0 else 0.0
+		var target := (float(done) / active) if active > 0 else 0.0
+		if _ring_tween != null:
+			_ring_tween.tween_property(_day_circles[d], "value", target, RING_FILL_SEC) \
+				.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		else:
+			_day_circles[d].value = target
 
 # 이번 주를 볼 때만 오늘 요일 라벨을 강조. 다른 주면 전부 원래 색으로 되돌린다
 func _highlight_today(week_start: String) -> void:

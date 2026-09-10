@@ -3,6 +3,9 @@ extends PopupPanel
 
 signal confirmed(iso: String)
 
+const ENTER_SEC := 0.14        # 작은 오버레이라 짧다. F6에서 눈으로 조정할 값
+
+@onready var vbox: VBoxContainer = $VBox
 @onready var title_label: Label = $VBox/TitleLabel
 @onready var calendar: DueCalendar = $VBox/DueCalendar
 @onready var ok_button: Button = $VBox/HBox/OKButton
@@ -22,6 +25,8 @@ func open_for(current_iso: String, task_text: String) -> void:
 	_pending_iso = current_iso
 	calendar.set_selected(current_iso)
 	popup_centered()
+	# 창은 즉시 뜬다. Window엔 투명도가 없어 연출을 걸 자리가 안쪽뿐이다.
+	PanelEnter.pop_in(self, vbox, ENTER_SEC)
 
 func _on_day_selected(iso: String) -> void:
 	_pending_iso = iso

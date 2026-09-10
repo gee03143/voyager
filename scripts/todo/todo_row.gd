@@ -6,6 +6,13 @@ signal completed(title: String)
 signal delete_requested(row: TodoRow)
 signal due_edit_requested(row: TodoRow)
 
+# 행 하나짜리 작은 변화라 짧다. 줄이 밀리는 동안 손이 먼저 도착하면 오클릭이 나므로
+# 이 셋의 합이 커서가 다음 행으로 옮겨가는 시간보다 짧아야 한다.
+const ENTER_SEC := 0.12    # 자리가 열리는 시간
+const FADE_SEC := 0.08     # 내용이 스며드는 시간. 자리보다 짧아 열린 뒤에 채워진다
+const EXIT_SEC := 0.12
+
+@onready var hbox: HBoxContainer = $HBox
 @onready var drag_handle: DragHandle = $HBox/DragHandle
 @onready var done_check: CheckBox = $HBox/DoneCheck
 @onready var text_display: RichTextLabel = $HBox/TextDisplay
@@ -20,6 +27,8 @@ var _text: String = ""
 var _done: bool = false
 var _due: String = ""
 var _created_ts: int = 0
+var _flow_tween: Tween
+var _empty_style := StyleBoxEmpty.new()
 
 func _ready() -> void:
 	done_check.toggled.connect(_on_done_toggled)
@@ -139,3 +148,45 @@ func _set_actions_shown(on: bool) -> void:
 	for b in [due_button, delete_button]:
 		b.modulate.a = 1.0 if on else 0.0
 		b.mouse_filter = Control.MOUSE_FILTER_PASS if on else Control.MOUSE_FILTER_IGNORE
+
+# --- 생기고 사라지는 연출 ---
+# 컨테이너는 숨긴 자식을 최소 크기 계산에서 뺀다(panel_container.cpp).
+# 그래서 내용을 숨기면 행 높이를 자유롭게 줄일 수 있다.
+# 스타일박스의 상하 여백도 바닥이 되므로 접는 동안엔 그것도 비운다.
+
+func play_enter(after: Callable = Callable()) -> void:
+	_kill_flow()
+	var full := get_combined_minimum_size().y
+	modulate.a = 0.0
+	_collapse_shell()
+	custom_minimum_size.y = 0.0
+	_flow_tween = create_tween()
+	_flow_tween.tween_property(self, "custom_minimum_size:y", full, ENTER_SEC) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_flow_tween.tween_callback(_restore_shell)
+	if after.is_valid():
+		_flow_tween.tween_callback(after)   # 자리가 열린 뒤에야 내용을 만질 수 있다
+	_flow_tween.tween_property(self, "modulate:a", 1.0, FADE_SEC)
+
+func play_exit(on_done: Callable) -> void:
+	_kill_flow()
+	var full := size.y
+	_flow_tween = create_tween()
+	_flow_tween.tween_property(self, "modulate:a", 0.0, FADE_SEC)
+	_flow_tween.tween_callback(_collapse_shell)
+	_flow_tween.tween_property(self, "custom_minimum_size:y", 0.0, EXIT_SEC).from(full) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	_flow_tween.tween_callback(on_done)
+
+func _collapse_shell() -> void:
+	hbox.visible = false
+	add_theme_stylebox_override("panel", _empty_style)
+
+func _restore_shell() -> void:
+	remove_theme_stylebox_override("panel")
+	hbox.visible = true
+	custom_minimum_size.y = 0.0      # 고정해두면 나중에 내용이 늘어도 높이가 안 따라간다
+
+func _kill_flow() -> void:
+	if _flow_tween != null and _flow_tween.is_valid():
+		_flow_tween.kill()
