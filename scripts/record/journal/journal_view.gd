@@ -2,6 +2,11 @@ extends HBoxContainer
 
 const SAVE_DEBOUNCE := 0.5
 
+# 행 하나가 아니라 섹션 전체가 움직이므로 행 하나짜리보다 조금 길다.
+# 접기는 시야에서 치우려는 조작이라 더 짧다. F6에서 맞출 값.
+const GROUP_OPEN_SEC := 0.18
+const GROUP_CLOSE_SEC := 0.11
+
 const DOC_ROW := preload("res://scenes/record/journal/JournalDocRow.tscn")
 const GROUP_HEADER := preload("res://scenes/record/journal/JournalGroupHeader.tscn")
 
@@ -16,6 +21,15 @@ const GROUP_HEADER := preload("res://scenes/record/journal/JournalGroupHeader.ts
 var _save_timer: Timer
 var _current_id: int = 0      # 편집 중 문서 id (0=없음)
 var _collapsed: Dictionary = {}   # group_id → true (접힘, 비영속 UI 상태)
+
+# 목록 노드는 파괴하지 않고 키로 찾아 재사용한다. 값은 전부 `list`에 직접 들어가는 노드다.
+var _doc_wraps: Dictionary = {}       # 문서 id → 들여쓰기 래퍼(안에 JournalDocRow 하나)
+var _group_headers: Dictionary = {}   # 그룹 id → JournalGroupHeader
+var _date_headers: Dictionary = {}    # 날짜 제목 → Label
+
+# 연출은 조작에 응답한다. 목록이 다른 이유로 다시 그려질 때는 행이 그냥 나타나고 사라진다.
+var _entering: Dictionary = {}        # 문서 id → 펼치는 데 쓸 시간
+var _exiting: Array = []              # [{node, index}] 접히는 중이라 아직 목록에 남아 있는 래퍼
 
 var _group_dialog: AcceptDialog
 var _group_name_edit: LineEdit
@@ -55,8 +69,12 @@ func _build_group_dialog() -> void:
 	_group_dialog.confirmed.connect(_on_group_dialog_confirmed)
 	add_child(_group_dialog)
 
+# 이 신호는 래퍼로 옮겨지는 도중(reparent)에도 터진다. 그때는 트리 진입 전파가 끝나기 전이라
+# 새로 붙인 행의 _ready가 아직 안 돌아 @onready가 비어 있다.
 func _on_visibility() -> void:
-	if visible:
+	if not is_inside_tree():
+		return
+	if is_visible_in_tree():
 		_rebuild_list()
 	else:
 		_commit()                 # 탭 떠날 때 저장
@@ -64,16 +82,43 @@ func _on_visibility() -> void:
 func _on_add() -> void:
 	_commit()
 	_current_id = Save.journal.add_doc()    # 그룹 없음(0)
+	_entering[_current_id] = JournalDocRow.ENTER_SEC
 	_load_editor()
 	_rebuild_list()
 	title_edit.grab_focus()
 
 func _on_delete(id: int) -> void:
+	var wrap: MarginContainer = _doc_wraps.get(id)
 	Save.journal.remove_doc(id)
 	if id == _current_id:
 		_current_id = 0
 		_load_editor()
+	if wrap != null and is_visible_in_tree():
+		_hold_exit(id, wrap, JournalDocRow.EXIT_SEC)   # 노드를 남겨 제자리에서 접히게 한다
 	_rebuild_list()
+
+# 지워진 문서의 행은 목록 계획에서 빠지지만 노드는 접히는 동안 자리를 지킨다.
+func _hold_exit(id: int, wrap: MarginContainer, sec: float) -> void:
+	_doc_wraps.erase(id)
+	var entry := {"id": id, "node": wrap, "index": wrap.get_index()}
+	_exiting.append(entry)
+	(wrap.get_child(0) as JournalDocRow).play_exit(func(): _finish_exit(entry), sec)
+
+# 접히던 중에 같은 문서가 다시 나타나야 하면 접힘을 버리고 즉시 치운다.
+func _cancel_exit(id: int) -> void:
+	for e in _exiting:
+		if int(e["id"]) == id:
+			_finish_exit(e)
+			return
+
+func _finish_exit(entry: Dictionary) -> void:
+	_exiting.erase(entry)
+	var node: Node = entry["node"]
+	if node.is_queued_for_deletion():
+		return
+	if node.get_parent() == list:
+		list.remove_child(node)
+	node.queue_free()
 
 func _select(id: int) -> void:
 	if id == _current_id:
@@ -165,39 +210,158 @@ func _on_group_dialog_confirmed() -> void:
 	_rebuild_list()
 
 # --- 목록 (그룹별 + 접기) ---
+# 목록을 다시 그릴 때 노드를 파괴하지 않는다. 문서 id·그룹 id·날짜 제목으로 키를 잡아
+# 재사용하고 순서만 다시 잡는다. 파괴하면 움직여야 할 행이 같은 프레임에 사라져
+# 연출을 걸 자리가 없고, 헤더가 다시 만들어지면 접기 조작 중에 호버 상태가 리셋된다.
 func _rebuild_list() -> void:
-	for c in list.get_children():
-		c.queue_free()
+	var plan := _list_plan()
+	var used_docs := {}
+	var used_groups := {}
+	var used_dates := {}
+	for i in plan.size():
+		var e: Dictionary = plan[i]
+		var node: Control
+		match str(e["kind"]):
+			"group":
+				node = _sync_group_header(int(e["gid"]), str(e["name"]), int(e["count"]), e["collapsed"])
+				used_groups[int(e["gid"])] = true
+			"date":
+				node = _sync_date_header(str(e["title"]))
+				used_dates[str(e["title"])] = true
+			_:
+				var d: Dictionary = e["doc"]
+				node = _sync_doc_row(d)
+				used_docs[int(d.get("id", 0))] = true
+		list.move_child(node, i)         # 앞자리는 이미 확정됐다. 남은 것들은 뒤로 밀린다
+	_drop_unused(_group_headers, used_groups)
+	_drop_unused(_date_headers, used_dates)
+	_drop_unused(_doc_wraps, used_docs)
+	for e in _exiting:                   # 접히는 중인 행은 원래 자리에서 접혀야 한다
+		list.move_child(e["node"], mini(int(e["index"]), list.get_child_count() - 1))
+
+# 무엇이 어떤 순서로 놓일지만 정한다. 노드는 만들지 않는다.
+func _list_plan() -> Array:
 	match _filter_mode:
 		"dates":
-			_rebuild_by_date()
+			return _plan_by_date()
 		"one":
-			_add_group_section(_filter_gid, _filter_label(_filter_gid), _docs_for_filter(_filter_gid))
+			return _plan_group_section(_filter_gid, _filter_label(_filter_gid), _docs_for_filter(_filter_gid))
 		_:
-			_rebuild_by_group()
+			return _plan_by_group()
 
-func _rebuild_by_group() -> void:
+func _plan_by_group() -> Array:
+	var plan := []
 	for g in Save.journal.groups:
 		var gid := int(g.get("id", 0))
-		_add_group_section(gid, str(g.get("name", "")), _docs_in(gid))
-	_add_group_section(0, "그룹 없음", _ungrouped_docs())
+		plan.append_array(_plan_group_section(gid, str(g.get("name", "")), _docs_in(gid)))
+	plan.append_array(_plan_group_section(0, "그룹 없음", _ungrouped_docs()))
+	return plan
 
-func _add_group_section(gid: int, name: String, docs_arr: Array) -> void:
-	var header := GROUP_HEADER.instantiate()
-	list.add_child(header)
-	header.setup(gid, name, docs_arr.size(), _collapsed.has(gid))
-	header.toggled.connect(_toggle_group)
-	header.rename_requested.connect(_on_rename_group)
-	header.delete_requested.connect(_on_delete_group)
-	if not _collapsed.has(gid):
+func _plan_group_section(gid: int, name: String, docs_arr: Array) -> Array:
+	var collapsed := _collapsed.has(gid)
+	var plan := [{"kind": "group", "gid": gid, "name": name, "count": docs_arr.size(), "collapsed": collapsed}]
+	if not collapsed:
 		for d in docs_arr:
-			_add_doc_row(d)
+			plan.append({"kind": "doc", "doc": d})
+	return plan
 
+func _plan_by_date() -> Array:
+	var today := []
+	var yest := []
+	var older := []
+	for d in Save.journal.docs:
+		var du := DateUtil.days_until(DateUtil.local_day_iso(int(d.get("ts", 0))))
+		if du >= 0:
+			today.append(d)
+		elif du == -1:
+			yest.append(d)
+		else:
+			older.append(d)
+	var plan := []
+	plan.append_array(_plan_date_section("오늘", today))
+	plan.append_array(_plan_date_section("어제", yest))
+	plan.append_array(_plan_date_section("이전", older))
+	return plan
+
+func _plan_date_section(title: String, docs_arr: Array) -> Array:
+	if docs_arr.is_empty():
+		return []
+	var plan := [{"kind": "date", "title": title}]
+	for d in docs_arr:
+		plan.append({"kind": "doc", "doc": d})
+	return plan
+
+# 시그널은 만들 때 한 번만 묶는다. 키가 곧 대상 id라 재사용해도 대상이 바뀌지 않는다.
+func _sync_group_header(gid: int, name: String, count: int, collapsed: bool) -> Control:
+	var header: JournalGroupHeader = _group_headers.get(gid)
+	if header == null:
+		header = GROUP_HEADER.instantiate()
+		list.add_child(header)
+		header.toggled.connect(_toggle_group)
+		header.rename_requested.connect(_on_rename_group)
+		header.delete_requested.connect(_on_delete_group)
+		_group_headers[gid] = header
+	header.setup(gid, name, count, collapsed)
+	return header
+
+func _sync_date_header(title: String) -> Control:
+	var hdr: Label = _date_headers.get(title)
+	if hdr == null:
+		hdr = Label.new()
+		hdr.text = title
+		hdr.modulate.a = 0.7
+		list.add_child(hdr)
+		_date_headers[title] = hdr
+	return hdr
+
+func _sync_doc_row(d: Dictionary) -> Control:
+	var id := int(d.get("id", 0))
+	var wrap: MarginContainer = _doc_wraps.get(id)
+	if wrap == null:
+		wrap = MarginContainer.new()
+		wrap.add_theme_constant_override("margin_left", 16)
+		var row := DOC_ROW.instantiate()
+		wrap.add_child(row)
+		list.add_child(wrap)                        # 트리에 먼저 → @onready 준비
+		row.selected.connect(_select)
+		row.delete_requested.connect(_on_delete)
+		_doc_wraps[id] = wrap
+	var row := wrap.get_child(0) as JournalDocRow
+	row.setup(d, id == _current_id)
+	if _entering.has(id):
+		var sec: float = _entering[id]
+		_entering.erase(id)
+		if is_visible_in_tree():
+			row.play_enter(sec)
+	return wrap
+
+func _drop_unused(map: Dictionary, used: Dictionary) -> void:
+	for key in map.keys():
+		if used.has(key):
+			continue
+		var node: Node = map[key]
+		list.remove_child(node)     # queue_free만 하면 이번 프레임 안의 다음 갱신까지 자식으로 남는다
+		node.queue_free()
+		map.erase(key)
+
+# 섹션 안의 행들이 각자 자기 높이를 동시에 접고 편다. 순서를 어긋내지 않는다 —
+# 문서가 많은 그룹에서 조작 하나에 대한 응답이 늘어지면 방해가 된다.
 func _toggle_group(gid: int) -> void:
+	var docs_arr := _docs_for_filter(gid)
 	if _collapsed.has(gid):
 		_collapsed.erase(gid)
+		for d in docs_arr:
+			var id := int(d.get("id", 0))
+			_cancel_exit(id)                  # 접히다 만 행이 남아 있으면 겹친다
+			_entering[id] = GROUP_OPEN_SEC
 	else:
 		_collapsed[gid] = true
+		if is_visible_in_tree():
+			for d in docs_arr:
+				var id := int(d.get("id", 0))
+				var wrap: MarginContainer = _doc_wraps.get(id)
+				if wrap != null:
+					_hold_exit(id, wrap, GROUP_CLOSE_SEC)
 	_rebuild_list()
 
 func _on_delete_group(gid: int) -> void:
@@ -232,32 +396,6 @@ func _on_filter_selected(index: int) -> void:
 	_filter_gid = int(s.get("gid", 0))
 	_rebuild_list()
 
-func _rebuild_by_date() -> void:
-	var today := []
-	var yest := []
-	var older := []
-	for d in Save.journal.docs:
-		var du := DateUtil.days_until(DateUtil.local_day_iso(int(d.get("ts", 0))))
-		if du >= 0:
-			today.append(d)
-		elif du == -1:
-			yest.append(d)
-		else:
-			older.append(d)
-	_add_date_section("오늘", today)
-	_add_date_section("어제", yest)
-	_add_date_section("이전", older)
-
-func _add_date_section(title: String, docs_arr: Array) -> void:
-	if docs_arr.is_empty():
-		return
-	var hdr := Label.new()
-	hdr.text = title
-	hdr.modulate.a = 0.7
-	list.add_child(hdr)
-	for d in docs_arr:
-		_add_doc_row(d)
-
 func _ungrouped_docs() -> Array:
 	var valid := {}
 	for g in Save.journal.groups:
@@ -280,16 +418,6 @@ func _docs_in(gid: int) -> Array:
 		if int(d.get("group_id", 0)) == gid:
 			out.append(d)
 	return out
-
-func _add_doc_row(d: Dictionary) -> void:
-	var indent := MarginContainer.new()
-	indent.add_theme_constant_override("margin_left", 16)
-	var row := DOC_ROW.instantiate()
-	indent.add_child(row)
-	list.add_child(indent)                          # 트리에 먼저 → @onready 준비
-	row.setup(d, int(d.get("id", 0)) == _current_id)
-	row.selected.connect(_select)
-	row.delete_requested.connect(_on_delete)
 
 func _find(id: int):
 	for d in Save.journal.docs:

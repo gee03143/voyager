@@ -14,7 +14,8 @@ var _gid: int = 0
 var _name: String = ""
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_STOP        # 헤더가 호버 감지
+	# 호버는 PASS로도 감지된다. STOP이면 헤더 위에서 휠이 죽어 목록이 안 굴러간다.
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	toggle_button.pressed.connect(func(): toggled.emit(_gid))
 	rename_button.pressed.connect(func(): rename_requested.emit(_gid, _name))
 	delete_button.held.connect(func(): delete_requested.emit(_gid))

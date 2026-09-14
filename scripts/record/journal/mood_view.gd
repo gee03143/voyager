@@ -23,8 +23,9 @@ func _ready() -> void:
 	visibility_changed.connect(_on_visibility)
 	_rebuild_history()
 
+# reparent 도중에도 터진다. gratitude_view와 같은 이유로 트리 밖에서는 건너뛴다.
 func _on_visibility() -> void:
-	if visible:
+	if is_inside_tree() and is_visible_in_tree():
 		_rebuild_history()
 
 func _on_memo_gui_input(event: InputEvent) -> void:
@@ -75,6 +76,7 @@ func _on_history_selected(entry: Dictionary) -> void:
 
 func _rebuild_history() -> void:
 	for c in history_list.get_children():
+		history_list.remove_child(c)
 		c.queue_free()
 	var entries := Save.mood.entries.duplicate()
 	entries.sort_custom(func(a, b): return int(a.get("ts", 0)) > int(b.get("ts", 0)))

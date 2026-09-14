@@ -14,6 +14,7 @@ signal delete_requested(id: int)
 var _id: int = 0
 var _items: Array = []
 var _expanded: bool = false
+var _entry: Dictionary = {}    # _ready 전에 들어온 값. 노드를 만지는 건 _ready 뒤로 미룬다
 
 func _ready() -> void:
 	summary_label.clip_text = true
@@ -21,6 +22,8 @@ func _ready() -> void:
 	delete_button.held.connect(func(): delete_requested.emit(_id))
 	click_area.gui_input.connect(_on_click_area_input)
 	HoverReveal.setup(self, [delete_button])
+	if not _entry.is_empty():
+		_apply()
 
 func _on_click_area_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -36,6 +39,7 @@ func _apply_expanded() -> void:
 
 func _rebuild_expand() -> void:
 	for c in expand_box.get_children():
+		expand_box.remove_child(c)   # queue_free만 하면 같은 프레임의 다음 갱신까지 자식으로 남는다
 		c.queue_free()
 	for it in _items:
 		var t := str(it).strip_edges()
@@ -47,9 +51,14 @@ func _rebuild_expand() -> void:
 		expand_box.add_child(lbl)
 
 func setup(entry: Dictionary) -> void:
+	_entry = entry
 	_id = int(entry.get("id", 0))
 	_items = entry.get("items", [])
-	date_label.text = DateUtil.format_day(str(entry.get("date_iso", "")))
+	if is_node_ready():
+		_apply()
+
+func _apply() -> void:
+	date_label.text = DateUtil.format_day(str(_entry.get("date_iso", "")))
 	var parts := []
 	for it in _items:
 		var t := str(it).strip_edges()

@@ -23,8 +23,12 @@ func _ready() -> void:
 	_load_today()
 	_rebuild_history()
 
+# 이 신호는 래퍼로 옮겨지는 도중(reparent)에도 터진다. 그때는 트리 밖이라
+# 새로 붙인 행의 _ready가 안 돌아 @onready가 비고, 목록 전체가 헛돌며 오류만 쌓인다.
 func _on_visibility() -> void:
-	if visible:
+	if not is_inside_tree():
+		return
+	if is_visible_in_tree():
 		_load_today()
 		_rebuild_history()
 	else:
@@ -44,6 +48,7 @@ func _load_today() -> void:
 
 func _clear_items() -> void:
 	for c in items_box.get_children():
+		items_box.remove_child(c)     # queue_free만 하면 같은 프레임의 다음 갱신까지 자식으로 남는다
 		c.queue_free()
 
 func _add_item_row(text: String, focus: bool = false) -> void:
@@ -98,6 +103,7 @@ func _has_gratitude_event(entry_id: int) -> bool:
 
 func _rebuild_history() -> void:
 	for c in history_list.get_children():
+		history_list.remove_child(c)
 		c.queue_free()
 	var past := []
 	for e in Save.gratitude.entries:

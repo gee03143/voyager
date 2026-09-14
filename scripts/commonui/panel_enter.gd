@@ -24,22 +24,31 @@ static func make_wrap() -> Control:
 static func adopt(wrap: Control, panel: Control) -> void:
 	if panel.get_parent() != wrap:
 		panel.reparent(wrap, false)                # 전역 변형 보정이 오프셋으로 남지 않게
-	# set_anchors_preset은 앵커만 바꾸고 오프셋은 그대로 둔다(Control.xml).
+	fill(panel)
+
+# ⚠️ 앵커된 컨트롤에 position을 쓰면 **그 순간의 크기가 오프셋으로 구워진다.**
+# 첫 레이아웃 전에는 래퍼가 0이고 패널은 자기 최소 크기라, 그대로 두면
+# 이후 영원히 `크기 = 래퍼 + 최소 크기`가 되어 오른쪽·아래가 래퍼 밖으로 밀려난다.
+# 그래서 이동을 걸기 전과 끝난 뒤에 반드시 오프셋을 다시 0으로 돌린다.
+# set_anchors_preset은 앵커만 바꾸고 오프셋은 그대로 두므로 offsets 쪽을 쓴다(Control.xml).
+static func fill(panel: Control) -> void:
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 # 시간은 표면마다 따로 정한다. 큰 것이 느리게 움직여야 무겁게 느껴진다.
 static func play(host: Node, panel: Control, sec: float, from: Vector2 = FROM_BELOW) -> Tween:
+	fill(panel)                                    # 굽힌 오프셋을 먼저 씻는다
 	panel.position = from
 	panel.modulate.a = 0.0                         # 재사용되는 인스턴스라 매번 같은 자리에서 시작시킨다
 	var t := host.create_tween().set_parallel()
 	t.tween_property(panel, "position", Vector2.ZERO, sec) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)   # 도착하며 멈추는 감속
 	t.tween_property(panel, "modulate:a", 1.0, sec * 0.5)
+	t.finished.connect(func(): fill(panel))        # 도착점의 position도 오프셋을 굽는다
 	return t
 
 # 연출 없이 제자리로. 아직 화면에 없는 패널에 연출을 걸면 보이지도 않고 소진된다.
 static func settle(panel: Control) -> void:
-	panel.position = Vector2.ZERO
+	fill(panel)
 	panel.modulate.a = 1.0
 
 # 팝업용 변형. PopupPanel은 자식의 position과 size를 매 배치마다 덮어쓰므로(popup.cpp)

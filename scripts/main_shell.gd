@@ -12,6 +12,8 @@ const MINI_WIDGET_GROUP := "mini_widget"
 
 # 화면 전체가 바뀌는 가장 큰 변화라 탭 전환보다 길게 잡았다. F6에서 눈으로 조정할 값.
 const SWAP_ENTER_SEC := 0.35
+# 선택 채움. 패널 진입보다 짧아 버튼이 먼저 확정되고 화면이 뒤따라온다.
+const NAV_FILL_SEC := 0.18
 
 @onready var nav_list: VBoxContainer = $Sidebar/Margin/VBox/NavList
 @onready var content_area: PanelContainer = $MainColumn/BodyRow/ContentArea
@@ -43,7 +45,7 @@ var _empty_style := StyleBoxEmpty.new()
 
 func _ready() -> void:
 	_init_swap_wrap()
-	_nav.setup_from(nav_list, false)
+	_nav.setup_from(nav_list, false, NAV_FILL_SEC)
 	_nav.selected.connect(_on_nav_selected)
 	_nav.select(0)
 	_init_mini_widget()

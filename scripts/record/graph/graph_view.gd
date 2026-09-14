@@ -1,6 +1,9 @@
 extends VBoxContainer
 
 const AXIS_STEP := 2.0 * 3600.0
+# 콘텐츠 스왑(0.35)·탭 전환(0.22)이 거의 끝날 즈음 시작한다. 두 연출이 겹치면 둘 다 안 읽힌다.
+# F6에서 눈으로 조정할 값.
+const APPEAR_DELAY_SEC := 0.2
 const PLAY_COLOR := Color("bfb49d")    # 플레이 시간 = 중립 모래
 const FOCUS_COLOR := Color("a63d2e")   # 집중 시간 = 팔레트의 집중색
 
@@ -19,11 +22,13 @@ var _mode_nav := ButtonGroupNav.new()
 func _ready() -> void:
 	_play_swatch.color = PLAY_COLOR
 	_focus_swatch.color = FOCUS_COLOR
-	_mode_nav.setup_from(_mode_nav_container, false)
+	# 여는 패널이 없어 서브탭의 정의엔 안 맞지만, 가로로 늘어선 겉모습이 같아 함께 맞춘다.
+	_mode_nav.setup_from(_mode_nav_container, false, TabNavSlot.FILL_SEC, SelectionFill.Dir.CENTER_OUT)
 	_mode_nav.selected.connect(_on_mode_selected)
 	_mode_nav.select(0)
-	_period_nav.refresh_requested.connect(func(): _refresh(_period_nav.current_start()))
+	_period_nav.refresh_requested.connect(func(): _refresh(_period_nav.current_start(), true))
 	_chart.resized.connect(_update_axis_positions)
+	visibility_changed.connect(_on_visibility_changed)
 	Save.activity_log.changed.connect(func(): _refresh(_period_nav.current_start()))
 	_refresh(_period_nav.current_start())
 	Save.voyage.changed.connect(_refresh_total_focus)
@@ -43,21 +48,30 @@ func _update_axis_labels() -> void:
 	_max_label.text = DateUtil.format_hours(_chart.axis_max)
 	_mid_label.text = DateUtil.format_hours(_chart.axis_max * 0.5)
 
-func _refresh(start: String) -> void:
-	if _period_nav.unit == PeriodNav.Unit.YEAR:
-		_refresh_year(start)
-	else:
-		_refresh_days(start)
+# 화면에 나타나는 것도 이 화면으로 오겠다는 조작의 결과다. 숨어 있는 사이의 갱신은
+# 조용히 반영돼 있으므로 값은 그대로 두고 차오르기만 다시 재생한다.
+func _on_visibility_changed() -> void:
+	if is_visible_in_tree():
+		_chart.play_fill(APPEAR_DELAY_SEC)
 
-func _refresh_days(start: String) -> void:
+# animate는 조작에 대한 응답일 때만 참이다. 활동 로그 변경처럼 다른 자리의 결과가
+# 흘러들어온 갱신은 연출 없이 즉시 반영한다.
+func _refresh(start: String, animate: bool = false) -> void:
+	var play := animate and is_visible_in_tree()   # 화면에 없는 동안에는 연출하지 않는다
+	if _period_nav.unit == PeriodNav.Unit.YEAR:
+		_refresh_year(start, play)
+	else:
+		_refresh_days(start, play)
+
+func _refresh_days(start: String, animate: bool) -> void:
 	var days := _days_for(start)
 	_rebuild_day_labels(days)
 	var play_values: Array[float] = []
 	for iso in days:
 		play_values.append(float(Save.activity_log.play_days.get(iso, 0.0)))
-	_apply_series(play_values, _focus_seconds_for(days))
+	_apply_series(play_values, _focus_seconds_for(days), animate)
 
-func _refresh_year(start: String) -> void:
+func _refresh_year(start: String, animate: bool) -> void:
 	var year := int(start.split("-")[0])
 	_rebuild_month_labels()
 	var play_values: Array[float] = []
@@ -67,18 +81,22 @@ func _refresh_year(start: String) -> void:
 		var p := str(iso).split("-")
 		if int(p[0]) == year:
 			play_values[int(p[1]) - 1] += float(Save.activity_log.play_days[iso])
-	_apply_series(play_values, _focus_seconds_for_months(year))
+	_apply_series(play_values, _focus_seconds_for_months(year), animate)
 
 func _refresh_total_focus() -> void:
 	_total_focus_value.text = DateUtil.format_hm(Save.voyage.total_focus_seconds)
 
-func _apply_series(play_values: Array[float], focus_values: Array[float]) -> void:
+func _apply_series(play_values: Array[float], focus_values: Array[float], animate: bool) -> void:
 	_chart.series = [
 		{"values": play_values, "color": PLAY_COLOR},
 		{"values": focus_values, "color": FOCUS_COLOR},
 	]
 	_chart.axis_max = _compute_axis_max(play_values + focus_values)
-	_update_axis_labels()	
+	_update_axis_labels()
+	if animate:
+		_chart.play_fill()
+	else:
+		_chart.settle()
 
 func _days_for(start: String) -> Array[String]:
 	var count := DateUtil.days_in_month(start) if _period_nav.unit == PeriodNav.Unit.MONTH else 7
