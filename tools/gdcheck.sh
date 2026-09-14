@@ -12,7 +12,7 @@ if [ -z "${GODOT_BIN:-}" ]; then
   exit 2
 fi
 PROJ="$(cd "$(dirname "$0")/.." && pwd)"
-AUTOLOADS="Save|Companion|Screen|ImeFocusGuard|PanelPool|Sound|Timers|Clock|Alarms"
+AUTOLOADS="Save|Companion|Screen|ImeCommitGuard|PanelPool|Sound|Timers|Clock|Alarms"
 fail=0
 for f in "$@"; do
   out="$("$GODOT_BIN" --headless --path "$PROJ" --check-only --script "res://$f" --quit 2>&1)"

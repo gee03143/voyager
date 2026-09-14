@@ -292,9 +292,6 @@ README의 3축 중 **활력·함께 있음**, 할 일/습관 완료 반응, 대�
 - **`DateUtil`**(`scripts/util/due_date_util.gd`, static 전용): 요일정렬(`month_grid`, 월요일 시작), 마감일 상대 표기(`format_due`: 오늘/내일/월-일), 기록용 상대 표기(`format_day`: 오늘/어제), 주 시작일(`monday_iso`), UTC→로컬 변환(`local_day_iso`, 타임존 bias 적용), 로컬 자정 기준 경과 분(`local_minutes`, 타임라인 y좌표용) 등. Todo·기록 캘린더·습관 트래커·그래프뷰 4곳이 공유.
 - **`PeriodNav`**(`scripts/commonui/period_nav.gd`): 주/월/년 단위 이전·다음·오늘 네비게이션. 두 모드 지원 — 산술 계산(`_step_arithmetic`, `DateUtil`로 날짜 가감) 또는 **유효 시작일 목록 안에서만 이동**(`set_valid_starts`, 예: 습관처럼 실제 데이터가 있는 주만 넘나들 때). 미래로는 "현재" 이상 못 감(`is_current`면 다음 버튼 비활성).
 
-### 입력 보조 — `LineEditAutoBlur`
-바깥 클릭 시 포커스 해제. `LineEdit`이 포커스 잡았을 때만 `_input` 처리를 켜서(`set_process_input`), 평소엔 전역 입력 감시 안 함.
-
 ### 시각화
 - **`BarChart`**(`scripts/commonui/bar_chart.gd`, `Control`, `_draw()` 기반): 여러 시리즈(`{values, color}`)를 그룹 막대로. `series`/`axis_max` setter가 `queue_redraw()` 트리거. 그래프뷰(플레이시간 vs 집중시간)에서 사용.
 - **`TimelineTrack`**(`scripts/record/timeline_track.gd`, `Control`, `_draw()` 기반): 0~24시 눈금선과 시각 라벨만 그림. `HOUR_PX`/`MIN_PX`/`GUTTER`의 **단일 출처**이고, `_ready()`에서 `custom_minimum_size.y`를 24시간분으로 잡음(스케일을 바꾸면 트랙 높이가 따라옴). `resized`에 `queue_redraw`를 걸어 폭 변화에 대응.
