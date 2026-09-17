@@ -55,20 +55,21 @@ func _add_item_row(text: String, focus: bool = false) -> void:
 	var row := ITEM_ROW.instantiate()
 	items_box.add_child(row)
 	row.set_text(text)
-	row.text_changed.connect(func(_t): _save_timer.start())
+	row.text_changed.connect(func(_t): _touch())
 	row.delete_requested.connect(func(): _on_item_deleted(row))
 	if focus:
 		row.grab_edit_focus()
 
 func _on_item_deleted(row: Node) -> void:
+	items_box.remove_child(row)        # queue_free만 하면 같은 프레임의 _current_items()에 남는다
 	row.queue_free()
-	if items_box.get_child_count() <= 1:
+	if items_box.get_child_count() == 0:
 		_add_item_row("")
-	_save_timer.start()
+	_touch()
 
 func _on_add_item() -> void:
 	_add_item_row("", true)
-	_save_timer.start()
+	_touch()
 
 func _current_items() -> Array:
 	var out := []
@@ -80,7 +81,20 @@ func _on_debounce() -> void:
 	_commit()
 	_rebuild_history()
 
+# 타이핑마다 불린다. 모델은 즉시 맞추고 무거운 기록 목록 갱신만 미룬다.
+# 모델을 미루면 디바운스가 터지기 전에 창을 닫을 때 그동안 쓴 것이 통째로 사라진다.
+func _touch() -> void:
+	_commit_items()
+	_save_timer.start()
+
 func _commit() -> void:
+	var id := _commit_items()
+	if id != 0 and not _has_gratitude_event(id):
+		Save.activity_log.add("gratitude", {"entry_id": id})
+
+## 모델의 항목만 맞춘다. 활동 이벤트는 내용이 있을 때만 달리므로,
+## 내용이 있는 채로 반영했으면 그 id를 주고 아니면 0을 준다.
+func _commit_items() -> int:
 	var items := _current_items()
 	var has_content := false
 	for it in items:
@@ -89,11 +103,10 @@ func _commit() -> void:
 			break
 	if _current_id == 0:
 		if not has_content:
-			return
+			return 0
 		_current_id = Save.gratitude.add_entry(_today)
 	Save.gratitude.update_entry(_current_id, items)
-	if has_content and not _has_gratitude_event(_current_id):
-		Save.activity_log.add("gratitude", {"entry_id": _current_id})
+	return _current_id if has_content else 0
 
 func _has_gratitude_event(entry_id: int) -> bool:
 	for e in Save.activity_log.events:

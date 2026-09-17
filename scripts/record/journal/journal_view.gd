@@ -51,8 +51,8 @@ func _ready() -> void:
 	add_group_button.pressed.connect(_on_add_group)
 	group_option.item_selected.connect(_on_group_selected)
 	filter_option.item_selected.connect(_on_filter_selected)
-	title_edit.text_changed.connect(func(_t): _save_timer.start())
-	body_edit.text_changed.connect(func(): _save_timer.start())
+	title_edit.text_changed.connect(func(_t): _touch())
+	body_edit.text_changed.connect(_touch)
 	visibility_changed.connect(_on_visibility)
 	_build_group_dialog()
 	_refresh_filter_dropdown()
@@ -132,13 +132,25 @@ func _on_debounce() -> void:
 	_commit()
 	_rebuild_list()               # 제목 변경을 목록에 반영
 
+# 타이핑마다 불린다. 모델은 즉시 맞추고 무거운 목록 갱신만 미룬다.
+# 모델을 미루면 디바운스가 터지기 전에 창을 닫을 때 그동안 쓴 것이 통째로 사라진다.
+func _touch() -> void:
+	_commit_text()
+	_save_timer.start()
+
 func _commit() -> void:
-	if _current_id == 0 or _find(_current_id) == null:
+	if not _commit_text():
 		return
-	Save.journal.update_doc(_current_id, title_edit.text, body_edit.text, _group_of(_current_id))
 	var has_content := title_edit.text.strip_edges() != "" or body_edit.text.strip_edges() != ""
 	if has_content and not _has_journal_event(_current_id):
 		Save.activity_log.add("journal", {"doc_id": _current_id})
+
+## 모델의 제목·본문만 맞춘다. 활동 이벤트 판정은 이벤트 전체를 훑어 비싸므로 여기서 안 한다.
+func _commit_text() -> bool:
+	if _current_id == 0 or _find(_current_id) == null:
+		return false
+	Save.journal.update_doc(_current_id, title_edit.text, body_edit.text, _group_of(_current_id))
+	return true
 
 func _has_journal_event(doc_id: int) -> bool:
 	for e in Save.activity_log.events:

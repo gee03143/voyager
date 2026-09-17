@@ -12,6 +12,7 @@ const GRATITUDE_PATH := "user://gratitude.json"
 const GRATITUDE_VERSION := 1
 const MOOD_PATH := "user://mood.json"
 const MOOD_VERSION := 1
+const DISK_DEBOUNCE := 0.5        # 디스크 쓰기만 합친다. 모델은 항상 즉시 갱신된다
 
 var voyage := Voyage.new()
 var letters := LetterArchive.new()
@@ -32,6 +33,8 @@ var _play_base_seconds: float = 0.0     # 세션 시작 시점의 누적 플레�
 var _session_start_ms: int = 0
 
 var _play_ckpt_ms: int = 0         # 적립 체크포인트(모노토닉)
+var _disk_timer: Timer
+var _dirty: Dictionary = {}        # 쓰기 대기 중인 파일 이름
 
 func _ready() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
@@ -60,6 +63,11 @@ func _ready() -> void:
 	add_child(play_timer)
 	play_timer.timeout.connect(_accumulate_play_day)   # 메모리 누적만(자정 근사)
 	play_timer.start()
+	_disk_timer = Timer.new()
+	_disk_timer.one_shot = true
+	_disk_timer.wait_time = DISK_DEBOUNCE
+	add_child(_disk_timer)
+	_disk_timer.timeout.connect(_flush_disk)
 	get_tree().auto_accept_quit = false
 	save_game()
 	save_records()
@@ -70,10 +78,10 @@ func _ready() -> void:
 	settings.changed.connect(save_game)
 	voyage.changed.connect(save_game)
 	activity_log.changed.connect(save_records)
-	journal.changed.connect(save_journal)
+	journal.changed.connect(func(): _mark_dirty("journal"))
 	lexicon.changed.connect(save_game)
 	letters.changed.connect(save_game)
-	gratitude.changed.connect(save_gratitude)
+	gratitude.changed.connect(func(): _mark_dirty("gratitude"))
 	mood.changed.connect(save_mood)
 		
 func _accumulate_play_day() -> void:
@@ -246,6 +254,18 @@ func load_todo() -> void:
 		if typeof(d) == TYPE_DICTIONARY:
 			todo_groups.append(TodoGroup.from_dict(d))
 		
+# 일지·감사는 타이핑마다 모델이 갱신된다. 파일 쓰기까지 매번 하면 낭비라
+# 0.5초로 합친다. 종료 시에는 quit_game()이 직접 써서 밀린 쓰기가 남지 않는다.
+func _mark_dirty(what: String) -> void:
+	_dirty[what] = true
+	_disk_timer.start()
+
+func _flush_disk() -> void:
+	if _dirty.erase("journal"):
+		save_journal()
+	if _dirty.erase("gratitude"):
+		save_gratitude()
+
 func quit_game() -> void:
 	save_game()
 	save_records()
