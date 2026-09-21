@@ -14,6 +14,18 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_nq7m8")
 
+[node name="Background" type="CanvasLayer" parent="." unique_id=311204977]
+layer = -1
+
+[node name="Fill" type="ColorRect" parent="Background" unique_id=311204978]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.9411765, 0.9137255, 0.85882354, 1)
+
 [node name="Sidebar" type="PanelContainer" parent="." unique_id=632687558]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2

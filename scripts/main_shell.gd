@@ -51,6 +51,10 @@ func _ready() -> void:
 	_init_mini_widget()
 	banner.navigate_requested.connect(_on_banner_navigate)
 
+# 시메지 우클릭 메뉴가 부른다. 인덱스는 NavList 순서(0=홈)다.
+func open_tool(index: int) -> void:
+	_nav.select(index)
+
 func _on_banner_navigate(target: StringName) -> void:
 	if NAV_TARGETS.has(target):
 		_nav.select(NAV_TARGETS[target])   # 눌림 표시 + selected 발신 → 콘텐츠 전환까지 한 번에
@@ -91,11 +95,11 @@ func _init_mini_widget() -> void:
 	Clock.pomodoro.session_completed.connect(_on_mini_session_completed)
 	Clock.timer.timer_finished.connect(_on_mini_session_completed)
 	
+# 미니 모드는 시메지로 대체됐다(docs/specs/shimeji.md).
+# 이제 이 버튼은 셸을 숨기는 것이고, 항상 위에 남는 역할은 시메지가 맡는다.
+# _enter_mini_widget/_exit_mini_widget 는 대체가 확인될 때까지 지우지 않고 둔다.
 func _on_mini_toggle_pressed() -> void:
-	if _mini_mode:
-		_exit_mini_widget()
-	else:
-		_enter_mini_widget()
+	get_window().hide()
 
 func _on_mini_timer_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:

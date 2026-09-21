@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Voyager"
-run/main_scene="uid://drbksltg435d4"
+run/main_scene="res://scenes/Shimeji.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
@@ -29,6 +29,11 @@ Alarms="*uid://bhkbvano58jva"
 
 [display]
 
+window/size/viewport_width=280
+window/size/viewport_height=340
+window/size/borderless=true
+window/size/always_on_top=true
+window/size/transparent=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/per_pixel_transparency/allowed=true
@@ -51,4 +56,4 @@ locale/test="ko"
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
-environment/defaults/default_clear_color=Color(0.9411765, 0.9137255, 0.85882354, 1)
+environment/defaults/default_clear_color=Color(0.9411765, 0.9137255, 0.85882354, 0)
