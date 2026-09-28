@@ -35,7 +35,11 @@ const READ_TIME := 22.0
 const PAGE_EVERY := 2.6
 const BURY_TIME := 6.6
 
+## 표정. 포즈 위에 얹힌다. 대화 연출이 쓰고, NONE 이면 표정을 얹지 않는다
+enum Face { NONE, SMILE, SOFT, FLUSTERED, THINK, SURPRISED, SHY }
+
 var pose := Pose.IDLE
+var face := Face.NONE
 var swing := 0.0                      # 들어올려졌을 때 몸이 도는 각도(도)
 var act := Act.NONE
 var walk_dir := 1                     # 걷는 방향. 몸 전체가 좌우로 뒤집힌다
@@ -281,7 +285,15 @@ func _ear_droop() -> float:
 		Pose.PET:
 			return 13.0
 		_:
-			return 0.0
+			match face:
+				Face.FLUSTERED:
+					return 16.0             # 귀가 뒤로 눕는다
+				Face.SHY:
+					return 10.0
+				Face.SURPRISED:
+					return -8.0             # 쫑긋
+				_:
+					return 0.0
 
 
 func _head_tilt() -> float:
@@ -291,7 +303,54 @@ func _head_tilt() -> float:
 		Pose.PET:
 			return sin(_t * 2.4) * 4.0
 		_:
-			return 0.0
+			match face:
+				Face.SOFT:
+					return 5.0
+				Face.THINK:
+					return -8.0
+				Face.SHY:
+					return 8.0
+				Face.FLUSTERED:
+					return sin(_t * 5.0) * 3.0
+				_:
+					return 0.0
+
+
+## 표정이 눈·눈동자·입에 주는 값. 눈 뜬 정도는 깜빡임과 겹치도록 상한으로만 준다
+func _face_eyes(open: float, iris: Vector2) -> Array:
+	match face:
+		Face.SMILE:
+			return [minf(open, 0.3), Vector2.ZERO]
+		Face.SOFT:
+			return [minf(open, 0.72), iris]
+		Face.FLUSTERED:
+			return [open, Vector2(sin(_t * 9.0) * 2.4, 0)]   # 눈동자가 이리저리
+		Face.THINK:
+			return [minf(open, 0.85), Vector2(-3.0, -3.2)]
+		Face.SURPRISED:
+			return [open * 1.25, Vector2.ZERO]
+		Face.SHY:
+			return [minf(open, 0.55), Vector2(1.5, 3.2)]      # 아래로 피한다
+		_:
+			return [open, iris]
+
+
+func _face_mouth(base: float) -> float:
+	match face:
+		Face.SMILE:
+			return 7.0
+		Face.SOFT:
+			return 3.8
+		Face.FLUSTERED:
+			return -1.5
+		Face.THINK:
+			return 0.5
+		Face.SURPRISED:
+			return -3.0
+		Face.SHY:
+			return 2.0
+		_:
+			return base
 
 
 ## 포즈를 파츠의 transform 으로 옮긴다. 매 프레임 전부 다시 정한다 —
@@ -417,9 +476,13 @@ func _apply_pose() -> void:
 	var head: Node2D = _p["head"]
 	head.position = Vector2(0, -76 + head_dy + body_dy)
 	head.rotation_degrees = head_deg
+	if face != Face.NONE and pose == Pose.IDLE:
+		var eyes := _face_eyes(open, iris)
+		open = eyes[0]
+		iris = eyes[1]
 	head.open = open
 	head.iris = iris
-	head.mouth_curve = 6.0 if pose == Pose.PET else 2.5
+	head.mouth_curve = 6.0 if pose == Pose.PET else _face_mouth(2.5)
 	head.queue_redraw()
 
 	var bk: Node2D = _p["book"]

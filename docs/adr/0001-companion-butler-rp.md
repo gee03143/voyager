@@ -45,5 +45,6 @@
 ## 관련
 
 - `docs/companion-persona.md` — 개정된 정본
-- `docs/companion-butler-draft.md` — 온보딩 대본과 구현 메모
-- `docs/specs/onboarding.md` — ⚠️ 아직 구 페르소나 기준. 교체 대기
+- `docs/companion-butler-draft.md` — 온보딩 대본과 그 근거
+- `docs/specs/onboarding.md` — 온보딩 동작 규격. 2026-09-28 교체됐다
+- ⚠️ 이 결정의 "격식체"는 2026-09-28 페르소나 개정에서 **해요체를 쓰는 초짜 집사**로 바뀌었다. 고용되지 않은 집사와 서열은 그대로다
