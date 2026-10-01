@@ -1,7 +1,7 @@
 # 투명 창
 
-- `scripts/util/transparency_test.gd` — 확인용 임시 스크립트
-- `scenes/TransparencyTest.tscn` — 확인용 임시 씬
+- `project.godot` — `display/window/size/transparent`, `display/window/per_pixel_transparency/allowed`
+- `scripts/shimeji_root.gd` — 투명 창을 쓰는 곳(시메지가 주 창이다)
 
 ## 역할
 

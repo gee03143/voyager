@@ -2,8 +2,6 @@
 
 - `assets/companion/rig/` — 레이어와 소스
 - `tools/split_hazel_parts.py` — 소스에서 파츠를 뽑는 빌드 스크립트
-- `scripts/companion/rig_test.gd` — 리그 조립과 애니메이션
-- `scenes/CompanionRigTest.tscn` — 확인용 임시 씬
 - `scripts/companion/shimeji_view.gd` — 시메지와 온보딩이 쓰는 도형 리그. 포즈·자기 일·표정
 
 ## 역할
@@ -71,7 +69,7 @@
 | 목덜미 | (0, -128) |
 
 - 좌표계 원점은 **발바닥 중앙**이고 위가 음수다. 키는 약 160이다
-- `rig_test.gd`의 좌표(원본 스프라이트 좌상단 원점)와는 다른 계다
+- 원본 스프라이트(`assets/companion/rig/`)의 좌상단 원점 좌표와는 다른 계다
 - 이 표는 픽셀값이 아니라 **비율 계약**이다. 그림을 교체해도 유지되게 그린다
 - 목덜미는 들어올려졌을 때 몸이 매달리는 지점이다
 - 축이 움직이면 모든 행동을 다시 잡아야 한다

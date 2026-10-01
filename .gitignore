@@ -7,3 +7,6 @@
 
 # Claude 작업용 휘발성 파일 (티켓 초안 등)
 .scratch/
+
+# Godot 에디터가 씬을 저장하다 남기는 임시 파일(예: World.tscn6495574000.tmp)
+*.tmp

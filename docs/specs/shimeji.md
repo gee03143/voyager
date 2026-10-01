@@ -122,7 +122,6 @@ status: planned
 
 ## 관련 파일
 - `scripts/companion/companion_engine.gd`
-- `scripts/companion/rig_test.gd` — 본 리그로 승격 대상
 - `scripts/display/screen.gd`
 - `scripts/main_shell.gd`
 - `scripts/data/app_settings.gd`
