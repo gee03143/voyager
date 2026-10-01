@@ -7,7 +7,7 @@ extends Node2D
 ## 좌표는 전부 **자기 회전축 기준**이다. 회전축의 절대 위치는 ShimejiView 가 정한다.
 ## 축 목록은 docs/architecture/companion-rig.md 의 회전축 계약과 같다.
 
-enum Kind { TAIL, EAR, FOOT, BODY, CLOAK, BAG, ARM, HEAD, BOOK, ACORN, GROUND }
+enum Kind { TAIL, EAR, FOOT, BODY, CLOAK, BAG, ARM, HEAD, BOOK, ACORN, GROUND, PENCIL }
 
 const FUR := Color(0.776, 0.714, 0.631)
 const FUR_DARK := Color(0.718, 0.651, 0.569)
@@ -67,6 +67,8 @@ func _draw() -> void:
 			_draw_acorn()
 		Kind.GROUND:
 			_draw_ground()
+		Kind.PENCIL:
+			_draw_pencil()
 
 
 func _draw_book() -> void:
@@ -90,6 +92,13 @@ func _draw_acorn() -> void:
 	_outlined(PackedVector2Array([
 		Vector2(-8, -2), Vector2(-6, -8), Vector2(6, -8), Vector2(8, -2),
 	]), Color(0.478, 0.369, 0.220))
+
+
+## 연필. 원점이 심 끝이다 — 적는 자리에 원점을 놓으면 된다
+func _draw_pencil() -> void:
+	draw_line(Vector2(0, 0), Vector2(9, -22), LINE, 6.0)
+	draw_line(Vector2(1, -3), Vector2(9, -21), Color(0.886, 0.702, 0.290), 3.5)
+	draw_circle(Vector2(0, 0), 1.6, LINE)
 
 
 func _draw_ground() -> void:
