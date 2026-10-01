@@ -13,7 +13,7 @@ const VOICE_PATHS := [
 ]
 const VOICE_PITCH_JITTER := 0.06        # 같은 파일을 반복 재생해도 기계적으로 안 들릴 만큼만
 
-## 효과음(docs/architecture/sound.md). id → [파일 이름들, 음량 dB]. 파일은 SFX_DIR 의 .ogg 다.
+## 효과음. id → [파일 이름들, 음량 dB]. 파일은 SFX_DIR 의 .ogg 다.
 ## 임시 소리다 — Kenney CC0 팩에서 골랐고 이름은 원본 그대로다. 파일마다 크기가 달라 음량을 id 단위로 맞춘다
 const SFX_DIR := "res://assets/sounds/sfx/"
 const SFX := {

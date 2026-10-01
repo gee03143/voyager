@@ -207,7 +207,7 @@ status: planned
 - 설정의 `내보내기` 통로
 - 온보딩 다시 보기 메뉴
 - 건너뛰기 버튼
-- 최종 효과음. 지금은 Kenney CC0 팩에서 고른 임시 소리다(`docs/architecture/sound.md`)
+- 최종 효과음. 지금은 Kenney CC0 팩에서 고른 임시 소리다(`assets/sounds/sfx/`, 라이선스 원문 동봉)
 - 효과음 전용 음량 설정. 마스터 음량을 따른다
 - 온보딩 밖(헤이즐 부르기·시메지 자기 일)의 효과음
 - 셸 대화 모드를 온보딩 밖에서 여는 것. 헤이즐 부르기(`docs/specs/hazel-room.md`)가 맡는다
