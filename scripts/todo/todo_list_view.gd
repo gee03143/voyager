@@ -401,12 +401,15 @@ func _on_reordered(from: int, to: int) -> void:
 
 func _on_row_changed(row: TodoRow, todo: Todo, group: TodoGroup) -> void:
 	var was_done := todo.done
+	var was_empty := todo.text.strip_edges().is_empty()
 	todo.text = row.get_text()
 	todo.done = row.is_done()
 	todo.due_date = row.get_due()
 	if todo.done and not was_done and not todo.text.strip_edges().is_empty():
 		var id := Save.activity_log.add("todo", {"title": todo.text})
 		Companion.notify_todo_completed(id, todo, group)   # 모델이 갱신된 뒤라 잔여 계산이 맞음
+	if was_empty and not todo.text.strip_edges().is_empty():
+		Companion.notify_todo_written(todo)                # 새로 추가한 행에 처음 적은 순간
 	_save_timer.start()
 	# 완료 여부가 바뀌면 행이 다른 자리로 옮겨간다. 체크된 모습을 잠깐 보여준 뒤에 옮긴다 —
 	# 누른 것이 그 자리에서 곧바로 사라지면 그냥 없어진 것으로 읽힌다.

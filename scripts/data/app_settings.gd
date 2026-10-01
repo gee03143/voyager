@@ -35,6 +35,11 @@ var companion_voice_volume: float = 1.0   # 헤이즐 발화음 — 알람과 �
 # 컴패니언 모드
 var companion_position: Vector2i = Vector2i(-1, -1)  # (-1,-1) = 미설정 → 화면 우하단
 
+# 온보딩(docs/specs/onboarding.md)
+var onboarded: bool = false
+var nickname: String = ""                # 헤이즐이 부르는 호칭. 비우면 부르지 않는다
+var onboarded_in_file := false           # 불러온 파일에 onboarded 키가 있었는가 — 저장하지 않는다
+
 func to_dict() -> Dictionary:
 	return {
 		"focus_seconds": focus_seconds,
@@ -56,6 +61,8 @@ func to_dict() -> Dictionary:
 		"master_volume": master_volume,
 		"companion_voice_volume": companion_voice_volume,
 		"companion_position": [companion_position.x, companion_position.y],
+		"onboarded": onboarded,
+		"nickname": nickname,
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -89,3 +96,7 @@ func from_dict(d: Dictionary) -> void:
 	var cp = d.get("companion_position", null)
 	if typeof(cp) == TYPE_ARRAY and cp.size() == 2:
 		companion_position = Vector2i(int(cp[0]), int(cp[1]))
+
+	onboarded_in_file = d.has("onboarded")
+	onboarded = bool(d.get("onboarded", onboarded))
+	nickname = str(d.get("nickname", nickname))

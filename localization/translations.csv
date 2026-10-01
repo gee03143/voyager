@@ -193,3 +193,75 @@ COMPANION_REASK_WRAP_HABIT,그래. 근데 습관 {m}개는 채우고 가자.,Sur
 COMPANION_OPT_SEE_HABIT,습관 채울래,Fill them in
 COMPANION_FOLLOW_HABIT,금방 끝나. 하나씩 체크하자.,Won't take long. Check them off.
 SHIMEJI_MENU_QUIT,종료,Quit
+ONB_SPEAKER_HAZEL,헤이즐,Hazel
+ONB_B1_HELLO,"아, 저... 처음 뵙겠습니다.","Oh— um... It's nice to meet you."
+ONB_B1_JOB,오늘부터 여기 일을 맡게 됐어요.,I'll be looking after things here from today.
+ONB_B1_NAME,"아, 인사가 늦었네요. 헤이즐이에요.","Oh, I didn't introduce myself. I'm Hazel."
+ONB_B1_UNPACK,짐은 이게 다예요. 금방 풀게요.,This is all I brought. I'll unpack in a moment.
+ONB_B2_ASK_WHY,그래서... 왜 온 건데요?,So... why are you here?
+ONB_B2_ASK_PEEK,(트렁크 안을 들여다본다),(Peek into the trunk)
+ONB_B2_ASK_WHAT,집사가 뭘 하는데요?,What does a butler even do?
+ONB_B2_RE_WHY,"아, 그게...","Oh, well..."
+ONB_B2_RE_PEEK,이거 때문에요.,Because of this.
+ONB_B2_RE_WHAT,음... 제일 중요한 것부터 말씀드릴게요.,Um... I'll start with the most important part.
+ONB_B2_DAYS,"저희는 날들을 모아요. 좋은 날도, 그냥 그런 날도요.","We gather days. The good ones, and the so-so ones too."
+ONB_B2_WINTER,마음에도 겨울이 오거든요.,Hearts get winters too.
+ONB_B2_WARM,그때 꺼내 볼 게 있으면... 좀 덜 추워요.,Having something to take out then... makes it a little less cold.
+ONB_B2_TRAINEE,선배들은 다들 한 분씩 맡아서 모아요. 저는... 아직 수습이고요.,The seniors each look after one person. I'm... still in training.
+ONB_B2_HERE,그래서 여기서 할 일은요.,So here's what I'll do here.
+ONB_B2_TODO,"하실 일을 적어두고, 잊지 않게 챙겨드릴게요.","I'll note down what you need to do, and make sure it isn't forgotten."
+ONB_B2_DAYEND,하루가 끝나면 그날 걸 같이 모아두고요.,And when a day ends we'll put it away together.
+ONB_B2_EMPTY,아무것도 안 한 날도 적어요. 그것도 하루니까요.,I write down the days nothing happened too. Those are days as well.
+ONB_B2_OPT_OK,...그럼 잘 부탁해요.,...Then I'm in your hands.
+ONB_B2_OPT_DOUBT,아직 믿는다고는 안 했어요.,I didn't say I trust you yet.
+ONB_B2_OPT_BOOK,(수첩을 본다),(Look at the notebook)
+ONB_B2_RE_OK,네.,Okay.
+ONB_B2_RE_DOUBT,네. 천천히요.,Okay. Take your time.
+ONB_B2_RE_BOOK,여기서부터 시작이에요.,This is where it starts.
+ONB_B3_FIRST,그럼... 제일 먼저 적어둘 게 있어요.,Then... there's something I should write down first.
+ONB_B3_ASK,어떻게 불러드리면 될까요?,What should I call you?
+ONB_B3_NAME_HINT,이름,Name
+ONB_B3_OPT_TELL,(알려준다),(Tell)
+ONB_B3_OPT_LATER,...그건 나중에요.,...Maybe later.
+ONB_B3_CALL,{name}님.,{name}.
+ONB_B3_PRACTICE,{name}님... {name}님.,{name}... {name}.
+ONB_B3_NARR_PRACTICE,— 연습하고 있다.,— Practicing.
+ONB_B3_MEMORIZED,외웠어요.,Got it.
+ONB_B3_OK,...네.,...Okay.
+ONB_B3_NO_CALL,그럼 부르지 않을게요.,Then I won't call you anything.
+ONB_B3_NARR_BLANK,— 첫 장은 비워두었다.,— The first page was left blank.
+ONB_B4_TODO,하실 일은 여기 적어두세요. 잊지 않게 챙길게요.,Put the things you need to do here. I'll make sure they aren't forgotten.
+ONB_B4_HABIT,매일 하고 싶은 건 여기요.,The things you want to do every day go here.
+ONB_B4_TIMER,집중할 땐 이걸 돌려요. 도는 동안은 조용히 있을게요.,Wind this when you want to focus. I'll stay quiet while it runs.
+ONB_B4_JOURNAL,쓰고 싶은 날엔 여기에요.,On days you feel like writing — here.
+ONB_B4_RECORD,이건... 제 거예요. 모은 날들이 여기 들어가요.,This one's... mine. The days we gather go in here.
+ONB_B4_INVITE,하나만 적어볼래요? 큰 거 아니어도 돼요.,Want to write just one down? It doesn't have to be big.
+ONB_B4_LATER,나중에 할게요,Maybe later
+ONB_B4_WRITTEN,적어두셨네요. 제가 기억해 둘게요.,You wrote it down. I'll remember it.
+ONB_B4_LATER_RE,네. 수첩은 여기 둘게요.,Okay. I'll leave the notebook right here.
+TODO_SAMPLE_ADD,할 일 추가하기,Add a to-do
+ONB_B1_NARR_KNOCK,— 안쪽에서 두드렸다.,— The knock came from the inside.
+ONB_B1_OPT_OPEN,(열어준다),(Let them in)
+ONB_B1_OPT_WHO,...누구세요?,...Who's there?
+ONB_B1_OPT_IGNORE,(못 본 척한다),(Pretend not to see)
+ONB_B1_BUTLER,아... 집사예요.,Oh... I'm the butler.
+ONB_B1_NARR_HEARS,— 들리는 모양이다.,— Apparently it can hear.
+ONB_B1_CARD,잠깐 들어가도 될까요?,May I come in for a bit?
+ONB_B1_NARR_WAITS,— 정말로 기다린다.,— It really is waiting.
+ONB_B1_OPT_WHO_SENT,...누가 보냈어요?,...Who sent you?
+ONB_B1_OPT_JOB,일이요? 무슨 일이요?,Things? What things?
+ONB_B1_OPT_LOOK,(말없이 내려다본다),(Look down in silence)
+ONB_B1_RE_NOBODY,아무도요.,Nobody.
+ONB_B1_RE_CAME,...제가 왔어요.,...I just came.
+ONB_B1_RE_JOB,집사 일이요.,Butler things.
+ONB_B1_RE_SLOWLY,자세한 건... 천천히 말씀드릴게요.,I'll... explain the rest slowly.
+ONB_B5_NARR_SPOT,— 마음에 드는 자리를 찾은 모양이다.,— Looks like that spot will do.
+ONB_B5_OUTSIDE,그럼 저는 밖에 있을게요.,Then I'll be right outside.
+ONB_B5_CALL_ME,필요하시면 불러주세요.,Call me if you need me.
+ONB_B5_OPT_THANKS,고마워요.,Thank you.
+ONB_B5_OPT_WAVE,(손을 흔든다),(Wave)
+ONB_B3_CONFIRM,「{name}」... 이렇게 적었는데 맞아요?,"""{name}""... is this how it's written?"
+ONB_B3_OPT_RIGHT,맞아요.,That's right.
+ONB_B3_OPT_WRONG,"아, 잘못 적었어요.","Oh, I typed it wrong."
+ONB_B3_MISHEARD,"아, 제가 잘못 들었나 봐요.","Oh, I must have misheard."
+ONB_B3_AGAIN,다시 한 번 알려주세요.,Please tell me once more.
