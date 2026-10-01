@@ -7,7 +7,7 @@ var due_date: String = ""          # "YYYY-MM-DD", "" = 마감일 없음
 var created_ts: int = 0            # 만든 시각(unix). 0 = 모름
 
 func _init() -> void:
-	created_ts = int(Time.get_unix_time_from_system())
+	created_ts = DateUtil.now_unix()
 
 func to_dict() -> Dictionary:
 	return {

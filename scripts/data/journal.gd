@@ -19,7 +19,7 @@ var _group_by_id: Dictionary = {}    # id → groups의 항목(같은 참조)
 # --- 문서 CRUD ---
 func add_doc(group_id: int = 0) -> int:
 	var id := IdGen.fresh(_doc_by_id)        # 색인이 곧 사용 중 id 집합이다
-	var doc := {"id": id, "title": "", "body": "", "group_id": group_id, "ts": int(Time.get_unix_time_from_system())}
+	var doc := {"id": id, "title": "", "body": "", "group_id": group_id, "ts": DateUtil.now_unix()}
 	docs.append(doc)
 	_doc_by_id[id] = doc
 	changed.emit()

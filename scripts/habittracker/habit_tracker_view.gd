@@ -149,7 +149,7 @@ func _notify_checked(before) -> void:
 func _today_column() -> int:                          # 이번 주를 안 보고 있으면 -1
 	if _period_nav.current_start() != DateUtil.monday_iso():
 		return -1
-	return (int(Time.get_date_dict_from_system().weekday) + 6) % 7
+	return (int(DateUtil.today_dict().weekday) + 6) % 7
 
 func _on_reordered(from: int, to: int) -> void:
 	var r := _rows[from]
@@ -186,7 +186,7 @@ func _refresh_progress(animate: bool = false) -> void:
 func _highlight_today(week_start: String) -> void:
 	var today_col := -1
 	if week_start == DateUtil.monday_iso():
-		today_col = (int(Time.get_date_dict_from_system().weekday) + 6) % 7   # 일0..토6 → 월요일 시작
+		today_col = (int(DateUtil.today_dict().weekday) + 6) % 7   # 일0..토6 → 월요일 시작
 	for i in _day_labels.size():
 		var is_today := i == today_col
 		_day_labels[i].theme_type_variation = &"VgTodayLabel" if is_today else &"VgDayLabel"

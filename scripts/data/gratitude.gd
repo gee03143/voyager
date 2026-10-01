@@ -13,7 +13,7 @@ var _by_id: Dictionary = {}          # id → entries의 항목(같은 참조)
 
 func add_entry(date_iso: String) -> int:
 	var id := IdGen.fresh(_by_id)            # 색인이 곧 사용 중 id 집합이다
-	var e := {"id": id, "date_iso": date_iso, "items": [], "ts": int(Time.get_unix_time_from_system())}
+	var e := {"id": id, "date_iso": date_iso, "items": [], "ts": DateUtil.now_unix()}
 	entries.append(e)
 	_by_id[id] = e
 	changed.emit()

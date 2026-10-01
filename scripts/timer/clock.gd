@@ -33,10 +33,10 @@ func _ready() -> void:
 	timer.timer_finished.connect(_on_timer_finished)
 
 func _on_session_started() -> void:
-	_pomo_start_ts = int(Time.get_unix_time_from_system())
+	_pomo_start_ts = DateUtil.now_unix()
 
 func _on_timer_started() -> void:
-	_timer_start_ts = int(Time.get_unix_time_from_system())
+	_timer_start_ts = DateUtil.now_unix()
 
 func _on_focus_finished() -> void:
 	Save.voyage.add_focus(pomodoro.focus_seconds)   # 집중 1구간 = 계획된 집중 길이 적립

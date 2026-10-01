@@ -3,12 +3,30 @@ extends RefCounted
 
 const DAY_NAME_KEYS := ["DATE_MON", "DATE_TUE", "DATE_WED", "DATE_THU", "DATE_FRI", "DATE_SAT", "DATE_SUN"]  # 월요일 시작 — month_grid()와 순서 일치 필수
 
+## 앱이 보는 오늘을 옮긴 일수. 개발자 콘솔의 date 명령이 샌드박스에서만 바꾼다(docs/specs/dev-console.md).
+## 0이면 아래 두 함수가 엔진 값을 그대로 돌려준다
+static var day_offset := 0
+
+# 벽시계는 이 두 함수로만 읽는다. 시각만 읽는 곳(알람)과 시간대는 엔진을 직접 부른다 — 날짜만 옮기기 때문이다
+
+## 지금 유닉스 초
+static func now_unix() -> int:
+	return int(Time.get_unix_time_from_system()) + day_offset * 86400
+
+## 오늘 로컬 날짜 {year, month, day, weekday}. weekday 는 일0..토6
+static func today_dict() -> Dictionary:
+	if day_offset == 0:
+		return Time.get_date_dict_from_system()
+	# get_date_dict_from_unix_time 은 UTC 기준이라 시간대를 더해야 로컬 날짜가 된다(2026-10-01 실행 확인)
+	var bias := int(Time.get_time_zone_from_system().get("bias", 0))
+	return Time.get_date_dict_from_unix_time(now_unix() + bias * 60)
+
 # "YYYY-MM-DD" → 오늘까지 남은 일수 (음수=지남). 빈/형식오류는 호출부에서 거른다.
 static func days_until(iso: String) -> int:
 	var p := iso.split("-")
 	var due := Time.get_unix_time_from_datetime_dict(
 		{"year": int(p[0]), "month": int(p[1]), "day": int(p[2]), "hour": 0, "minute": 0, "second": 0})
-	var t := Time.get_date_dict_from_system()
+	var t := today_dict()
 	var today := Time.get_unix_time_from_datetime_dict(
 		{"year": t.year, "month": t.month, "day": t.day, "hour": 0, "minute": 0, "second": 0})
 	return int((due - today) / 86400.0)
@@ -26,7 +44,7 @@ static func format_due(iso: String) -> String:
 	if days == 1:
 		return TranslationServer.translate("DATE_TOMORROW")
 	var year := int(p[0])
-	if year == Time.get_date_dict_from_system().year:
+	if year == today_dict().year:
 		return "%d/%d" % [int(p[1]), int(p[2])]            # 올해 → 월/일
 	return "%d/%d/%d" % [year, int(p[1]), int(p[2])]       # 다른 해 → 연/월/일
 	
@@ -40,7 +58,7 @@ static func format_day(iso: String) -> String:
 	var p := iso.split("-")
 	if p.size() != 3:
 		return iso
-	if int(p[0]) == Time.get_date_dict_from_system().year:
+	if int(p[0]) == today_dict().year:
 		return "%d/%d" % [int(p[1]), int(p[2])]
 	return "%d/%d/%d" % [int(p[0]), int(p[1]), int(p[2])]
 
@@ -49,7 +67,7 @@ static func format_created(ts: int) -> String:        # ts → "D/M/YYYY"
 	return "%d/%d/%d" % [int(p[2]), int(p[1]), int(p[0])]
 
 static func monday_iso() -> String:
-	var t := Time.get_date_dict_from_system()
+	var t := today_dict()
 	var days_back := (int(t.weekday) + 6) % 7          # weekday: 일0..토6 → 월요일까지 거슬러
 	var today_unix := Time.get_unix_time_from_datetime_dict(
 		{"year": t.year, "month": t.month, "day": t.day, "hour": 0, "minute": 0, "second": 0})
@@ -89,7 +107,7 @@ static func add_days(iso: String, days: int) -> String:
 
 # 오늘 로컬 날짜 iso
 static func today_iso() -> String:
-	var t := Time.get_date_dict_from_system()
+	var t := today_dict()
 	return "%04d-%02d-%02d" % [t.year, t.month, t.day]
 	
 static func format_hours(seconds: float) -> String:
@@ -105,7 +123,7 @@ static func format_time_hm(ts: int) -> String:
 	return "%02d:%02d" % [d.hour, d.minute]
 
 static func month_start_iso() -> String:
-	var t := Time.get_date_dict_from_system()
+	var t := today_dict()
 	return "%04d-%02d-01" % [t.year, t.month]
 	
 static func days_in_month(iso: String) -> int:
@@ -133,7 +151,7 @@ static func month_label(iso: String) -> String:
 	return TranslationServer.translate("DATE_MONTH_LABEL").format({"year": int(p[0]), "month": int(p[1])})
 
 static func year_start_iso() -> String:
-	var t := Time.get_date_dict_from_system()
+	var t := today_dict()
 	return "%04d-01-01" % t.year
 
 static func year_label(iso: String) -> String:

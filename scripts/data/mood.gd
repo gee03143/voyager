@@ -12,7 +12,7 @@ var _by_id: Dictionary = {}          # id → entries의 항목(같은 참조)
 
 func add_entry(level: int, memo: String = "") -> int:
 	var id := IdGen.fresh(_by_id)            # 색인이 곧 사용 중 id 집합이다
-	var e := {"id": id, "ts": int(Time.get_unix_time_from_system()), "level": clampi(level, 1, 5), "memo": memo}
+	var e := {"id": id, "ts": DateUtil.now_unix(), "level": clampi(level, 1, 5), "memo": memo}
 	entries.append(e)
 	_by_id[id] = e
 	changed.emit()

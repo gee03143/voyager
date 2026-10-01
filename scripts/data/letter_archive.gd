@@ -15,7 +15,7 @@ func add(template_idx: int, subject: String, fact: String, state: String, author
 	entries.append({
 		"id": id, "template_idx": template_idx,
 		"subject": subject, "fact": fact, "state": state,
-		"author": author, "ts": int(Time.get_unix_time_from_system()),
+		"author": author, "ts": DateUtil.now_unix(),
 	})
 	changed.emit()
 	return id

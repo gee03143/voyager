@@ -16,7 +16,7 @@ func add(type: String, payload: Dictionary = {}) -> int:
 	for e in events:
 		used[int(e.get("id", 0))] = true
 	var id := IdGen.fresh(used)
-	var ev := {"id": id, "type": type, "ts": int(Time.get_unix_time_from_system())}
+	var ev := {"id": id, "type": type, "ts": DateUtil.now_unix()}
 	ev.merge(payload)
 	events.append(ev)
 	changed.emit()

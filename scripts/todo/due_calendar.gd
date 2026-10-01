@@ -15,7 +15,7 @@ var _month: int
 var _selected: String = ""
 
 func _ready() -> void:
-	var t := Time.get_date_dict_from_system()
+	var t := DateUtil.today_dict()
 	_year = t.year
 	_month = t.month
 	_prev_button.pressed.connect(_prev_month)
@@ -30,7 +30,7 @@ func _ready() -> void:
 # 팝업이 열릴 때 현재 마감일로 동기화(신호 없이). 빈 값이면 오늘 달로.
 func set_selected(iso: String) -> void:
 	_selected = iso
-	var t := Time.get_date_dict_from_system()
+	var t := DateUtil.today_dict()
 	_year = t.year; _month = t.month
 	if not iso.is_empty():
 		var p := iso.split("-")
@@ -88,7 +88,7 @@ func _next_month() -> void:
 	_render_month()
 
 func _go_today() -> void:
-	var t := Time.get_date_dict_from_system()
+	var t := DateUtil.today_dict()
 	_year = t.year; _month = t.month
 	_render_month()
 

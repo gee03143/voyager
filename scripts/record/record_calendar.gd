@@ -18,7 +18,7 @@ var _selected: String = ""
 var _counts: Dictionary = {}     # {iso: 활동 수}
 
 func _ready() -> void:
-	var t := Time.get_date_dict_from_system()
+	var t := DateUtil.today_dict()
 	_year = t.year
 	_month = t.month
 	_prev_button.pressed.connect(_prev_month)
@@ -125,7 +125,7 @@ func _next_month() -> void:
 	_render_month()
 
 func _go_today() -> void:
-	var t := Time.get_date_dict_from_system()
+	var t := DateUtil.today_dict()
 	_year = t.year; _month = t.month
 	_render_month()
 	
