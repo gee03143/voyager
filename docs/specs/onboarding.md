@@ -5,7 +5,7 @@ status: planned
 
 첫 실행에서 헤이즐이 바탕화면으로 찾아와 집사로 부임하고, 유저에게 도구를 소개한 뒤 시메지로 자리 잡는 시퀀스.
 
-⚠️ **2026-09-28 전면 교체.** 이전 판은 셸 오버레이 + 격식체 7비트 기준이었다. 이번 판은 `scenes/ArrivalProto.tscn` 프로토타입에서 확인한 결과를 옮긴 것이다.
+⚠️ **2026-09-28 전면 교체.** 이전 판은 셸 오버레이 + 격식체 7비트 기준이었다. 이번 판은 `ArrivalProto` 프로토타입(삭제됨, git 히스토리)에서 확인한 결과를 옮긴 것이다.
 
 ⚠️ **셸 상단의 배너 자리는 헤이즐의 방이다(`docs/specs/hazel-room.md`).** 이 문서의 "배너"는 그 방과 쪽지를 품은 노드(`CompanionBanner`)를 가리킨다.
 
@@ -349,4 +349,3 @@ status: planned
 - `scripts/data/app_settings.gd`
 - `scripts/data/save.gd`
 - `localization/translations.csv`
-- `scripts/onboarding/arrival_proto.gd` — 프로토타입. 구현이 끝나면 지운다
