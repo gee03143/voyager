@@ -15,7 +15,8 @@ const PART_SCRIPT := preload("res://scripts/companion/shimeji_part.gd")
 
 enum Pose { IDLE, LIFTED, LANDING, PET }
 ## 자기 일. 창을 옮기는 것은 루트가 하고 여기는 몸만 맡는다
-enum Act { NONE, READ, WALK, BURY }
+## WRITE 는 쪽지가 꽂힐 때 루트가 시킨다(docs/specs/hazel-room.md 의 "쪽지 — 반응")
+enum Act { NONE, READ, WALK, BURY, WRITE }
 
 const SCRUFF := Vector2(0, -128)      # 들어올려질 때 매달리는 지점
 const HEAD_CENTER := Vector2(0, -106)
@@ -34,12 +35,17 @@ const TWITCH_TIME := 0.26
 const READ_TIME := 22.0
 const PAGE_EVERY := 2.6
 const BURY_TIME := 6.6
+const WRITE_TIME := 3.2               # 꺼내기 0.5 · 적기 2.1 · 넣기 0.6
+const WRITE_FROM := 0.5
+const WRITE_TO := 2.6
 
 ## 표정. 포즈 위에 얹힌다. 대화 연출이 쓰고, NONE 이면 표정을 얹지 않는다
 enum Face { NONE, SMILE, SOFT, FLUSTERED, THINK, SURPRISED, SHY }
 
 var pose := Pose.IDLE
 var face := Face.NONE
+## 왼팔을 밖에서 드는 각도(도). 가리키기용이다. 0 이면 지금과 같고, 들어올려지면 무시한다
+var point_l := 0.0
 var swing := 0.0                      # 들어올려졌을 때 몸이 도는 각도(도)
 var act := Act.NONE
 var walk_dir := 1                     # 걷는 방향. 몸 전체가 좌우로 뒤집힌다
@@ -95,6 +101,7 @@ func _prop_layout() -> Array:
 		{"name": "ground", "kind": K.GROUND, "pivot": Vector2(0, -2)},
 		{"name": "acorn", "kind": K.ACORN, "pivot": Vector2(0, -52)},
 		{"name": "book", "kind": K.BOOK, "pivot": Vector2(0, -44)},
+		{"name": "pencil", "kind": K.PENCIL, "pivot": Vector2(10, -40)},
 	]
 
 
@@ -109,6 +116,7 @@ func _ready() -> void:
 		_p[item["name"]] = part
 	_p["book"].visible = false
 	_p["acorn"].visible = false
+	_p["pencil"].visible = false
 	_twitch_at = randf_range(TWITCH_MIN, TWITCH_MAX)
 
 
@@ -236,6 +244,8 @@ func _tick_act(delta: float) -> void:
 		if _act_t >= READ_TIME:
 			stop_act()
 	elif act == Act.BURY and _act_t >= BURY_TIME:
+		stop_act()
+	elif act == Act.WRITE and _act_t >= WRITE_TIME:
 		stop_act()
 
 
@@ -373,6 +383,10 @@ func _apply_pose() -> void:
 	var open := _open
 	var tail := _tail_deg
 	var book := false
+	var book_pos := Vector2(0, -44)
+	var book_deg := -7.0
+	var book_scale := 1.0
+	var pencil := Vector2.INF       # INF 면 안 보인다. 심 끝의 자리
 	var acorn := Vector2.INF        # INF 면 안 보인다
 	var ground_grow := 0.0
 	var ground_mound := false
@@ -449,6 +463,24 @@ func _apply_pose() -> void:
 				if u >= 5.8:
 					head_deg += 10.0
 			arm_r = -arm_l
+		Act.WRITE:
+			# 수첩을 꺼내 가슴 앞에 펴고, 오른쪽 장에 몇 자 적고, 넣는다
+			var u := _act_t
+			var hold := clampf(u / WRITE_FROM, 0.0, 1.0) * (1.0 - clampf((u - WRITE_TO) / (WRITE_TIME - WRITE_TO), 0.0, 1.0))
+			arm_l = 38.0 * hold
+			arm_r = -38.0 * hold
+			head_deg += 13.0 * hold
+			iris = Vector2(0, 3.2 * hold)
+			open = minf(open, lerpf(1.0, 0.5, hold))
+			book = hold > 0.45
+			book_pos = Vector2(0, -38)
+			book_deg = 0.0
+			book_scale = 0.78
+			if u >= WRITE_FROM and u < WRITE_TO:
+				var w := _t * 13.0
+				arm_r = -38.0 + sin(w) * 5.0
+				pencil = Vector2(8 + sin(w) * 5.0, -38 + absf(cos(w * 0.5)) * 2.0)
+				tail = lerpf(tail, 14.0, 0.5) + sin(_t * 2.2) * 3.0   # 적는 동안 꼬리가 조금 들린다
 		_:
 			pass
 
@@ -470,7 +502,7 @@ func _apply_pose() -> void:
 	_p["foot_r"].position = foot_r
 	_p["arm_l"].position = Vector2(-26 - (8.0 if lifted else 0.0), -60 + body_dy)
 	_p["arm_r"].position = Vector2(26 + (8.0 if lifted else 0.0), -60 + body_dy)
-	_p["arm_l"].rotation_degrees = arm_l
+	_p["arm_l"].rotation_degrees = arm_l + (0.0 if lifted else point_l)
 	_p["arm_r"].rotation_degrees = arm_r
 
 	var head: Node2D = _p["head"]
@@ -488,10 +520,16 @@ func _apply_pose() -> void:
 	var bk: Node2D = _p["book"]
 	bk.visible = book
 	if book:
-		bk.position = Vector2(0, -44 + body_dy)
-		bk.rotation_degrees = -7.0
+		bk.position = book_pos + Vector2(0, body_dy)
+		bk.rotation_degrees = book_deg
+		bk.scale = Vector2.ONE * book_scale
 		bk.page = maxf(_page_flip, 0.0)
 		bk.queue_redraw()
+
+	var pc: Node2D = _p["pencil"]
+	pc.visible = pencil != Vector2.INF
+	if pc.visible:
+		pc.position = pencil + Vector2(0, body_dy)
 
 	var ac: Node2D = _p["acorn"]
 	ac.visible = acorn != Vector2.INF

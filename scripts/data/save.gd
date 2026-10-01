@@ -1,17 +1,19 @@
 extends Node
 
-const SAVE_PATH := "user://save.json"
+const SAVE_FILE := "save.json"
 const VERSION := 8
-const RECORDS_PATH := "user://records.json"
+const RECORDS_FILE := "records.json"
 const RECORDS_VERSION := 2
-const JOURNAL_PATH := "user://journal.json"
+const JOURNAL_FILE := "journal.json"
 const JOURNAL_VERSION := 1
-const TODO_PATH := "user://todo.json"
+const TODO_FILE := "todo.json"
 const TODO_VERSION := 1
-const GRATITUDE_PATH := "user://gratitude.json"
+const GRATITUDE_FILE := "gratitude.json"
 const GRATITUDE_VERSION := 1
-const MOOD_PATH := "user://mood.json"
+const MOOD_FILE := "mood.json"
 const MOOD_VERSION := 1
+# class_name 은 전역 목록에 오르기 전까지 파스 단계에서 안 잡힌다. preload 로 직접 가리킨다
+const SANDBOX := preload("res://scripts/dev/sandbox.gd")
 const DISK_DEBOUNCE := 0.5        # 디스크 쓰기만 합친다. 모델은 항상 즉시 갱신된다
 
 var voyage := Voyage.new()
@@ -36,24 +38,35 @@ var _play_ckpt_ms: int = 0         # 적립 체크포인트(모노토닉)
 var _disk_timer: Timer
 var _dirty: Dictionary = {}        # 쓰기 대기 중인 파일 이름
 
+## 저장 파일의 경로. 샌드박스로 띄웠으면 실제 폴더 대신 테스트 폴더다(docs/specs/dev-console.md)
+func _path(file: String) -> String:
+	return SANDBOX.dir() + file
+
 func _ready() -> void:
-	if FileAccess.file_exists(SAVE_PATH):
+	SANDBOX.prepare()             # 파일을 읽기 전에 — 샌드박스면 폴더를 비우고, 복사본이면 실제 파일을 복사한다
+	if FileAccess.file_exists(_path(SAVE_FILE)):
 		load_game()
-	if FileAccess.file_exists(RECORDS_PATH):
+	if FileAccess.file_exists(_path(RECORDS_FILE)):
 		load_records()
-	if FileAccess.file_exists(JOURNAL_PATH):
+	if FileAccess.file_exists(_path(JOURNAL_FILE)):
 		load_journal()
-	if FileAccess.file_exists(TODO_PATH):
+	if FileAccess.file_exists(_path(TODO_FILE)):
 		load_todo()
-	if FileAccess.file_exists(GRATITUDE_PATH):
+	if FileAccess.file_exists(_path(GRATITUDE_FILE)):
 		load_gratitude()
-	if FileAccess.file_exists(MOOD_PATH):
+	if FileAccess.file_exists(_path(MOOD_FILE)):
 		load_mood()
 	if todo_groups.is_empty():
 		var g := TodoGroup.new()
 		g.is_default = true
 		todo_groups.append(g)
 	current_group_index = clampi(current_group_index, 0, todo_groups.size() - 1)
+	# 온보딩 이전부터 쓰던 저장 파일은 온보딩을 본 것으로 친다(docs/specs/onboarding.md).
+	# 기록 파일까지 다 읽은 뒤라야 판단할 수 있고, 아래 첫 save_game()이 그대로 적는다
+	if not settings.onboarded_in_file and not activity_log.events.is_empty():
+		settings.onboarded = true
+	if SANDBOX.skips_onboarding():
+		settings.onboarded = true   # 샌드박스 · 빈 상태는 온보딩을 건너뛴다(docs/specs/dev-console.md)
 	_play_base_seconds = voyage.total_play_seconds
 	_session_start_ms = Time.get_ticks_msec()
 	_play_ckpt_ms = _session_start_ms
@@ -91,7 +104,7 @@ func _accumulate_play_day() -> void:
 	activity_log.add_play(_local_day_iso(), elapsed)
 
 func _local_day_iso() -> String:
-	var t := Time.get_date_dict_from_system()     # 로컬 날짜(habit과 동일 기준)
+	var t := DateUtil.today_dict()     # 로컬 날짜(habit과 동일 기준)
 	return "%04d-%02d-%02d" % [t.year, t.month, t.day]
 
 func current_play_seconds() -> float:
@@ -114,7 +127,7 @@ func save_game() -> void:
 		"lexicon": lexicon.to_dict(),
 	}
 	
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(_path(SAVE_FILE), FileAccess.WRITE)
 	if file == null:
 		push_warning("Fail to Save: %s" % FileAccess.get_open_error())
 		return
@@ -122,7 +135,7 @@ func save_game() -> void:
 	file.close()
 		
 func load_game() -> void:
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var file := FileAccess.open(_path(SAVE_FILE), FileAccess.READ)
 	if file == null:
 		push_warning("Fail to Load: %s" % FileAccess.get_open_error())
 		return
@@ -185,7 +198,7 @@ func save_records() -> void:
 		"version": RECORDS_VERSION,
 		"activity_log": activity_log.to_dict(),
 	}
-	var file := FileAccess.open(RECORDS_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(_path(RECORDS_FILE), FileAccess.WRITE)
 	if file == null:
 		push_warning("Fail to Save records: %s" % FileAccess.get_open_error())
 		return
@@ -193,7 +206,7 @@ func save_records() -> void:
 	file.close()
 
 func load_records() -> void:
-	var file := FileAccess.open(RECORDS_PATH, FileAccess.READ)
+	var file := FileAccess.open(_path(RECORDS_FILE), FileAccess.READ)
 	if file == null:
 		return
 	var text := file.get_as_text()
@@ -208,7 +221,7 @@ func load_records() -> void:
 func save_journal() -> void:
 	var data := journal.to_dict()        # {groups, docs}
 	data["version"] = JOURNAL_VERSION
-	var file := FileAccess.open(JOURNAL_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(_path(JOURNAL_FILE), FileAccess.WRITE)
 	if file == null:
 		push_warning("Fail to Save journal: %s" % FileAccess.get_open_error())
 		return
@@ -216,7 +229,7 @@ func save_journal() -> void:
 	file.close()
 
 func load_journal() -> void:
-	var file := FileAccess.open(JOURNAL_PATH, FileAccess.READ)
+	var file := FileAccess.open(_path(JOURNAL_FILE), FileAccess.READ)
 	if file == null:
 		return
 	var text := file.get_as_text()
@@ -233,7 +246,7 @@ func save_todo() -> void:
 		"version": TODO_VERSION,
 		"todo_groups": todo_group_dicts,
 	}
-	var file := FileAccess.open(TODO_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(_path(TODO_FILE), FileAccess.WRITE)
 	if file == null:
 		push_warning("Fail to Save todo: %s" % FileAccess.get_open_error())
 		return
@@ -241,7 +254,7 @@ func save_todo() -> void:
 	file.close()
 
 func load_todo() -> void:
-	var file := FileAccess.open(TODO_PATH, FileAccess.READ)
+	var file := FileAccess.open(_path(TODO_FILE), FileAccess.READ)
 	if file == null:
 		return
 	var text := file.get_as_text()
@@ -318,7 +331,7 @@ func activity_entries_for(date_iso: String) -> Array:    # 로그 이벤트 + �
 func save_gratitude() -> void:
 	var data := gratitude.to_dict()
 	data["version"] = GRATITUDE_VERSION
-	var file := FileAccess.open(GRATITUDE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(_path(GRATITUDE_FILE), FileAccess.WRITE)
 	if file == null:
 		push_warning("Fail to Save gratitude: %s" % FileAccess.get_open_error())
 		return
@@ -326,7 +339,7 @@ func save_gratitude() -> void:
 	file.close()
 
 func load_gratitude() -> void:
-	var file := FileAccess.open(GRATITUDE_PATH, FileAccess.READ)
+	var file := FileAccess.open(_path(GRATITUDE_FILE), FileAccess.READ)
 	if file == null:
 		return
 	var text := file.get_as_text()
@@ -338,7 +351,7 @@ func load_gratitude() -> void:
 func save_mood() -> void:
 	var data := mood.to_dict()
 	data["version"] = MOOD_VERSION
-	var file := FileAccess.open(MOOD_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(_path(MOOD_FILE), FileAccess.WRITE)
 	if file == null:
 		push_warning("Fail to Save mood: %s" % FileAccess.get_open_error())
 		return
@@ -346,7 +359,7 @@ func save_mood() -> void:
 	file.close()
 
 func load_mood() -> void:
-	var file := FileAccess.open(MOOD_PATH, FileAccess.READ)
+	var file := FileAccess.open(_path(MOOD_FILE), FileAccess.READ)
 	if file == null:
 		return
 	var text := file.get_as_text()

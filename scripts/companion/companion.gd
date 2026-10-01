@@ -6,6 +6,7 @@ extends Node
 
 signal todo_completed(ctx: Dictionary)
 signal habit_completed(ctx: Dictionary)
+signal todo_written(title: String)     # 빈 할 일에 글자가 처음 채워졌다 — 온보딩 4비트가 듣는다
 
 const VITALITY_TYPES := ["todo", "pomodoro_session", "timer"]   # 습관은 개수가 아니라 완료율로 따로 본다
 
@@ -20,6 +21,10 @@ func notify_todo_completed(event_id: int, todo: Todo, group: TodoGroup) -> void:
 		"title": todo.text,
 	})
 	
+# 할 일 적기 보고. 비어 있던 행에 글자가 처음 채워진 순간이다(docs/specs/onboarding.md 의 "할 일 적기 감지")
+func notify_todo_written(todo: Todo) -> void:
+	todo_written.emit(todo.text)
+
 # 습관 체크 보고. **habit_weeks에 반영한 뒤에** 부를 것 — remaining이 방금 것까지 반영해 계산된다
 func notify_habit_completed(habit: Habit) -> void:
 	var t := habit_today()
@@ -103,7 +108,7 @@ func is_first_time() -> bool:
 	return Save.activity_log.events.is_empty()      # 기록이 통째로 비면 첫 사용
 	
 func habit_today() -> Dictionary:                             # 오늘 활성 습관 수와 그중 체크된 수
-	var col := (int(Time.get_date_dict_from_system().weekday) + 6) % 7   # 일0..토6 → 월요일 시작
+	var col := (int(DateUtil.today_dict().weekday) + 6) % 7   # 일0..토6 → 월요일 시작
 	var checks := _week_checks(DateUtil.monday_iso())
 	var active := 0
 	var done := 0

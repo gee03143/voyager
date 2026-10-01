@@ -1,5 +1,8 @@
 extends HBoxContainer
 
+signal note_pinned               # 쪽지가 꽂혔다. 시메지 루트가 받아 수첩 적기를 시킨다(docs/specs/hazel-room.md)
+signal hazel_called              # 방을 눌러 헤이즐을 불렀다. 시메지 루트가 받는다(docs/specs/hazel-room.md)
+
 const TODO_SCENE := preload("res://scenes/todo/TodoListView.tscn")
 const HABIT_SCENE := preload("res://scenes/habittracker/HabitTrackerView.tscn")
 const TIMER_SCENE := preload("res://scenes/timer/TimerDashboard.tscn")
@@ -50,10 +53,28 @@ func _ready() -> void:
 	_nav.select(0)
 	_init_mini_widget()
 	banner.navigate_requested.connect(_on_banner_navigate)
+	banner.call_requested.connect(hazel_called.emit)
+	banner.note_pinned.connect(note_pinned.emit)
 
 # 시메지 우클릭 메뉴가 부른다. 인덱스는 NavList 순서(0=홈)다.
 func open_tool(index: int) -> void:
 	_nav.select(index)
+
+# 온보딩이 사이드바 항목을 가리킬 때 부른다. 창 안 캔버스 좌표다. 인덱스는 NavList 순서(0=홈)다.
+func nav_item_rect(index: int) -> Rect2:
+	return (nav_list.get_child(index) as Control).get_global_rect()
+
+# 온보딩이 부른다. @onready 대신 경로로 찾는다 — 셸이 트리에 붙기 전에도 불리기 때문이다.
+func set_banner_suspended(on: bool) -> void:
+	$MainColumn/Banner.set_suspended(on)
+
+# 온보딩 5비트가 헤이즐의 트렁크를 방에 놓을 때 부른다
+func hazel_room() -> Control:
+	return $MainColumn/Banner.room
+
+# 헤이즐 부르기의 대화가 도구로 안내할 때도 부른다. target 은 NAV_TARGETS 의 키다
+func navigate(target: StringName) -> void:
+	_on_banner_navigate(target)
 
 func _on_banner_navigate(target: StringName) -> void:
 	if NAV_TARGETS.has(target):

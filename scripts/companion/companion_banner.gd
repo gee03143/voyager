@@ -6,6 +6,8 @@ extends PanelContainer
 # _event_id 는 노트를 달 대상만 가리킨다(습관 반응은 id가 없어 0).
 
 signal navigate_requested(target: StringName)
+signal note_pinned                      # 완료 반응의 쪽지가 꽂혔다 — 바탕화면의 헤이즐이 수첩에 적는다
+signal call_requested                    # 방을 눌렀다 — 헤이즐을 부른다(docs/specs/hazel-room.md 의 "헤이즐 부르기")
 
 const CHAR_SEC := 0.025         # 글자당 타이핑 시간
 const MAX_TYPE_SEC := 0.8       # 문장 전체 상한 — 영어 긴 문장이 늘어지지 않게
@@ -14,6 +16,15 @@ const FADE_OUT_SHORT_SEC := 0.08  # 아직 안 끝난 말을 거두는 시간
 const OPTIONS_FADE_SEC := 0.15  # 말이 끝난 뒤 선택지가 스며드는 시간
 const VOICE_EVERY := 3          # 글자마다 울리면 시끄럽다
 const VOICE_MIN_GAP_MS := 60    # 상한에 걸려 빨라져도 소리가 몰리지 않게
+const ROOM_SCRIPT := preload("res://scripts/room/hazel_room.gd")
+const BUBBLE_W := 380.0         # 방을 가리지 않도록 쪽지를 오른쪽에 이 폭으로 붙인다
+const TACK_SCRIPT := preload("res://scripts/room/note_tack.gd")
+const STAMP_SIZE := 72.0        # 쪽지에 겹쳐 찍히는 도장 크기
+const STAMP_OVERLAP := -22      # 쪽지와 도장 사이 간격. 음수라 도장이 쪽지 끝에 겹친다
+const NOTE_PAPER := Color("#FFFDF4")
+const NOTE_EDGE := Color("#D8CDB8")
+const NOTE_INK := Color("#3A3128")
+const NOTE_USER_INK := Color("#2C5578")
 
 @onready var message_label: Label = $Margin/HBox/Bubble/BubbleMargin/VBox/MessageLabel
 @onready var meta_label: Label = $Margin/HBox/Bubble/BubbleMargin/VBox/MetaLabel
@@ -37,14 +48,36 @@ var _voice_next := 0            # 다음으로 발화음을 낼 글자 인덱스
 var _voice_last_ms := 0
 var _said := ""                 # 지금 떠 있는 문구 줄
 var _said_meta := ""            # 지금 떠 있는 보조 줄 — 둘 다 같을 때만 다시 안 찍는다
+var _suspended := false         # 온보딩 동안 — 쪽지를 꽂지 않고 어떤 반응도 그리지 않는다(발화음도 안 난다)
+var room: Control               # 헤이즐의 방. 온보딩이 트렁크를 놓는다
+
+## 온보딩이 배너를 멈추고 되살린다(docs/specs/onboarding.md).
+## 멈춘 동안 방은 헤이즐이 오기 전 모습이다 — 트렁크도 수첩도 없다. 쪽지는 거둔다.
+## 트리에 붙기 전에도 부를 수 있다 — 붙자마자 _ready 가 첫 문구를 찍으며 소리를 내기 때문이다.
+func set_suspended(on: bool) -> void:
+	_suspended = on
+	if not is_node_ready():
+		return                  # _build_room 이 _suspended 를 보고 방을 맞춘다
+	_apply_arrival()
+	if on:
+		_set_note_pinned(false)
+		return
+	_said = ""                  # 멈춰 있던 사이의 문구와 같더라도 다시 찍는다
+	_said_meta = ""
+	_refresh()
+
+func _apply_arrival() -> void:
+	room.show_trunk = not _suspended
+	room.show_notebooks = not _suspended
 
 func _ready() -> void:
+	_build_room()
 	stamp.pivot_offset = stamp.custom_minimum_size / 2.0   # 중심 기준 스케일
 	stamp.modulate.a = 0.0                                 # 자리는 유지하고 안 보이게만
 	# 기본값 VC_CHARS_BEFORE_SHAPING은 숨긴 글자를 줄바꿈·크기 계산에서 뺀다(TextServer.xml).
 	# autowrap 라벨이라 그대로 두면 찍히는 동안 줄이 계속 다시 접혀 말풍선이 튄다.
 	message_label.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
-	# 배너 전체가 스킵 대상이다. Label은 IGNORE, TextureRect는 PASS라 그대로 통과하지만
+	# 배너 전체가 클릭 대상이다(쪽지 위는 스킵, 방은 부르기). Label은 IGNORE, TextureRect는 PASS라 그대로 통과하지만
 	# PanelContainer와 Control은 기본이 STOP이라 여기서 열어줘야 클릭이 배너까지 온다.
 	# NoteEdit(TextEdit)은 STOP으로 둔다 — 노트를 쓰는 중에 스킵이 먹으면 안 된다.
 	bubble.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -62,13 +95,74 @@ func _ready() -> void:
 	Clock.timer.running_changed.connect(_on_activity_changed)
 	_refresh()
 
+# --- 헤이즐의 방(docs/specs/hazel-room.md) ---
+# 배너 뒤에 방을 깔고 아바타를 뺀다. 말풍선은 방 벽에 꽂힌 쪽지가 된다 — 헤이즐이 남기고 간 글이다.
+# 씬은 고치지 않는다. 배너는 PanelContainer 라 첫 자식으로 넣으면 같은 사각형에 깔린다.
+func _build_room() -> void:
+	room = ROOM_SCRIPT.new()
+	add_child(room)
+	move_child(room, 0)                            # 쪽지 뒤에 깔린다
+	_apply_arrival()
+	avatar_slot.visible = false                    # 방에 헤이즐을 그리지 않는다. 몸은 바탕화면에 있다
+	# 쪽지가 폭을 다 차지하면 방이 가려진다. 오른쪽에 좁게 붙이고 왼쪽을 방에 내준다
+	bubble.size_flags_horizontal = Control.SIZE_SHRINK_END
+	bubble.custom_minimum_size.x = BUBBLE_W
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_PASS   # 클릭이 배너까지 와야 한다(아래 _on_banner_input)
+	spacer.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND   # 방은 누를 수 있다
+	bubble.get_parent().add_child(spacer)
+	bubble.get_parent().move_child(spacer, bubble.get_index())
+	_style_note()
+
+
+## 말풍선을 쪽지로 꾸민다. 종이·그림자·압정, 헤이즐의 글씨는 명조, 유저가 남기는 줄은 파란 글씨
+func _style_note() -> void:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = NOTE_PAPER
+	sb.border_color = NOTE_EDGE
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(3)
+	sb.shadow_color = Color(0, 0, 0, 0.10)
+	sb.shadow_size = 3
+	sb.shadow_offset = Vector2(1, 2)
+	bubble.add_theme_stylebox_override("panel", sb)
+	bubble.add_child(TACK_SCRIPT.new())            # 쪽지 크기에 맞춰지고 위 가운데에 압정만 그린다
+	var serif := SystemFont.new()
+	serif.font_names = PackedStringArray(["Noto Serif KR", "Nanum Myeongjo", "Batang", "serif"])
+	message_label.add_theme_font_override("font", serif)
+	message_label.add_theme_color_override("font_color", NOTE_INK)
+	note_edit.add_theme_color_override("font_color", NOTE_USER_INK)
+	# 도장은 쪽지에 찍힌다. 작게 줄여 쪽지 오른쪽 끝에 겹쳐 둔다
+	stamp_slot.custom_minimum_size = Vector2.ONE * STAMP_SIZE
+	stamp_slot.size_flags_vertical = Control.SIZE_SHRINK_CENTER   # 칸이 쪽지 높이로 늘어나면 도장도 따라 커진다
+	stamp.custom_minimum_size = Vector2.ONE * STAMP_SIZE
+	# 기본 expand_mode 는 텍스처 원본 크기(120) 아래로 줄어들지 않는다. 칸에 맞춰 줄이고 비율은 지킨다
+	stamp.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	stamp.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	bubble.get_parent().add_theme_constant_override("separation", STAMP_OVERLAP)
+
+
+## 세션이 도는 동안에는 쪽지를 꽂지 않는다. 말 걸지 않는다(hazel-room.md 의 "집중 세션")
+func _set_note_pinned(on: bool) -> void:
+	bubble.visible = on
+	if not on:
+		_kill_stamp_tween()
+		stamp.modulate.a = 0.0                     # 도장은 쪽지에 찍힌 것이다. 쪽지를 거두면 같이 거둔다
+
 # --- 대기 ---
 func _refresh() -> void:
 	_event_id = 0                                  # 먼저 지워야 note_edit이 숨겨질 때 헛커밋이 안 남
 	_held = false
-	if Clock.is_active():
-		_apply(CompanionEngine.focusing())         # 진행 중엔 말 걸지 않음
+	if _suspended:
+		_set_note_pinned(false)                    # 온보딩 동안은 쪽지가 없다
 		return
+	if Clock.is_active():
+		_set_note_pinned(false)                    # 진행 중엔 말 걸지 않음. 쪽지를 거두고 방의 램프만 켜진다
+		_said = ""                                 # 세션이 끝나면 대기 문구를 처음부터 다시 찍는다
+		_said_meta = ""
+		return
+	_set_note_pinned(true)
 	_apply(CompanionEngine.idle(
 		Companion.today_done_count(), Companion.last_activity(), Companion.habit_today()))
 
@@ -95,18 +189,30 @@ func _on_session_logged(event_id: int) -> void:
 	_event_id = event_id
 	_held = true
 	_apply(CompanionEngine.session_done(e))
+	_notify_pinned()
 
 func _on_todo_completed(ctx: Dictionary) -> void:
+	if Clock.is_active():
+		return                                     # 세션 중에는 쪽지를 꽂지 않는다
 	_commit_note()
 	_event_id = int(ctx.get("event_id", 0))
 	_held = true
 	_apply(CompanionEngine.todo_done(ctx), str(ctx.get("title", "")))   # 제목은 문장이 아니라 보조 줄로
+	_notify_pinned()
 
 func _on_habit_completed(ctx: Dictionary) -> void:
+	if Clock.is_active():
+		return                                     # 세션 중에는 쪽지를 꽂지 않는다
 	_commit_note()
 	_event_id = 0                                  # 습관은 활동 로그에 없어 노트를 달 수 없음
 	_held = true
 	_apply(CompanionEngine.habit_done(ctx), str(ctx.get("title", "")))
+	_notify_pinned()
+
+## 완료 반응만 알린다. 대기 문구·대화는 쪽지를 새로 꽂는 일이 아니다. 멈춘 동안(온보딩)은 꽂지 않았으니 알리지 않는다
+func _notify_pinned() -> void:
+	if not _suspended:
+		note_pinned.emit()
 
 func _show_note() -> void:
 	_kill_type_tween()
@@ -131,6 +237,9 @@ func _show_note() -> void:
 
 # --- 엔진 반응 적용 ---
 func _apply(r: Dictionary, meta: String = "") -> void:
+	if _suspended:
+		return                                     # 모든 반응이 여기를 지난다 — 한 곳에서 막는다
+	_set_note_pinned(true)                         # 세션 완료 반응은 세션이 끝난 뒤에 온다. 거둬둔 쪽지를 다시 꽂는다
 	# 보조 줄·선택지·도장은 여기서 안 건드린다 — 전부 문구와 같은 박자로 움직여야 한다.
 	note_edit.visible = false
 	_pending_reward = bool(r["reward"])
@@ -157,8 +266,7 @@ func _on_action(action: int, arg: StringName = &"") -> void:
 			_commit_note()
 			_refresh()
 		CompanionEngine.Action.TALK:
-			_held = true
-			_apply(CompanionEngine.talk_open(Companion.today_done_count(), Companion.is_first_time()))
+			call_requested.emit()                  # 대화는 쪽지가 아니라 대화 모드에서 한다. 방을 누른 것과 같다
 		CompanionEngine.Action.TALK_NODE:
 			_apply(CompanionEngine.talk_node(arg, Companion.habit_today()))
 		CompanionEngine.Action.GOTO_TODO:
@@ -251,10 +359,19 @@ func _start_typing(text: String) -> void:
 	_type_tween.tween_method(_set_typed, 0.0, float(_total_chars), minf(_total_chars * CHAR_SEC, MAX_TYPE_SEC))
 	_type_tween.tween_callback(_finish_typing)
 
-# --- 스킵 ---
+# --- 스킵 · 부르기 ---
+# 쪽지와 도장 위는 스킵, 그 밖(방)은 부르기다. 쪽지 안의 Label·여백도 PASS 로 배너까지 올라오므로 자리로 가른다
 func _on_banner_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		_skip()
+		if _on_note(get_global_transform() * (event as InputEventMouseButton).position):   # gui_input 의 position 은 배너 기준이다
+			_skip()
+		else:
+			call_requested.emit()
+
+func _on_note(at: Vector2) -> bool:
+	if not bubble.visible:
+		return false                               # 세션 중엔 쪽지가 없다. 방 전체가 부르기다
+	return bubble.get_global_rect().has_point(at) or stamp_slot.get_global_rect().has_point(at)
 
 func _skip() -> void:
 	if not _is_speaking():

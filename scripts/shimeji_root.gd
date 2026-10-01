@@ -8,6 +8,10 @@ extends Node2D
 
 const VIEW_SCRIPT := preload("res://scripts/companion/shimeji_view.gd")
 const MAIN_SHELL := preload("res://scenes/MainShell.tscn")
+const ONBOARDING_SCRIPT := preload("res://scripts/onboarding/onboarding_player.gd")
+const STAGE_SCRIPT := preload("res://scripts/onboarding/desktop_stage.gd")
+const CALL_SCRIPT := preload("res://scripts/room/hazel_call.gd")
+const CONSOLE_SCRIPT := preload("res://scripts/dev/dev_console.gd")
 
 const WIN_SIZE := Vector2i(280, 340)
 const FOOT_MARGIN := 40              # 발바닥이 창 아래에서 이만큼 위에 선다
@@ -27,6 +31,7 @@ const WALK_SPEED := 46.0                             # 초당 픽셀
 const WALK_TIME_RELEASE := Vector2(12.0, 25.0)
 const WALK_TIME_DEBUG := Vector2(7.0, 12.0)
 const MENU_QUIT_ID := 100
+const AWAY_POS := Vector2i(-20000, -20000)           # 헤이즐이 방에 불려가 있는 동안의 창 자리. 모든 모니터 밖
 
 ## 우클릭 메뉴. 값은 NavList 순서이고 0 이 홈이다.
 const MENU_ITEMS := [
@@ -42,6 +47,10 @@ var _view: Node2D
 var _shell: Window
 var _main_shell: Node
 var _menu: PopupMenu
+var _onboarding: Node                 # 재생 중일 때만 있다
+var _stage: Node2D                    # 온보딩 동안의 바탕화면 무대
+var _call: Node                       # 헤이즐이 방에 불려가 있는 동안만 있다
+var _call_from := Vector2i.ZERO       # 불려가기 직전의 창 자리. 걷기는 자리를 저장하지 않아 따로 기억한다
 
 var _press := Press.NONE
 var _drag_offset := Vector2i.ZERO     # 커서에서 창 좌상단까지의 거리
@@ -64,10 +73,115 @@ func _ready() -> void:
 	get_tree().root.gui_embed_subwindows = false   # 셸을 진짜 OS 창으로 띄운다
 	_setup_root_window()
 	_build_view()
+	var onboarding := not Save.settings.onboarded
+	if onboarding:
+		# 셸이 트리에 붙기 전에 멈춘다. 붙자마자 배너가 첫 문구를 찍으며 소리를 낸다
+		_main_shell = MAIN_SHELL.instantiate()
+		_main_shell.set_banner_suspended(true)
 	_build_shell()
 	_build_menu()
+	if OS.is_debug_build():
+		var console := CONSOLE_SCRIPT.new()     # 개발자 콘솔. 셸 창에서 F12(docs/specs/dev-console.md)
+		add_child(console)
+		console.setup(_shell)
+	_main_shell.hazel_called.connect(_call_hazel)
+	_main_shell.note_pinned.connect(_on_note_pinned)
 	_view.act_finished.connect(_schedule_act)
 	_schedule_act()
+	if onboarding:
+		_start_onboarding()
+
+
+# ── 온보딩(docs/specs/onboarding.md) ──
+
+## 온보딩 동안 이 창은 바탕화면 무대가 된다(desktop_stage.gd). 만지기·메뉴·자기 일은 멈춘다.
+## 헤이즐이 셸 안에 있는 동안은 창을 숨기지 않고 헤이즐을 그리지 않는다 —
+## 투명 창에 그려진 것이 없으면 비어 보이고 클릭도 통과한다
+func _start_onboarding() -> void:
+	_view.visible = false
+	_stage = STAGE_SCRIPT.new()
+	_stage.setup(_view, WIN_SIZE, FOOT_MARGIN)
+	add_child(_stage)                     # 헤이즐 뒤에 붙어 트렁크·말풍선이 헤이즐 위에 그려진다
+	_onboarding = ONBOARDING_SCRIPT.new()
+	add_child(_onboarding)
+	_onboarding.ended.connect(_on_onboarding_ended)
+	_onboarding.start(_shell, _main_shell, _stage)
+
+
+## 완료든 중단(셸 닫기)이든 헤이즐은 바탕화면으로 돌아온다. onboarded 는 완료일 때만 남긴다 —
+## 중단이면 다음 실행에서 처음부터 다시 재생된다(docs/specs/onboarding.md 의 "중단")
+func _on_onboarding_ended(completed: bool) -> void:
+	_onboarding.queue_free()
+	_onboarding = null
+	remove_child(_stage)
+	_stage.queue_free()
+	_stage = null
+	var w := get_window()
+	w.size = WIN_SIZE
+	w.content_scale_size = WIN_SIZE
+	_view.position = Vector2(WIN_SIZE.x * 0.5, FOOT_LINE)
+	_view.scale = Vector2.ONE
+	_view.face = VIEW_SCRIPT.Face.NONE
+	if completed:
+		Save.settings.onboarded = true
+		Save.settings.changed.emit()   # 전역 설정은 save-on-change
+		_save_position()               # 5비트에서 헤이즐이 걸어간 자리가 곧 시메지 자리다
+	else:
+		# 셸 단계에서는 이 창이 모든 모니터 밖에 있다(desktop_stage.gd 의 close_stage). 그대로 기본 자리를 구하면
+		# 엉뚱한 모니터가 잡힌다 — 셸이 있는 모니터로 먼저 옮겨두고 구한다
+		w.current_screen = _shell.current_screen
+		w.position = _restored_position()
+	_main_shell.set_banner_suspended(false)
+	_view.visible = true
+	_schedule_act()
+
+
+func _is_onboarding() -> bool:
+	return _onboarding != null
+
+
+# ── 헤이즐 부르기(docs/specs/hazel-room.md) ──
+
+## 방을 눌렀다. 헤이즐은 한 번에 한 곳에만 있다 — 시메지를 거두고 셸의 대화 모드로 들어간다.
+## 주 창은 숨길 수 없어 모든 모니터 밖으로 옮긴다(docs/architecture/transparent-window.md)
+func _call_hazel() -> void:
+	if _is_away() or _falling or _press != Press.NONE:
+		return
+	_walk_left = 0.0
+	_view.stop_act()
+	var w := get_window()
+	_call_from = w.position
+	_view.visible = false
+	w.position = AWAY_POS
+	_call = CALL_SCRIPT.new()
+	add_child(_call)
+	_call.ended.connect(_on_call_ended)
+	_call.start(_shell, _main_shell)
+
+
+## 대화가 끝났거나 셸이 닫혔다. 불려가기 직전 자리로 돌아와 내려앉는다
+func _on_call_ended() -> void:
+	_call.queue_free()
+	_call = null
+	get_window().position = _call_from
+	_view.visible = true
+	_view.land()
+	_schedule_act()
+
+
+## 방에 쪽지가 꽂혔다. 바탕화면의 헤이즐이 수첩을 꺼내 적는다 — 몸과 쪽지가 이어진다.
+## 다른 일을 하는 중이면(자기 일·만지기·떨어지기·자리 비움) 동작은 생략하고 쪽지만 꽂힌다
+func _on_note_pinned() -> void:
+	if _is_away() or _falling or _press != Press.NONE:
+		return
+	if _view.is_acting() or _view.pose != VIEW_SCRIPT.Pose.IDLE:
+		return
+	_view.start_act(VIEW_SCRIPT.Act.WRITE)
+
+
+## 헤이즐이 바탕화면에 없다. 온보딩 중이거나 방에 불려가 있다
+func _is_away() -> bool:
+	return _is_onboarding() or _call != null
 
 
 func _setup_root_window() -> void:
@@ -107,7 +221,8 @@ func _build_shell() -> void:
 	_shell.title = "Voyager"
 	_shell.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	_shell.size = Save.settings.window_size
-	_main_shell = MAIN_SHELL.instantiate()
+	if _main_shell == null:                        # 온보딩이면 미리 만들어 배너를 멈춰둔 것이 있다
+		_main_shell = MAIN_SHELL.instantiate()
 	_shell.add_child(_main_shell)
 	add_child(_shell)
 	_shell.close_requested.connect(_shell.hide)    # 닫기는 숨기기다. 앱은 안 끝난다
@@ -140,6 +255,8 @@ func show_shell() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _is_away():
+		return                          # 만지기·우클릭 메뉴를 막는다. 온보딩 중 메뉴로 할 일 도구가 먼저 만들어지면 안 된다
 	if event is InputEventMouseButton:
 		_on_button(event as InputEventMouseButton)
 	elif event is InputEventMouseMotion and _press != Press.NONE:
@@ -249,6 +366,8 @@ func _tick_act(delta: float) -> void:
 		return
 	if _press != Press.NONE or _falling:
 		return                      # 만지는 중에는 자기 일을 시작하지 않는다
+	if _is_away():
+		return
 	_act_wait -= delta
 	if _act_wait > 0.0:
 		return
