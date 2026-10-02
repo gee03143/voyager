@@ -35,6 +35,9 @@ const WALK_TIME_RELEASE := Vector2(12.0, 25.0)
 const WALK_TIME_DEBUG := Vector2(7.0, 12.0)
 const MENU_QUIT_ID := 100
 const AWAY_POS := Vector2i(-20000, -20000)           # 헤이즐이 방에 불려가 있는 동안의 창 자리. 모든 모니터 밖
+## 클릭을 받는 영역. 발바닥 기준이다. 몸 전체를 덮어야 한다 — 영역 밖은 클릭뿐 아니라 그리기도 잘린다.
+## 리그는 꼬리 끝 x ±63, 귀 끝 y −161 까지다(shimeji_view.gd / shimeji_part.gd). 조금 넉넉히 둔다
+const HIT_BOX := Rect2(-70, -172, 140, 186)
 const DESK_WALK_SPEED := 120.0                       # 나가고 들어오는 걸음. 평소 걷기보다 빠르다 — 떠나는 데 오래 걸리면 미련으로 읽힌다
 
 ## 우클릭 메뉴. 값은 NavList 순서이고 0 이 홈이다.
@@ -75,6 +78,7 @@ var _walk_left := 0.0
 var _desk := Desk.HERE
 var _desk_x := 0.0                    # 나가고 들어오는 걸음의 창 x. 정수 자리로 반올림하면 느린 프레임에서 멈춘다
 var _desk_to := 0.0
+var _hit_clipped := false             # 창 영역을 HIT_BOX 로 잘라 두었는가
 var _desk_walk := false               # 바탕화면 걸음이 준비됐다. 들어오기 전 방에서 걸어 나가는 동안은 거짓이다
 
 
@@ -370,7 +374,7 @@ func _build_menu() -> void:
 
 func _on_menu_id(id: int) -> void:
 	if id == MENU_QUIT_ID:
-		get_tree().quit()
+		Save.quit_game()                    # 밀린 쓰기·플레이 시간까지 저장하고 끝낸다. get_tree().quit() 는 저장을 건너뛴다
 		return
 	show_shell()
 	if _main_shell != null and _main_shell.has_method("open_tool"):
@@ -481,6 +485,24 @@ func _process(delta: float) -> void:
 		_tick_fall(delta)
 	_tick_desk(delta)
 	_tick_act(delta)
+	_update_hit_area()
+
+
+## 투명 창은 그려진 픽셀이 아니라 창 사각형 전체가 클릭을 받는다 — 엔진이 DwmEnableBlurBehindWindow 로만
+## 투명을 만들고 픽셀 단위 판정을 하지 않는다(4.6 display_server_windows.cpp). 그래서 몸 둘레로 창 영역을 자른다.
+## 들어 올려 흔드는 동안·떨어지는 동안은 몸이 상자를 벗어나므로 풀어 둔다. 온보딩은 창이 무대가 되므로 풀어 둔다
+func _update_hit_area() -> void:
+	var clip := not _is_onboarding() and not _falling and not (_press == Press.DRAGGING and _drag_moved)
+	if clip == _hit_clipped:
+		return
+	_hit_clipped = clip
+	if not clip:
+		get_window().mouse_passthrough_polygon = PackedVector2Array()
+		return
+	var r := Rect2(_view.position + HIT_BOX.position, HIT_BOX.size)
+	get_window().mouse_passthrough_polygon = PackedVector2Array([
+		r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y),
+	])
 
 
 ## 다음 자기 일까지의 대기. 행동이 끝날 때마다 다시 잡는다
