@@ -34,22 +34,18 @@ func bind_shell(window: Window) -> void:
 	apply_window_mode()
 
 
+## 셸은 늘 일반 창이다. 저장된 window_mode 는 읽지 않는다(docs/specs/settings.md 의 "뺀 항목") —
+## 설정에서 항목을 뺐으니 이미 전체화면으로 저장된 파일이면 되돌릴 길이 없어진다
 func apply_window_mode() -> void:
 	if _shell == null:
 		return
-	match Save.settings.window_mode:
-		Mode.FULLSCREEN:
-			_shell.mode = Window.MODE_EXCLUSIVE_FULLSCREEN
-		Mode.BORDERLESS:
-			_shell.mode = Window.MODE_FULLSCREEN
-		_:
-			_shell.mode = Window.MODE_WINDOWED
-			apply_window_size()
+	_shell.mode = Window.MODE_WINDOWED
+	apply_window_size()
 	apply_always_on_top()
 
 
 func apply_window_size() -> void:
-	if _shell == null or Save.settings.window_mode != Mode.WINDOWED:
+	if _shell == null:
 		return
 	_shell.size = Save.settings.window_size
 	_center()
@@ -67,10 +63,11 @@ func apply_fps(focused: bool) -> void:
 		Engine.max_fps = maxi(Save.settings.fps_unfocused, SHIMEJI_MIN_FPS)
 
 
+## 늘 끈다. 저장된 always_on_top 은 읽지 않는다 — 상주하는 역할은 시메지가 맡았다(docs/specs/settings.md)
 func apply_always_on_top() -> void:
 	if _shell == null:
 		return
-	_shell.always_on_top = Save.settings.always_on_top
+	_shell.always_on_top = false
 
 
 # --- 폐기 예정 ---

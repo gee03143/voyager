@@ -295,3 +295,17 @@ HOME_FOCUS_TITLE,오늘 집중,Focus today
 HOME_FOCUS_VALUE,{min}분 · {n}회,{min} min · {n} sessions
 HOME_FOCUS_EMPTY,오늘 집중한 기록이 없어요,No focus sessions today
 HOME_MORE,+{n}개,+{n} more
+SETTINGS_TAB_GENERAL,일반,General
+SETTINGS_TAB_HAZEL,헤이즐,Hazel
+SETTINGS_WINDOW_SIZE,창 크기,Window size
+SETTINGS_VOLUME,음량,Volume
+SETTINGS_ALARM_SOUND,알람 소리,Alarm sound
+SETTINGS_SOUND_SET,세트 {n},Set {n}
+SETTINGS_QUIT,Voyage 종료,Quit Voyage
+SETTINGS_NICKNAME,호칭,What Hazel calls you
+SETTINGS_NICKNAME_EMPTY,비우면 부르지 않아요,Leave empty for no name
+SETTINGS_VOICE_VOLUME,목소리 음량,Voice volume
+SETTINGS_BIRTHDAY,생일,Birthday
+SETTINGS_BIRTHDAY_NONE,—,—
+SETTINGS_BIRTHDAY_MONTH,{m}월,{m}
+SETTINGS_BIRTHDAY_DAY,{d}일,{d}

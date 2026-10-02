@@ -40,6 +40,9 @@ var onboarded: bool = false
 var nickname: String = ""                # 헤이즐이 부르는 호칭. 비우면 부르지 않는다
 var onboarded_in_file := false           # 불러온 파일에 onboarded 키가 있었는가 — 저장하지 않는다
 
+# 설정의 헤이즐 탭(docs/specs/settings.md)
+var birthday: String = ""                # "MM-DD". 연도는 받지 않는다. 비우면 없음
+
 func to_dict() -> Dictionary:
 	return {
 		"focus_seconds": focus_seconds,
@@ -63,6 +66,7 @@ func to_dict() -> Dictionary:
 		"companion_position": [companion_position.x, companion_position.y],
 		"onboarded": onboarded,
 		"nickname": nickname,
+		"birthday": birthday,
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -100,3 +104,4 @@ func from_dict(d: Dictionary) -> void:
 	onboarded_in_file = d.has("onboarded")
 	onboarded = bool(d.get("onboarded", onboarded))
 	nickname = str(d.get("nickname", nickname))
+	birthday = str(d.get("birthday", birthday))

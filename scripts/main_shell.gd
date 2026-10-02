@@ -10,6 +10,7 @@ const TIMER_SCENE := preload("res://scenes/timer/TimerDashboard.tscn")
 const RECORD_SCENE := preload("res://scenes/record/RecordDashboard.tscn")
 const JOURNAL_SCENE := preload("res://scenes/record/journal/JournalDashboard.tscn")
 const HOME_SCENE := preload("res://scenes/home/HomeView.tscn")
+const SETTINGS_SCENE := preload("res://scenes/option/SettingsView.tscn")
 
 const NAV_TARGETS := {&"todo": 1, &"habit": 2, &"timer": 3, &"record": 5, &"journal": 4}
 
@@ -21,6 +22,7 @@ const SWAP_ENTER_SEC := 0.35
 const NAV_FILL_SEC := 0.18
 
 @onready var nav_list: VBoxContainer = $Sidebar/Margin/VBox/NavList
+@onready var settings_button: Button = $Sidebar/Margin/VBox/SettingsButton
 @onready var content_area: PanelContainer = $MainColumn/BodyRow/ContentArea
 
 @onready var sidebar: PanelContainer = $Sidebar
@@ -37,6 +39,7 @@ const CONTENT_SCENES := {
 	3: TIMER_SCENE,
 	4: JOURNAL_SCENE,
 	5: RECORD_SCENE,
+	6: SETTINGS_SCENE,     # ⚙. NavList 밖에 있지만 같은 선택 묶음의 마지막이다(docs/specs/settings.md)
 }
 
 var _nav := ButtonGroupNav.new()
@@ -55,7 +58,10 @@ func _ready() -> void:
 	var home := PanelPool.get_instance(HOME_SCENE, null)
 	home.verdict_requested.connect(verdict_requested.emit)
 	home.navigate_requested.connect(navigate)
-	_nav.setup_from(nav_list, false, NAV_FILL_SEC)
+	# NavList 의 0~5 뒤에 ⚙ 를 6번으로 붙인다. 앞 번호가 그대로라 온보딩·시메지 메뉴의 인덱스가 안 바뀐다
+	var nav_buttons: Array = nav_list.get_children().filter(func(c: Node) -> bool: return c is BaseButton)
+	nav_buttons.append(settings_button)
+	_nav.setup(nav_buttons, false, NAV_FILL_SEC)
 	_nav.selected.connect(_on_nav_selected)
 	_nav.select(0)
 	_init_mini_widget()
