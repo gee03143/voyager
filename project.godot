@@ -39,6 +39,10 @@ window/stretch/aspect="expand"
 window/per_pixel_transparency/allowed=true
 window/vsync/vsync_mode=0
 
+[editor]
+
+run/main_run_args="--sandbox-empty"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/run_mode/plugin.cfg")

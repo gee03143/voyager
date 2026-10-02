@@ -265,3 +265,23 @@ ONB_B3_OPT_RIGHT,맞아요.,That's right.
 ONB_B3_OPT_WRONG,"아, 잘못 적었어요.","Oh, I typed it wrong."
 ONB_B3_MISHEARD,"아, 제가 잘못 들었나 봐요.","Oh, I must have misheard."
 ONB_B3_AGAIN,다시 한 번 알려주세요.,Please tell me once more.
+VERDICT_ASK,오늘은... 뭐라고 이름 붙일까요?,So... what should we call today?
+VERDICT_HELD,잘 쥐고 보낸 날,A day I held on to
+VERDICT_ENDURED,버틴 날,A day I got through
+VERDICT_DRIFTED,흘려보낸 날,A day that slipped by
+VERDICT_OPT_CUSTOM,(직접 적는다),(Write my own)
+VERDICT_OPT_LATER,...나중에요,...Later
+VERDICT_CUSTOM_HINT,오늘의 이름,Today's name
+VERDICT_CUSTOM_OK,(적어준다),(Write it down)
+VERDICT_CUSTOM_BACK,...역시 나중에요,...Later after all
+VERDICT_KEEP,네. 넣어둘게요.,Okay. I'll put it away.
+VERDICT_LATER_RE,네. 수첩은 여기 둘게요.,Okay. I'll leave the notebook right here.
+VERDICT_ALREADY,오늘 건 벌써 넣어뒀어요.,Today's is already put away.
+HOME_VERDICT_OPEN,오늘은 아직 이름이 없어요,Today doesn't have a name yet
+HOME_VERDICT_CALL,헤이즐에게 말하기,Tell Hazel
+HOME_VERDICT_LAST,마지막으로 붙인 이름,The last name you gave
+HOME_VERDICT_RECENT,최근에 붙인 이름,Recent names
+HOME_VERDICT_TOTAL,이름 붙인 날 {n}일,{n} days named
+VERDICT_STAMP_HELD,쥠,H
+VERDICT_STAMP_ENDURED,버,G
+VERDICT_STAMP_DRIFTED,흘,S

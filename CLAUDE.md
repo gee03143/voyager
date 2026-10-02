@@ -83,8 +83,8 @@ Claude가 "이건 ADR감입니다"라고 **제안**하고, 승인받으면 작�
 ## 아키텍처 원칙 (확립됨)
 - **메커니즘 vs 뷰/컨트롤러 분리**: 메커니즘(`Pomodoro`/`SimpleTimer`/`AlarmClock`, 지속시간 타이밍은 `Timers`)은 `Save`·전역을 **모름**(재사용·테스트 가능). 뷰/컨트롤러가 `Save`를 알고 배선한다
 - **공통 뷰 동작은 베이스로 추출**(`ClockToolView`). 원칙: "하나만 보고 일반화 안 함 → **두 번째 사례에서** 추출"
-- **저장 정책**: 세션 duration = save-on-start / 전역 설정 = save-on-change(`AppSettings.changed`→`Save`) / 알람·Todo·습관 = 디바운스 저장(0.5s)
-- 결합도: 알림은 **signal**, 단일 진실은 **`Save`**(autoload) — 저장 파일은 `save.json`/`records.json`/`journal.json`/`todo.json`/`gratitude.json`/`mood.json` **6개**로 분리
+- **저장 정책**: 세션 duration = save-on-start / 전역 설정 = save-on-change(`AppSettings.changed`→`Save`) / 알람·Todo·습관 = 디바운스 저장(0.5s) / 하루 판정 = save-on-change
+- 결합도: 알림은 **signal**, 단일 진실은 **`Save`**(autoload) — 저장 파일은 `save.json`/`records.json`/`journal.json`/`todo.json`/`gratitude.json`/`mood.json`/`verdict.json` **7개**로 분리
 - 다국어: 원본 문자열=키, 문장 통째로 포맷(조각 연결 금지)
 - 미래 서버/sync 대비: 단일 진실(`Save`)·JSON·`version` 필드
-  **안정 ID**: Todo·알람은 스냅샷(ID 없음) 유지. 습관·저널·기록·편지는 ID 도입(`IdGen`, randi 정수). 도입 기준 = 항목을 정체성으로 다뤄야 할 때(반복·참조·sync)
+  **안정 ID**: Todo·알람은 스냅샷(ID 없음) 유지. 습관·저널·기록·편지·하루 판정은 ID 도입(`IdGen`, randi 정수). 도입 기준 = 항목을 정체성으로 다뤄야 할 때(반복·참조·sync)

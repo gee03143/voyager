@@ -12,8 +12,11 @@ const GRATITUDE_FILE := "gratitude.json"
 const GRATITUDE_VERSION := 1
 const MOOD_FILE := "mood.json"
 const MOOD_VERSION := 1
+const VERDICT_FILE := "verdict.json"
+const VERDICT_VERSION := 1
 # class_name 은 전역 목록에 오르기 전까지 파스 단계에서 안 잡힌다. preload 로 직접 가리킨다
 const SANDBOX := preload("res://scripts/dev/sandbox.gd")
+const DAY_VERDICT := preload("res://scripts/data/day_verdict.gd")
 const DISK_DEBOUNCE := 0.5        # 디스크 쓰기만 합친다. 모델은 항상 즉시 갱신된다
 
 var voyage := Voyage.new()
@@ -23,6 +26,7 @@ var activity_log := ActivityLog.new()
 var journal := Journal.new()
 var gratitude := Gratitude.new()
 var mood := Mood.new()
+var verdict := DAY_VERDICT.new()
 var settings := AppSettings.new()
 var alarms: Array[Alarm] = []
 var todo_groups: Array[TodoGroup] = []
@@ -56,6 +60,8 @@ func _ready() -> void:
 		load_gratitude()
 	if FileAccess.file_exists(_path(MOOD_FILE)):
 		load_mood()
+	if FileAccess.file_exists(_path(VERDICT_FILE)):
+		load_verdict()
 	if todo_groups.is_empty():
 		var g := TodoGroup.new()
 		g.is_default = true
@@ -88,6 +94,7 @@ func _ready() -> void:
 	save_todo()
 	save_gratitude()
 	save_mood()
+	save_verdict()
 	settings.changed.connect(save_game)
 	voyage.changed.connect(save_game)
 	activity_log.changed.connect(save_records)
@@ -96,6 +103,7 @@ func _ready() -> void:
 	letters.changed.connect(save_game)
 	gratitude.changed.connect(func(): _mark_dirty("gratitude"))
 	mood.changed.connect(save_mood)
+	verdict.changed.connect(save_verdict)    # 판정은 드물다. 바뀌면 바로 쓴다
 		
 func _accumulate_play_day() -> void:
 	var now_ms := Time.get_ticks_msec()
@@ -286,6 +294,7 @@ func quit_game() -> void:
 	save_todo()
 	save_gratitude()
 	save_mood()
+	save_verdict()
 	get_tree().quit()
 	
 # 원본이 삭제된 참조형 이벤트(journal/mood/gratitude) 판정.
@@ -367,3 +376,23 @@ func load_mood() -> void:
 	var parsed = JSON.parse_string(text)
 	if typeof(parsed) == TYPE_DICTIONARY:
 		mood.from_dict(parsed)
+
+func save_verdict() -> void:
+	var data := verdict.to_dict()
+	data["version"] = VERDICT_VERSION
+	var file := FileAccess.open(_path(VERDICT_FILE), FileAccess.WRITE)
+	if file == null:
+		push_warning("Fail to Save verdict: %s" % FileAccess.get_open_error())
+		return
+	file.store_string(JSON.stringify(data, "	"))
+	file.close()
+
+func load_verdict() -> void:
+	var file := FileAccess.open(_path(VERDICT_FILE), FileAccess.READ)
+	if file == null:
+		return
+	var text := file.get_as_text()
+	file.close()
+	var parsed = JSON.parse_string(text)
+	if typeof(parsed) == TYPE_DICTIONARY:
+		verdict.from_dict(parsed)

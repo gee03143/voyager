@@ -540,14 +540,14 @@ func choose(labels: Array) -> int:
 
 ## 이름 입력 칸. 적은 이름을 돌려준다. 비워두거나 나중에를 골라도, 중단돼도 빈 문자열이다 —
 ## 셋을 가르는 것은 재생기가 aborted 로 한다
-func ask_name(placeholder: String, tell_label: String, later_label: String, prefill := "") -> String:
+func ask_name(placeholder: String, tell_label: String, later_label: String, prefill := "", max_len := 12) -> String:
 	if aborted:
 		return ""
 	_pending = null
 	_clear_choices()
 	var edit := LineEdit.new()
 	edit.placeholder_text = placeholder
-	edit.max_length = 12
+	edit.max_length = max_len
 	edit.text = prefill                          # 다시 받을 때 앞서 적은 이름을 고치기만 하면 되게
 	edit.caret_column = prefill.length()
 	edit.custom_minimum_size = Vector2(240, 0)

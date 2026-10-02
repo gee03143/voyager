@@ -85,6 +85,7 @@ func _ready() -> void:
 		add_child(console)
 		console.setup(_shell)
 	_main_shell.hazel_called.connect(_call_hazel)
+	_main_shell.verdict_requested.connect(_call_hazel.bind(true))
 	_main_shell.note_pinned.connect(_on_note_pinned)
 	_view.act_finished.connect(_schedule_act)
 	_schedule_act()
@@ -144,7 +145,8 @@ func _is_onboarding() -> bool:
 
 ## 방을 눌렀다. 헤이즐은 한 번에 한 곳에만 있다 — 시메지를 거두고 셸의 대화 모드로 들어간다.
 ## 주 창은 숨길 수 없어 모든 모니터 밖으로 옮긴다(docs/architecture/transparent-window.md)
-func _call_hazel() -> void:
+## verdict 면 홈에서 불렀다. 대화가 곧장 하루 판정으로 열린다(docs/specs/day-verdict.md)
+func _call_hazel(verdict := false) -> void:
 	if _is_away() or _falling or _press != Press.NONE:
 		return
 	_walk_left = 0.0
@@ -156,7 +158,7 @@ func _call_hazel() -> void:
 	_call = CALL_SCRIPT.new()
 	add_child(_call)
 	_call.ended.connect(_on_call_ended)
-	_call.start(_shell, _main_shell)
+	_call.start(_shell, _main_shell, verdict)
 
 
 ## 대화가 끝났거나 셸이 닫혔다. 불려가기 직전 자리로 돌아와 내려앉는다

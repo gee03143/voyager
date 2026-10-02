@@ -2,12 +2,14 @@ extends HBoxContainer
 
 signal note_pinned               # 쪽지가 꽂혔다. 시메지 루트가 받아 수첩 적기를 시킨다(docs/specs/hazel-room.md)
 signal hazel_called              # 방을 눌러 헤이즐을 불렀다. 시메지 루트가 받는다(docs/specs/hazel-room.md)
+signal verdict_requested         # 홈에서 하루 판정을 하러 헤이즐을 불렀다. 시메지 루트가 받는다(docs/specs/day-verdict.md)
 
 const TODO_SCENE := preload("res://scenes/todo/TodoListView.tscn")
 const HABIT_SCENE := preload("res://scenes/habittracker/HabitTrackerView.tscn")
 const TIMER_SCENE := preload("res://scenes/timer/TimerDashboard.tscn")
 const RECORD_SCENE := preload("res://scenes/record/RecordDashboard.tscn")
 const JOURNAL_SCENE := preload("res://scenes/record/journal/JournalDashboard.tscn")
+const HOME_SCENE := preload("res://scenes/home/HomeView.tscn")
 
 const NAV_TARGETS := {&"todo": 1, &"habit": 2, &"timer": 3, &"record": 5, &"journal": 4}
 
@@ -29,6 +31,7 @@ const NAV_FILL_SEC := 0.18
 @onready var banner: PanelContainer = $MainColumn/Banner
 
 const CONTENT_SCENES := {
+	0: HOME_SCENE,
 	1: TODO_SCENE,
 	2: HABIT_SCENE,
 	3: TIMER_SCENE,
@@ -48,6 +51,8 @@ var _empty_style := StyleBoxEmpty.new()
 
 func _ready() -> void:
 	_init_swap_wrap()
+	# 풀에 하나만 있는 패널이라 한 번만 잇는다. 홈이 처음 보이기 전에 이어 둔다
+	PanelPool.get_instance(HOME_SCENE, null).verdict_requested.connect(verdict_requested.emit)
 	_nav.setup_from(nav_list, false, NAV_FILL_SEC)
 	_nav.selected.connect(_on_nav_selected)
 	_nav.select(0)

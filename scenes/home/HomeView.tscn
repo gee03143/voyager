@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/home/home_view.gd" id="1_home"]
+
+[node name="HomeView" type="VBoxContainer"]
+offset_right = 709.0
+offset_bottom = 498.0
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+script = ExtResource("1_home")
+
+[node name="VerdictCard" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_type_variation = &"VgCard"
+
+[node name="VBox" type="VBoxContainer" parent="VerdictCard"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Caption" type="Label" parent="VerdictCard/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"VgMutedLabel"
+
+[node name="NameLabel" type="Label" parent="VerdictCard/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+autowrap_mode = 3
+
+[node name="DateLabel" type="Label" parent="VerdictCard/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"VgMutedLabel"
+
+[node name="CallButton" type="Button" parent="VerdictCard/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"VgActionButton"
+text = "HOME_VERDICT_CALL"

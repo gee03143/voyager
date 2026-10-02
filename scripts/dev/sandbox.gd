@@ -20,7 +20,7 @@ const ARG_LEGACY := "--sandbox"
 const DIR := "user://sandbox/"
 const REAL_DIR := "user://"
 ## Save 가 쓰는 파일. 이름은 save.gd 의 *_FILE 과 같아야 한다
-const SAVE_FILES := ["save.json", "records.json", "journal.json", "todo.json", "gratitude.json", "mood.json"]
+const SAVE_FILES := ["save.json", "records.json", "journal.json", "todo.json", "gratitude.json", "mood.json", "verdict.json"]
 const LEGACY_FILES := ["dev.json"]           # 실행 사이에 이어 쓰던 때(--sandbox)의 흔적. 샌드박스 폴더 안에만 있다
 
 static var _mode := Mode.OFF
