@@ -22,9 +22,12 @@ const GRAVITY := 2000.0
 const FOREHEAD_EXIT_MARGIN := 12.0   # 이마를 이만큼 벗어나야 들기로 넘어간다
 
 enum Press { NONE, PETTING, DRAGGING }
+## 바탕화면에 있는가(docs/specs/settings.md 의 "내보내기"). 설정의 hazel_on_desktop 을 따라간다
+enum Desk { HERE, LEAVING, AWAY, ARRIVING }
 
 ## 자기 일 사이의 간격. spec 초안값은 하루 3~5회라 F6 로는 확인이 안 된다.
 ## 그래서 디버그 실행에서만 짧게 준다. 내보낸 빌드는 진짜 간격으로 돈다.
+# ⚠️ 간격과 걷기 시간은 방 안의 헤이즐(room_hazel.gd)에 같은 값이 옮겨 적혀 있다. 바꿀 때 같이 바꾼다
 const ACT_GAP_RELEASE := Vector2(14400.0, 28800.0)   # 4~8시간
 const ACT_GAP_DEBUG := Vector2(8.0, 18.0)
 const WALK_SPEED := 46.0                             # 초당 픽셀
@@ -32,6 +35,7 @@ const WALK_TIME_RELEASE := Vector2(12.0, 25.0)
 const WALK_TIME_DEBUG := Vector2(7.0, 12.0)
 const MENU_QUIT_ID := 100
 const AWAY_POS := Vector2i(-20000, -20000)           # 헤이즐이 방에 불려가 있는 동안의 창 자리. 모든 모니터 밖
+const DESK_WALK_SPEED := 120.0                       # 나가고 들어오는 걸음. 평소 걷기보다 빠르다 — 떠나는 데 오래 걸리면 미련으로 읽힌다
 
 ## 우클릭 메뉴. 값은 NavList 순서이고 0 이 홈이다.
 const MENU_ITEMS := [
@@ -68,6 +72,11 @@ var _fall_v := 0.0
 var _act_wait := 0.0
 var _walk_left := 0.0
 
+var _desk := Desk.HERE
+var _desk_x := 0.0                    # 나가고 들어오는 걸음의 창 x. 정수 자리로 반올림하면 느린 프레임에서 멈춘다
+var _desk_to := 0.0
+var _desk_walk := false               # 바탕화면 걸음이 준비됐다. 들어오기 전 방에서 걸어 나가는 동안은 거짓이다
+
 
 func _ready() -> void:
 	get_tree().root.gui_embed_subwindows = false   # 셸을 진짜 OS 창으로 띄운다
@@ -88,9 +97,12 @@ func _ready() -> void:
 	_main_shell.verdict_requested.connect(_call_hazel.bind(true))
 	_main_shell.note_pinned.connect(_on_note_pinned)
 	_view.act_finished.connect(_schedule_act)
+	Save.settings.changed.connect(_reconcile_desk)
 	_schedule_act()
 	if onboarding:
-		_start_onboarding()
+		_start_onboarding()                     # 온보딩 동안은 설정과 상관없이 바탕화면에 있다. 끝나면 맞춘다
+	elif not Save.settings.hazel_on_desktop:
+		_set_away()                             # 내보낸 채로 켰다. 걸어 나가지 않고 처음부터 없다
 
 
 # ── 온보딩(docs/specs/onboarding.md) ──
@@ -135,6 +147,7 @@ func _on_onboarding_ended(completed: bool) -> void:
 	_main_shell.set_banner_suspended(false)
 	_view.visible = true
 	_schedule_act()
+	_reconcile_desk()
 
 
 func _is_onboarding() -> bool:
@@ -146,25 +159,41 @@ func _is_onboarding() -> bool:
 ## 방을 눌렀다. 헤이즐은 한 번에 한 곳에만 있다 — 시메지를 거두고 셸의 대화 모드로 들어간다.
 ## 주 창은 숨길 수 없어 모든 모니터 밖으로 옮긴다(docs/architecture/transparent-window.md)
 ## verdict 면 홈에서 불렀다. 대화가 곧장 하루 판정으로 열린다(docs/specs/day-verdict.md)
+## 바탕화면에서 내보낸 동안에도 부를 수 있다. 셸 안으로만 들어왔다 나간다
 func _call_hazel(verdict := false) -> void:
-	if _is_away() or _falling or _press != Press.NONE:
+	if _is_onboarding() or _call != null or _falling or _press != Press.NONE:
 		return
-	_walk_left = 0.0
-	_view.stop_act()
-	var w := get_window()
-	_call_from = w.position
-	_view.visible = false
-	w.position = AWAY_POS
+	if _desk == Desk.LEAVING or _desk == Desk.ARRIVING:
+		return                                  # 걷는 중이다. 한 번에 한 곳에만 있다
+	var room_x := -1.0
+	if _desk == Desk.HERE:
+		_walk_left = 0.0
+		_view.stop_act()
+		var w := get_window()
+		_call_from = w.position
+		_view.visible = false
+		w.position = AWAY_POS
+	else:
+		room_x = _room_hazel().room_x()         # 방 안에 있다. 그 자리에서 대화가 시작된다
+		_room_hazel().paused = true
 	_call = CALL_SCRIPT.new()
 	add_child(_call)
 	_call.ended.connect(_on_call_ended)
-	_call.start(_shell, _main_shell, verdict)
+	_call.start(_shell, _main_shell, verdict, room_x)
 
 
 ## 대화가 끝났거나 셸이 닫혔다. 불려가기 직전 자리로 돌아와 내려앉는다
 func _on_call_ended() -> void:
+	var end_x: float = _call.end_room_x
 	_call.queue_free()
 	_call = null
+	if _desk == Desk.AWAY:
+		# 내보낸 동안 불렀다. 바탕화면으로 돌아오지 않고 방의 대화가 끝난 자리에 남는다
+		var rh := _room_hazel()
+		rh.place(end_x)
+		rh.paused = false
+		_reconcile_desk()
+		return
 	get_window().position = _call_from
 	_view.visible = true
 	_view.land()
@@ -174,6 +203,9 @@ func _on_call_ended() -> void:
 ## 방에 쪽지가 꽂혔다. 바탕화면의 헤이즐이 수첩을 꺼내 적는다 — 몸과 쪽지가 이어진다.
 ## 다른 일을 하는 중이면(자기 일·만지기·떨어지기·자리 비움) 동작은 생략하고 쪽지만 꽂힌다
 func _on_note_pinned() -> void:
+	if _desk == Desk.AWAY and _call == null:
+		_room_hazel().write()                   # 방 안에 있다. 그 자리에서 적는다
+		return
 	if _is_away() or _falling or _press != Press.NONE:
 		return
 	if _view.is_acting() or _view.pose != VIEW_SCRIPT.Pose.IDLE:
@@ -181,9 +213,104 @@ func _on_note_pinned() -> void:
 	_view.start_act(VIEW_SCRIPT.Act.WRITE)
 
 
-## 헤이즐이 바탕화면에 없다. 온보딩 중이거나 방에 불려가 있다
+## 헤이즐이 바탕화면에 없다. 온보딩 중이거나, 방에 불려가 있거나, 내보냈거나 나가고 들어오는 중이다
 func _is_away() -> bool:
-	return _is_onboarding() or _call != null
+	return _is_onboarding() or _call != null or _desk != Desk.HERE
+
+
+# ── 내보내기·다시 부르기(docs/specs/settings.md 의 "내보내기") ──
+
+## 설정과 지금 자리를 맞춘다. 걷는 중이면 그 걸음이 끝날 때 다시 불린다.
+## 온보딩·부르기·만지기·떨어지기 중에도 미룬다 — 그것들이 끝나는 자리에서 다시 불린다
+func _reconcile_desk() -> void:
+	if _is_onboarding() or _call != null or _falling or _press != Press.NONE:
+		return
+	var want := Save.settings.hazel_on_desktop
+	if _desk == Desk.HERE and not want:
+		_start_leaving()
+	elif _desk == Desk.AWAY and want:
+		_start_arriving()
+
+
+## 가장 가까운 화면 가장자리로 걸어가 밖으로 나간다. 말은 없다
+func _start_leaving() -> void:
+	_desk = Desk.LEAVING
+	_view.stop_act()
+	_walk_left = 0.0
+	var w := get_window()
+	var rect := DisplayServer.screen_get_usable_rect(w.current_screen)
+	var center := w.position.x + WIN_SIZE.x * 0.5
+	var dir := -1 if center - rect.position.x < rect.end.x - center else 1
+	_desk_x = w.position.x
+	_desk_to = rect.position.x - WIN_SIZE.x if dir < 0 else rect.end.x   # 창이 화면 밖으로 다 나가는 자리
+	_desk_walk = true
+	_view.start_act(VIEW_SCRIPT.Act.WALK)
+	_view.walk_dir = dir
+
+
+## 방에서 왼쪽으로 걸어 나간 뒤, 셸이 있는 화면의 오른쪽 아래 가장자리 밖에서 걸어 들어온다. 처음 왔던 쪽이다.
+## 셸이 닫혀 있으면 방 쪽 걸음은 보이지 않으니 걷지 않는다
+func _start_arriving() -> void:
+	_desk = Desk.ARRIVING
+	_desk_walk = false
+	await _room_hazel().leave(_shell.visible)
+	var w := get_window()
+	w.current_screen = _shell.current_screen
+	var rect := DisplayServer.screen_get_usable_rect(_shell.current_screen)
+	_desk_x = rect.end.x
+	_desk_to = rect.end.x - WIN_SIZE.x - SCREEN_MARGIN.x
+	w.position = Vector2i(int(_desk_x), rect.end.y - FOOT_LINE)   # 발이 작업표시줄 위에 선다
+	_view.visible = true
+	_desk_walk = true
+	_view.start_act(VIEW_SCRIPT.Act.WALK)
+	_view.walk_dir = -1
+
+
+func _tick_desk(delta: float) -> void:
+	if not _desk_walk:
+		return
+	var dir := 1.0 if _desk_to > _desk_x else -1.0
+	_desk_x += dir * DESK_WALK_SPEED * delta
+	var done := (_desk_to - _desk_x) * dir <= 0.0
+	if done:
+		_desk_x = _desk_to
+	var w := get_window()
+	w.position = Vector2i(int(round(_desk_x)), w.position.y)
+	if not done:
+		return
+	_view.stop_act()
+	_desk_walk = false
+	if _desk == Desk.LEAVING:
+		_set_away(true)
+	else:
+		_desk = Desk.HERE
+		_view.land()
+		_save_position()
+		_schedule_act()
+	_reconcile_desk()                           # 걷는 동안 스위치가 또 바뀌었으면 지금 값으로 다시 맞춘다
+
+
+## 바탕화면에 없는 상태로 둔다. 창은 모든 모니터 밖에 있다 — 주 창은 숨길 수 없다(docs/architecture/transparent-window.md).
+## 헤이즐은 자기 방으로 들어간다. walk 면 셸이 보일 때 방 왼쪽에서 걸어 들어오고, 아니면 제자리에 바로 선다
+func _set_away(walk := false) -> void:
+	_desk = Desk.AWAY
+	_view.stop_act()
+	_walk_left = 0.0
+	_view.visible = false
+	get_window().position = AWAY_POS
+	_room_hazel().enter(walk and _shell.visible)
+
+
+func _room_hazel() -> Node2D:
+	return _main_shell.room_hazel()
+
+
+## 셸 닫기. 평소엔 숨기기고, 헤이즐을 내보낸 동안은 남는 창이 없으니 저장하고 끝낸다
+func _on_shell_close() -> void:
+	if _desk == Desk.AWAY or _desk == Desk.LEAVING:
+		Save.quit_game()
+		return
+	_shell.hide()
 
 
 func _setup_root_window() -> void:
@@ -227,7 +354,7 @@ func _build_shell() -> void:
 		_main_shell = MAIN_SHELL.instantiate()
 	_shell.add_child(_main_shell)
 	add_child(_shell)
-	_shell.close_requested.connect(_shell.hide)    # 닫기는 숨기기다. 앱은 안 끝난다
+	_shell.close_requested.connect(_on_shell_close)   # 닫기는 숨기기다. 앱은 안 끝난다 — 헤이즐을 내보낸 동안만 빼고
 	Screen.bind_shell(_shell)
 
 
@@ -338,6 +465,7 @@ func _end_press() -> void:
 func _finish_landing() -> void:
 	_view.land()
 	_save_position()
+	_reconcile_desk()                           # 들고 있는 동안 스위치가 바뀌었을 수 있다
 
 
 ## 발바닥이 닿는 높이. 작업표시줄을 뺀 영역의 아래끝이다
@@ -351,6 +479,7 @@ func _process(delta: float) -> void:
 	elif _falling:
 		_tick_swing(delta, true)
 		_tick_fall(delta)
+	_tick_desk(delta)
 	_tick_act(delta)
 
 

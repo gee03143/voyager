@@ -85,6 +85,10 @@ func set_banner_suspended(on: bool) -> void:
 func hazel_room() -> Control:
 	return $MainColumn/Banner.room
 
+# 바탕화면에서 내보낸 헤이즐이 들어가 사는 방 안의 몸(docs/specs/settings.md). 시메지 루트가 부른다
+func room_hazel() -> Node2D:
+	return $MainColumn/Banner.room_hazel
+
 # 헤이즐 부르기의 대화가 도구로 안내할 때도 부른다. target 은 NAV_TARGETS 의 키다
 func navigate(target: StringName) -> void:
 	_on_banner_navigate(target)

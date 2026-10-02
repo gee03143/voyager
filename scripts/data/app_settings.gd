@@ -42,6 +42,7 @@ var onboarded_in_file := false           # 불러온 파일에 onboarded 키가 
 
 # 설정의 헤이즐 탭(docs/specs/settings.md)
 var birthday: String = ""                # "MM-DD". 연도는 받지 않는다. 비우면 없음
+var hazel_on_desktop: bool = true        # 끄면 시메지만 물러난다. 방·부르기·판정은 그대로다
 
 func to_dict() -> Dictionary:
 	return {
@@ -67,6 +68,7 @@ func to_dict() -> Dictionary:
 		"onboarded": onboarded,
 		"nickname": nickname,
 		"birthday": birthday,
+		"hazel_on_desktop": hazel_on_desktop,
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -105,3 +107,4 @@ func from_dict(d: Dictionary) -> void:
 	onboarded = bool(d.get("onboarded", onboarded))
 	nickname = str(d.get("nickname", nickname))
 	birthday = str(d.get("birthday", birthday))
+	hazel_on_desktop = bool(d.get("hazel_on_desktop", hazel_on_desktop))

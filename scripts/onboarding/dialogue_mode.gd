@@ -334,6 +334,14 @@ func enter_from_left(x: float, with_trunk := true) -> void:
 	await walk_to(x, with_trunk)
 
 
+## 이미 방 안에 있던 헤이즐을 x 에 세운다. 걸어 들어오지 않는다(바탕화면에서 내보낸 동안의 부르기)
+func place_at(x: float) -> void:
+	_placed = true
+	hazel.position = Vector2(x, floor_y())
+	hazel.visible = true
+	trunk.visible = false
+
+
 ## 창 왼쪽 가장자리 밖으로 걸어 나간다(헤이즐 부르기의 끝)
 func exit_left() -> void:
 	_bubble.visible = false

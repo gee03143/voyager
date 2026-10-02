@@ -2,7 +2,8 @@ extends Control
 
 ## 헤이즐의 방(docs/specs/hazel-room.md). 셸 상단에서 들여다보이는 방 한 칸을 그린다.
 ##
-## 방에는 헤이즐이 없다. 헤이즐의 몸은 바탕화면 시메지에 있다.
+## 헤이즐의 몸이 바탕화면 시메지에 있는 동안 방에는 헤이즐이 없다. 내보내면 방 안에 들어와 산다 —
+## 그 몸은 이 노드가 그리지 않고 배너가 붙이는 room_hazel.gd 가 맡는다(docs/specs/settings.md).
 ## 그리는 것은 헤이즐이 모은 날들이다 — 온 날마다 수첩 한 권, 계절이 바뀌면 묶여 트렁크 위로.
 ##
 ## 기록은 읽기만 한다. 만난 날은 ActivityLog.play_days 의 날짜 키로 센다. 새 데이터를 만들지 않는다.
@@ -150,6 +151,15 @@ static func season_start(iso: String) -> String:
 ## 방 좌표를 화면 좌표로 바꾸는 배율
 func _zoom() -> float:
 	return size.x / LAYOUT_W if fill else 1.0
+
+
+## 방 좌표의 x 를 이 노드 기준 화면 좌표로. 방 안의 헤이즐을 대화 모드의 방에 같은 자리로 세울 때 쓴다
+func to_screen_x(room_x: float) -> float:
+	return room_x * _zoom()
+
+
+func to_room_x(screen_x: float) -> float:
+	return screen_x / _zoom()
 
 
 ## 트렁크 가운데의 x. 이 노드 기준 화면 좌표다. 온보딩이 헤이즐의 트렁크를 이 자리에 놓는다

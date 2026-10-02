@@ -9,6 +9,9 @@ extends Node
 ## 셸이 닫히면 중단한다. 답을 받은 직후마다 aborted 를 보고 그 자리에서 멈춘다.
 ##
 ## 홈에서 부르면 대화가 곧장 하루 판정으로 열린다(docs/specs/day-verdict.md).
+##
+## 바탕화면에서 내보낸 동안에는 헤이즐이 이미 방 안에 있다. 걸어 들어오지 않고 그 자리에서 시작하고,
+## 끝나도 나가지 않는다. 끝난 자리를 end_room_x 에 남긴다 — 셸 상단의 방이 같은 자리에 세운다(docs/specs/settings.md).
 
 signal ended
 
@@ -38,10 +41,13 @@ const GOTO_TARGETS := {
 
 var _dialogue: DIALOGUE_SCRIPT
 var _main_shell: Node
+var _room_x := -1.0                              # 방 안에서 시작하면 그 자리. 방 좌표. 아니면 음수
+var end_room_x := -1.0                           # 방 안에서 시작했을 때 끝난 자리. 방 좌표. 중단되면 음수로 남는다
 
 
-func start(shell: Window, main_shell: Node, verdict := false) -> void:
+func start(shell: Window, main_shell: Node, verdict := false, room_x := -1.0) -> void:
 	_main_shell = main_shell
+	_room_x = room_x
 	_dialogue = DIALOGUE_SCRIPT.new()
 	shell.add_child(_dialogue)                   # MainShell 뒤에 붙어 위에 그려진다
 	shell.close_requested.connect(_dialogue.abort)
@@ -58,9 +64,7 @@ func start(shell: Window, main_shell: Node, verdict := false) -> void:
 
 func _play() -> void:
 	var d := _dialogue
-	await get_tree().process_frame               # 대화 모드가 창 크기를 받은 뒤에 자리를 잡는다
-	await d.enter_from_left(d.size.x * DIALOGUE_SCRIPT.HAZEL_AT, false)
-	d.hazel.walk_dir = 1                         # 선택지가 뜨는 오른쪽을 본다
+	await _enter()
 	await d.wait(0.3)
 	var r := CompanionEngine.talk_open(Companion.today_done_count(), Companion.is_first_time())
 	var goto := &""
@@ -85,16 +89,13 @@ func _play() -> void:
 		return
 	if goto != &"":
 		_main_shell.navigate(goto)               # 대화 모드가 덮고 있는 동안 바꿔 둔다. 걷히면 그 도구가 보인다
-	await d.exit_left()
-	await d.dismiss()
+	await _leave()
 
 
 ## 하루 판정. 헤이즐이 수첩을 펴고 이름을 묻는다. 받아 적어 방의 트렁크에 넣고 나간다
 func _play_verdict() -> void:
 	var d := _dialogue
-	await get_tree().process_frame
-	await d.enter_from_left(d.size.x * DIALOGUE_SCRIPT.HAZEL_AT, false)
-	d.hazel.walk_dir = 1
+	await _enter()
 	await d.wait(0.3)
 	if not Save.verdict.can_judge(DateUtil.now_unix()):
 		# 홈이 열어둔 사이에 판정이 이미 들어갔다. 한 번 정하면 끝이다
@@ -164,11 +165,28 @@ func _verdict_later() -> void:
 	await _leave()
 
 
+## 대화 모드가 창 크기를 받은 뒤에 자리를 잡는다. 방 안에 있었으면 그 자리에 서 있고, 아니면 왼쪽에서 걸어 들어온다
+func _enter() -> void:
+	var d := _dialogue
+	await get_tree().process_frame
+	if _room_x >= 0.0:
+		d.place_at(d.room.to_screen_x(_room_x))
+	else:
+		await d.enter_from_left(d.size.x * DIALOGUE_SCRIPT.HAZEL_AT, false)
+	d.hazel.walk_dir = 1                         # 선택지가 뜨는 오른쪽을 본다
+
+
+## 방 안에서 시작했으면 나가지 않고 그 자리에 남는다. 바탕화면에서 왔으면 왼쪽으로 걸어 나간다
 func _leave() -> void:
 	var d := _dialogue
 	if d.aborted:
 		return
 	d.set_face(FACE.NONE)
+	if _room_x >= 0.0:
+		end_room_x = d.room.to_room_x(d.hazel.position.x)
+		d.hide_bubble()
+		await d.dismiss()
+		return
 	await d.exit_left()
 	await d.dismiss()
 

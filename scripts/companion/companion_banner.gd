@@ -17,6 +17,7 @@ const OPTIONS_FADE_SEC := 0.15  # 말이 끝난 뒤 선택지가 스며드는 �
 const VOICE_EVERY := 3          # 글자마다 울리면 시끄럽다
 const VOICE_MIN_GAP_MS := 60    # 상한에 걸려 빨라져도 소리가 몰리지 않게
 const ROOM_SCRIPT := preload("res://scripts/room/hazel_room.gd")
+const ROOM_HAZEL_SCRIPT := preload("res://scripts/room/room_hazel.gd")
 const BUBBLE_W := 380.0         # 방을 가리지 않도록 쪽지를 오른쪽에 이 폭으로 붙인다
 const TACK_SCRIPT := preload("res://scripts/room/note_tack.gd")
 const STAMP_SIZE := 72.0        # 쪽지에 겹쳐 찍히는 도장 크기
@@ -50,6 +51,7 @@ var _said := ""                 # 지금 떠 있는 문구 줄
 var _said_meta := ""            # 지금 떠 있는 보조 줄 — 둘 다 같을 때만 다시 안 찍는다
 var _suspended := false         # 온보딩 동안 — 쪽지를 꽂지 않고 어떤 반응도 그리지 않는다(발화음도 안 난다)
 var room: Control               # 헤이즐의 방. 온보딩이 트렁크를 놓는다
+var room_hazel: Node2D          # 방 안의 헤이즐. 바탕화면에서 내보냈을 때만 보인다(docs/specs/settings.md)
 
 ## 온보딩이 배너를 멈추고 되살린다(docs/specs/onboarding.md).
 ## 멈춘 동안 방은 헤이즐이 오기 전 모습이다 — 트렁크도 수첩도 없다. 쪽지는 거둔다.
@@ -102,8 +104,12 @@ func _build_room() -> void:
 	room = ROOM_SCRIPT.new()
 	add_child(room)
 	move_child(room, 0)                            # 쪽지 뒤에 깔린다
+	room.clip_contents = true                      # 방 안의 헤이즐이 가장자리 밖으로 걸어 나가면 안 보인다
+	room_hazel = ROOM_HAZEL_SCRIPT.new()
+	room_hazel.room = room
+	room.add_child(room_hazel)
 	_apply_arrival()
-	avatar_slot.visible = false                    # 방에 헤이즐을 그리지 않는다. 몸은 바탕화면에 있다
+	avatar_slot.visible = false                    # 헤이즐의 몸은 바탕화면에 있다. 내보냈을 때만 방 안에 선다(room_hazel)
 	# 쪽지가 폭을 다 차지하면 방이 가려진다. 오른쪽에 좁게 붙이고 왼쪽을 방에 내준다
 	bubble.size_flags_horizontal = Control.SIZE_SHRINK_END
 	bubble.custom_minimum_size.x = BUBBLE_W

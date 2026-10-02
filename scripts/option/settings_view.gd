@@ -22,6 +22,7 @@ var _nickname: LineEdit
 var _voice: HSlider
 var _month: OptionButton
 var _day: OptionButton
+var _desktop: CheckButton
 
 
 func _ready() -> void:
@@ -63,6 +64,7 @@ func _sync() -> void:
 	_month.select(m)
 	_fill_days(m)
 	_day.select(mini(d, _day.item_count - 1))
+	_desktop.set_pressed_no_signal(s.hazel_on_desktop)
 
 
 # ── 일반 ──
@@ -152,6 +154,13 @@ func _build_hazel() -> Control:
 	_day.item_selected.connect(func(_i: int) -> void: _commit_birthday())
 	bday.add_child(_day)
 	_row(page, "SETTINGS_BIRTHDAY", bday)
+
+	# 끄면 바탕화면의 헤이즐이 걸어 나간다. 시메지 루트가 설정 변경을 듣고 움직인다(shimeji_root.gd 의 _reconcile_desk)
+	_desktop = CheckButton.new()
+	_desktop.toggled.connect(func(on: bool) -> void:
+		Save.settings.hazel_on_desktop = on
+		Save.settings.changed.emit())
+	_row(page, "SETTINGS_HAZEL_ON_DESKTOP", _desktop)
 	return page
 
 
