@@ -49,6 +49,19 @@ status: planned
 - `sandbox` — 샌드박스 종류, 저장 위치, 앱이 받은 실행 인자를 출력한다
 - `room shelf <n>` / `room bundles <n>` / `room shelf off` / `room bundles off` — 방의 책장 수첩 수와 트렁크 위 묶음 수를 그 값으로 그려 본다. 92칸·8묶음 상한 확인용이다
 - `react todo` / `react habit` — 할 일 완료·습관 체크 반응을 흉내 낸다. 쪽지와 시메지의 수첩 적기 확인용이다
+- `taskbar` — 시메지 창의 지금 ex-style 을 출력한다. 아무것도 바꾸지 않는다
+- `taskbar hide` — 시메지 창의 작업 표시줄 버튼을 뗀다
+- `taskbar restore` — 되돌린다
+- `taskbar dance` — 창을 숨겼다 다시 보이며 뗀다. 왕복이 필요한 환경을 만났을 때 쓴다
+
+### 작업 표시줄 버튼
+
+- `taskbar hide`는 시메지 창의 `WS_EX_APPWINDOW`를 빼고 `WS_EX_TOOLWINDOW`를 붙인다
+- 왜 엔진 안에서는 못 하는지와 무엇을 확인했는지는 `docs/architecture/transparent-window.md`가 갖는다
+- ⚠️ **손으로 켜는 도구지 앱의 기능이 아니다.** 이번 실행 동안만 유효하고 다시 켜면 버튼이 돌아온다
+- 앱이 켜질 때마다 스스로 하려면 네이티브(GDExtension)가 필요하다. GDScript 에 창 스타일을 바꾸는 수단이 없다
+- PowerShell 을 띄워 창 스타일을 바꾼다. 결과는 파일로 받는다
+- ⚠️ 기다리면 안 된다. `OS.execute`로 막으면 앱이 멎는다 — 이유는 `scripts/dev/taskbar_probe.gd`의 주석에 있다
 
 ### 날짜 옮기기
 
@@ -62,6 +75,7 @@ status: planned
 ### 지켜야 할 것
 
 - `room ...`과 `react ...`는 아무것도 저장하지 않는다. 미리보기는 재시작하면 사라진다
+- `taskbar ...`도 아무것도 저장하지 않는다. 창 스타일은 재시작하면 원래대로 돌아온다
 - `onboarding`·`nickname`·`backup`은 샌드박스가 아니면 실제 저장 파일에 적용된다. 실제 기록(활동 로그·일지 등)은 건드리지 않는다
 - 모르는 명령이나 틀린 인자에는 사용법 한 줄을 출력하고 아무것도 하지 않는다
 
@@ -120,6 +134,7 @@ status: planned
 - `scripts/dev/dev_console.gd`
 - `scripts/dev/dev_console_view.gd`
 - `scripts/dev/sandbox.gd`
+- `scripts/dev/taskbar_probe.gd` — `taskbar` 명령
 - `addons/run_mode/plugin.cfg`, `addons/run_mode/plugin.gd` — 실행 모드 드롭다운
 - `scripts/shimeji_root.gd` — 콘솔을 붙인다
 - `scripts/util/due_date_util.gd` — `DateUtil`

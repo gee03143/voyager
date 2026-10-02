@@ -9,6 +9,7 @@ extends Node
 const VIEW_SCRIPT := preload("res://scripts/dev/dev_console_view.gd")
 const SANDBOX := preload("res://scripts/dev/sandbox.gd")
 const ROOM_SCRIPT := preload("res://scripts/room/hazel_room.gd")
+const TASKBAR_PROBE := preload("res://scripts/dev/taskbar_probe.gd")
 const SHELL_TITLE := "Voyager"
 
 const HELP := """help · clear
@@ -18,7 +19,8 @@ backup                       — 저장 파일 여섯 개를 복사
 date [+n|-n|YYYY-MM-DD|off]  — 샌드박스에서만, 이번 실행 동안만
 sandbox                      — 샌드박스 종류·저장 위치·받은 실행 인자
 room shelf|bundles <n>|off   — 방 미리보기(저장 안 함)
-react todo|habit             — 완료 반응 흉내(저장 안 함)"""
+react todo|habit             — 완료 반응 흉내(저장 안 함)
+taskbar [status|hide|dance|restore] — 시메지 창의 작업 표시줄 버튼(이번 실행만)"""
 
 var _view: VIEW_SCRIPT
 var _shell: Window
@@ -57,6 +59,8 @@ func _run(line: String) -> void:
 			_room(rest)
 		"react":
 			_react(rest)
+		"taskbar":
+			_taskbar(rest)
 		_:
 			_out("모르는 명령입니다. help 를 쳐보세요")
 
@@ -213,3 +217,23 @@ func _react(rest: Array) -> void:
 	else:
 		Companion.habit_completed.emit({"title": "콘솔 테스트", "remaining": 1, "gap_days": 1, "expected_gap": 1})
 	_out("react %s 보냈습니다" % rest[0])
+
+
+# ── 작업 표시줄 ──
+# 확인한 사실은 docs/architecture/transparent-window.md 의 "작업 표시줄 버튼"이 갖는다.
+# 손으로 켜는 도구다. 저장하지 않고 이번 실행 동안만 유효하다
+
+func _taskbar(rest: Array) -> void:
+	var action := String(rest[0]).to_lower() if rest.size() > 0 else "status"
+	if not (action in ["status", "hide", "dance", "restore"]):
+		_out("taskbar [status|hide|dance|restore]")
+		return
+	_out(TASKBAR_PROBE.start(action))
+	# ⚠️ 기다리지 않고 띄운 뒤 결과 파일을 지켜본다. 막으면 교착이다(taskbar_probe.gd 의 주석)
+	for i in 40:
+		await get_tree().create_timer(0.25).timeout
+		var text: String = TASKBAR_PROBE.read()
+		if text != "":
+			_out(text)
+			return
+	_out("10초 안에 결과가 안 왔다. user://taskbar_probe.txt 확인")

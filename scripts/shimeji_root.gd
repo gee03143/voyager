@@ -12,6 +12,8 @@ const ONBOARDING_SCRIPT := preload("res://scripts/onboarding/onboarding_player.g
 const STAGE_SCRIPT := preload("res://scripts/onboarding/desktop_stage.gd")
 const CALL_SCRIPT := preload("res://scripts/room/hazel_call.gd")
 const CONSOLE_SCRIPT := preload("res://scripts/dev/dev_console.gd")
+const TRAY_ICON := preload("res://icon.svg")       # 트레이 그림. 앱 아이콘을 그대로 쓴다(지금은 엔진 기본 그림)
+const TRAY_TOOLTIP := "Voyager"                    # 번역하지 않는다. 앱 이름이다
 
 const WIN_SIZE := Vector2i(280, 340)
 const FOOT_MARGIN := 40              # 발바닥이 창 아래에서 이만큼 위에 선다
@@ -54,6 +56,8 @@ var _view: Node2D
 var _shell: Window
 var _main_shell: Node
 var _menu: PopupMenu
+var _tray := -1                       # 트레이 아이콘 id. 못 만들었으면 -1 이다
+var _tray_menu := RID()               # 트레이의 우클릭 메뉴. PopupMenu 가 아니라 NativeMenu 다
 var _onboarding: Node                 # 재생 중일 때만 있다
 var _stage: Node2D                    # 온보딩 동안의 바탕화면 무대
 var _call: Node                       # 헤이즐이 방에 불려가 있는 동안만 있다
@@ -79,6 +83,7 @@ var _desk := Desk.HERE
 var _desk_x := 0.0                    # 나가고 들어오는 걸음의 창 x. 정수 자리로 반올림하면 느린 프레임에서 멈춘다
 var _desk_to := 0.0
 var _hit_clipped := false             # 창 영역을 HIT_BOX 로 잘라 두었는가
+var _cursor_shape := Input.CURSOR_ARROW   # 지금 깔아 둔 커서 모양. 바뀔 때만 Input 에 넘긴다
 var _desk_walk := false               # 바탕화면 걸음이 준비됐다. 들어오기 전 방에서 걸어 나가는 동안은 거짓이다
 
 
@@ -93,6 +98,7 @@ func _ready() -> void:
 		_main_shell.set_banner_suspended(true)
 	_build_shell()
 	_build_menu()
+	_build_tray()
 	if OS.is_debug_build():
 		var console := CONSOLE_SCRIPT.new()     # 개발자 콘솔. 셸 창에서 F12(docs/specs/dev-console.md)
 		add_child(console)
@@ -309,9 +315,13 @@ func _room_hazel() -> Node2D:
 	return _main_shell.room_hazel()
 
 
-## 셸 닫기. 평소엔 숨기기고, 헤이즐을 내보낸 동안은 남는 창이 없으니 저장하고 끝낸다
+## 셸 닫기는 숨기기다. 앱은 끝나지 않는다 — 헤이즐을 내보낸 동안에도 트레이로 돌아올 수 있다.
+## 끝내는 것은 트레이·시메지 메뉴의 종료뿐이다(docs/specs/shimeji.md).
+##
+## ⚠️ 트레이를 못 만들었고 헤이즐도 내보낸 상태면 돌아올 길도 끝낼 길도 없다. 그때만 끝낸다 —
+## 규칙이 아니라 안전망이다. Windows 에서는 걸릴 일이 없다
 func _on_shell_close() -> void:
-	if _desk == Desk.AWAY or _desk == Desk.LEAVING:
+	if _tray == -1 and (_desk == Desk.AWAY or _desk == Desk.LEAVING):
 		Save.quit_game()
 		return
 	_shell.hide()
@@ -379,6 +389,44 @@ func _on_menu_id(id: int) -> void:
 	show_shell()
 	if _main_shell != null and _main_shell.has_method("open_tool"):
 		_main_shell.open_tool(id)
+
+
+## 트레이 아이콘(docs/specs/shimeji.md 의 "트레이 아이콘"). 좌클릭은 셸 열기, 우클릭은 메뉴다.
+## 헤이즐을 바탕화면에서 내보내면 시메지를 누를 수 없어 입구가 사라진다 — 트레이가 그 자리를 맡는다.
+##
+## ⚠️ 트레이 메뉴는 PopupMenu 를 못 받는다. 엔진이 NativeMenu 의 RID 만 받는다(status_indicator_set_menu).
+## 그래서 _menu 와 같은 항목을 한 벌 더 짓는다. 항목 표(MENU_ITEMS)와 고른 뒤 할 일(_on_menu_id)은 공유한다.
+## 콜백은 tag 하나를 인자로 받으므로 _on_menu_id 가 PopupMenu 쪽과 그대로 같다
+func _build_tray() -> void:
+	if not NativeMenu.has_feature(NativeMenu.FEATURE_POPUP_MENU):
+		return                              # 이 플랫폼엔 네이티브 메뉴가 없다. 트레이를 두지 않는다
+	_tray_menu = NativeMenu.create_menu()
+	for item in MENU_ITEMS:
+		NativeMenu.add_item(_tray_menu, tr(item["key"]), _on_menu_id, Callable(), item["nav"])
+	NativeMenu.add_separator(_tray_menu)
+	NativeMenu.add_item(_tray_menu, tr("SHIMEJI_MENU_QUIT"), _on_menu_id, Callable(), MENU_QUIT_ID)
+	_tray = DisplayServer.create_status_indicator(TRAY_ICON, TRAY_TOOLTIP, _on_tray_click)
+	if _tray == -1:
+		NativeMenu.free_menu(_tray_menu)
+		_tray_menu = RID()
+		return
+	DisplayServer.status_indicator_set_menu(_tray, _tray_menu)
+
+
+## 우클릭은 엔진이 메뉴를 먼저 띄우므로 여기로 오지 않는다. 좌클릭만 처리한다
+func _on_tray_click(button: int, _at: Vector2i) -> void:
+	if button == MOUSE_BUTTON_LEFT:
+		show_shell()
+
+
+## 트레이 아이콘은 직접 거둔다. 남겨두면 앱이 끝난 뒤에도 알림 영역에 유령이 남는다
+func _exit_tree() -> void:
+	if _tray != -1:
+		DisplayServer.delete_status_indicator(_tray)
+		_tray = -1
+	if _tray_menu.is_valid():
+		NativeMenu.free_menu(_tray_menu)
+		_tray_menu = RID()
 
 
 func show_shell() -> void:
@@ -486,6 +534,7 @@ func _process(delta: float) -> void:
 	_tick_desk(delta)
 	_tick_act(delta)
 	_update_hit_area()
+	_update_cursor()
 
 
 ## 투명 창은 그려진 픽셀이 아니라 창 사각형 전체가 클릭을 받는다 — 엔진이 DwmEnableBlurBehindWindow 로만
@@ -499,10 +548,47 @@ func _update_hit_area() -> void:
 	if not clip:
 		get_window().mouse_passthrough_polygon = PackedVector2Array()
 		return
-	var r := Rect2(_view.position + HIT_BOX.position, HIT_BOX.size)
+	var r := _hit_rect()
 	get_window().mouse_passthrough_polygon = PackedVector2Array([
 		r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y),
 	])
+
+
+## 클릭을 받는 상자. 창 좌표다
+func _hit_rect() -> Rect2:
+	return Rect2(_view.position + HIT_BOX.position, HIT_BOX.size)
+
+
+## 커서가 헤이즐 위에 있으면 모양을 바꿔 만질 수 있다는 것을 보인다.
+## 이마는 쓰다듬기라 손가락, 그 밖은 들어올리기라 옮기기다 — commonui/drag_handle.gd 와 같은 관례다.
+##
+## 들고 가는 동안은 상자를 벗어나도 옮기기를 유지한다. 잡고 있는데 모양이 풀리면 놓은 것처럼 읽힌다.
+##
+## ⚠️ 창 영역 밖은 모션 이벤트가 오지 않는다(잘려서 커서가 다른 창 위에 있다) — 들어온 것도 나간 것도
+## 이벤트로는 알 수 없어 매 프레임 커서 자리를 직접 본다(docs/architecture/transparent-window.md)
+func _update_cursor() -> void:
+	var shape := Input.CURSOR_ARROW
+	if _press == Press.PETTING:
+		shape = Input.CURSOR_POINTING_HAND
+	elif _press == Press.DRAGGING and _drag_moved:
+		shape = Input.CURSOR_MOVE
+	elif not _is_away():
+		var at := _window_mouse()
+		if _hit_rect().has_point(at):
+			var forehead: bool = _view.is_forehead(_view.to_local(at))
+			shape = Input.CURSOR_POINTING_HAND if forehead else Input.CURSOR_MOVE
+	if shape == _cursor_shape:
+		return
+	_cursor_shape = shape
+	# Input 의 기본 모양은 앱 전체에 하나뿐이다(4.6 core/input/input.cpp 의 default_shape).
+	# 헤이즐을 벗어나면 화살표로 되돌려야 셸의 빈 자리까지 모양이 따라가지 않는다
+	Input.set_default_cursor_shape(shape)
+
+
+## 커서의 창 좌표. 창이 1:1 로 그려지므로 전역 좌표에서 창 자리만 뺀다.
+## 이벤트의 로컬 좌표를 쓰지 않는 이유는 _begin_press 와 같다 — 창이 움직이면 기준이 같이 흔들린다
+func _window_mouse() -> Vector2:
+	return Vector2(DisplayServer.mouse_get_position() - get_window().position)
 
 
 ## 다음 자기 일까지의 대기. 행동이 끝날 때마다 다시 잡는다
