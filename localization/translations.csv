@@ -285,3 +285,13 @@ HOME_VERDICT_TOTAL,이름 붙인 날 {n}일,{n} days named
 VERDICT_STAMP_HELD,쥠,H
 VERDICT_STAMP_ENDURED,버,G
 VERDICT_STAMP_DRIFTED,흘,S
+HOME_TODO_TITLE,할 일,Tasks
+HOME_TODO_DUE,오늘까지,Due today
+HOME_TODO_DONE,오늘 끝낸 것,Done today
+HOME_TODO_EMPTY,오늘까지인 할 일이 없어요,Nothing due today
+HOME_HABIT_TITLE,습관,Habits
+HOME_HABIT_EMPTY,오늘 할 습관이 없어요,No habits for today
+HOME_FOCUS_TITLE,오늘 집중,Focus today
+HOME_FOCUS_VALUE,{min}분 · {n}회,{min} min · {n} sessions
+HOME_FOCUS_EMPTY,오늘 집중한 기록이 없어요,No focus sessions today
+HOME_MORE,+{n}개,+{n} more

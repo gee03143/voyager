@@ -41,7 +41,7 @@ window/vsync/vsync_mode=0
 
 [editor]
 
-run/main_run_args="--sandbox-empty"
+run/main_run_args="--sandbox-copy"
 
 [editor_plugins]
 

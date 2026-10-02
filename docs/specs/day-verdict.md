@@ -114,6 +114,7 @@ status: planned
 ### 홈 패널
 
 - `scenes/home/HomeView.tscn` + `scripts/home/home_view.gd`. `MainShell.CONTENT_SCENES`의 0번이다
+- 홈 전체의 배치와 오늘 카드는 `docs/specs/home.md`가 갖는다
 - 최근 판정 카드는 씬이 아니라 `home_view.gd`가 코드로 만든다. 도장 하나는 `scripts/home/verdict_stamp.gd`가 그린다
 - 도장 글자는 번역 키(`VERDICT_STAMP_*`)다. 언어마다 한 글자를 고른다
 - 이전까지 0번은 비어 있었다

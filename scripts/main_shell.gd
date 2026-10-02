@@ -52,7 +52,9 @@ var _empty_style := StyleBoxEmpty.new()
 func _ready() -> void:
 	_init_swap_wrap()
 	# 풀에 하나만 있는 패널이라 한 번만 잇는다. 홈이 처음 보이기 전에 이어 둔다
-	PanelPool.get_instance(HOME_SCENE, null).verdict_requested.connect(verdict_requested.emit)
+	var home := PanelPool.get_instance(HOME_SCENE, null)
+	home.verdict_requested.connect(verdict_requested.emit)
+	home.navigate_requested.connect(navigate)
 	_nav.setup_from(nav_list, false, NAV_FILL_SEC)
 	_nav.selected.connect(_on_nav_selected)
 	_nav.select(0)
